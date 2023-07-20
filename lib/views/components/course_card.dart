@@ -15,7 +15,7 @@ class CourseCard extends StatelessWidget {
   Widget build(context) {
     return GestureDetector(
       onTap: () {
-        context.push("/modules/?courseId=1");
+        context.push("/modules/?courseId=${course.id}&courseName=${course.name}");
       },
       child: Card(
         semanticContainer: true,

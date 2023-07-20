@@ -9,21 +9,19 @@ part of 'lesson.dart';
 Lesson _$LessonFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    requiredKeys: const ['id', 'is_liked', 'title', 'content', 'question'],
+    requiredKeys: const ['id', 'name', 'is_unlocked', 'is_complete'],
   );
   return Lesson(
     id: json['id'] as int,
-    title: json['title'] as String,
-    content: json['content'] as String,
-    isLiked: json['is_liked'] as bool,
-    question: Question.fromJson(json['question'] as Map<String, dynamic>),
+    name: json['name'] as String,
+    isComplete: json['is_complete'] as bool,
+    isUnlocked: json['is_unlocked'] as bool,
   );
 }
 
 Map<String, dynamic> _$LessonToJson(Lesson instance) => <String, dynamic>{
       'id': instance.id,
-      'is_liked': instance.isLiked,
-      'title': instance.title,
-      'content': instance.content,
-      'question': instance.question,
+      'name': instance.name,
+      'is_unlocked': instance.isUnlocked,
+      'is_complete': instance.isComplete,
     };

@@ -3,37 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../models/lesson_model.dart';
-import '../serializers/lesson.dart';
+import '../serializers/topic.dart';
 import 'app_theme.dart';
 import 'components/page_view_indicators.dart';
 
-class LessonView extends StatefulWidget {
-  final int courseId;
+class TopicView extends StatefulWidget {
+  final int lessonId;
 
-  const LessonView({
+  const TopicView({
     super.key,
-    required this.courseId,
+    required this.lessonId,
   });
 
   @override
-  State createState() => LessonViewState();
+  State createState() => TopicViewState();
 }
 
-class LessonViewState extends State<LessonView> {
+class TopicViewState extends State<TopicView> {
   String? _next;
-  List<Lesson> _lessons = [];
+  List<Topic> _topics = [];
   final PageController _controller = PageController();
 
-  fetchLessons() {
+  /*fetchLessons() {
     LessonModel.getLessons(courseId: widget.courseId).then((lessons) {
       setState(() {
         _next = lessons.next;
-        _lessons = lessons.results;
+        _topics = lessons.results;
       });
     });
-  }
-
+  }*/
+/*
   loadMoreLessons() {
     LessonModel.getLessons(nextURL: _next).then((lessons) {
       setState(() {
@@ -41,8 +40,8 @@ class LessonViewState extends State<LessonView> {
         _lessons.addAll(lessons.results);
       });
     });
-  }
-
+  }*/
+/*
   @override
   void initState() {
     super.initState();
@@ -54,7 +53,7 @@ class LessonViewState extends State<LessonView> {
         loadMoreLessons();
       }
     });
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -68,16 +67,16 @@ class LessonViewState extends State<LessonView> {
           backgroundColor: Colors.transparent,
           leading: BackButton(onPressed: context.pop),
           title: LinearProgressPageIndicator(
-            itemCount: _lessons.length,
+            itemCount: _topics.length,
             pageController: _controller,
           ),
           centerTitle: true,
         ),
         body: PageView.builder(
-          itemCount: _lessons.length,
+          itemCount: _topics.length,
           controller: _controller,
           itemBuilder: (context, index) {
-            final lesson = _lessons[index];
+            final lesson = _topics[index];
 
             return Stack(
               children: [

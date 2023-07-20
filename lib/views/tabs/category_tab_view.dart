@@ -1,9 +1,10 @@
-import 'package:beelearn/models/course_model.dart';
-import 'package:beelearn/views/tabs/category_single_tab.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/course_model.dart';
+import '../components/pill_chip.dart';
+import 'category_single_tab.dart';
 import 'category_tab.dart';
 
 class CategoryTabView extends StatelessWidget {
@@ -16,12 +17,12 @@ class CategoryTabView extends StatelessWidget {
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
-            const SliverAppBar(
+            SliverAppBar(
               floating: true,
               pinned: true,
               snap: true,
-              title: CupertinoSearchTextField(),
-              bottom: TabBar(
+              title: const CupertinoSearchTextField(),
+              bottom: const TabBar(
                 isScrollable: true,
                 tabs: [
                   Tab(child: Text("For you")),
@@ -30,6 +31,30 @@ class CategoryTabView extends StatelessWidget {
                   Tab(child: Text("Completed")),
                 ],
               ),
+              actions: [
+                PillChip(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Theme.of(context).splashColor),
+                    borderRadius: BorderRadius.circular(100.0),
+                  ),
+                  children: const [
+                    Icon(
+                      CupertinoIcons.flame_fill,
+                      color: Colors.green,
+                    ),
+                    SizedBox(width: 8.0),
+                    Text("3"),
+                  ],
+                ),
+                IconButton(
+                  onPressed: () {},
+                  icon: Icon(
+                    Icons.notifications_none,
+                    color: Theme.of(context).indicatorColor,
+                  ),
+                ),
+                const SizedBox(width: 8),
+              ],
             )
           ];
         },

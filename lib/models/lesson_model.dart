@@ -27,7 +27,7 @@ class LessonModel {
     return get(
       Uri.parse(url),
       headers: {
-        HttpHeaders.authorizationHeader: "Token 55b3dcf6b57c5b8b2bf88e094a86221c167bf76f",
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
       },
     ).then((response) {
       return Paginate.fromJson(

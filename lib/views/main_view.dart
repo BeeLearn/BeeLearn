@@ -3,21 +3,21 @@ import 'package:flutter/material.dart';
 import 'app_theme.dart';
 import 'tabs/category_tab_view.dart';
 import 'tabs/favorite_tab_view.dart';
-import 'tabs/home_tab_view.dart';
+import 'tabs/profile_tab_view.dart';
 
-class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+class MainView extends StatefulWidget {
+  const MainView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
+  State<MainView> createState() => _MainViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _MainViewState extends State<MainView> {
   int _currentIndex = 0;
   final List<Widget> _tabs = [
     const CategoryTabView(),
     const FavoriteTab(),
-    const HomeTab(),
+    const ProfileTabView(),
   ];
 
   @override
@@ -49,9 +49,8 @@ class _HomeViewState extends State<HomeView> {
               icon: Icon(Icons.favorite_outline),
             ),
             BottomNavigationBarItem(
-              label: "Home",
-              activeIcon: Icon(Icons.home),
-              icon: Icon(Icons.home_outlined),
+              label: "Profile",
+              icon: CircleAvatar(radius: 16),
             ),
           ],
         ),

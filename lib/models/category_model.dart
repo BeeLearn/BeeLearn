@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:http/http.dart' show get;
@@ -25,7 +26,12 @@ class CategoryModel extends ChangeNotifier {
   }
 
   static Future<Paginate<Category>> getCategories({String next = apiURL}) {
-    return get(Uri.parse(next)).then(
+    return get(
+      Uri.parse(next),
+      headers: {
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
+      },
+    ).then(
       (response) => Paginate.fromJson(
         jsonDecode(response.body),
         Category.fromJson,

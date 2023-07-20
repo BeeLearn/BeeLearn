@@ -2,30 +2,26 @@ import 'package:flutter/material.dart';
 
 class PillChip extends StatelessWidget {
   final EdgeInsets? padding;
-  final BoxDecoration? decoration;
-  final Widget? child;
+  final List<Widget> children;
+  final BoxDecoration decoration;
 
   const PillChip({
     super.key,
-    this.padding,
-    this.decoration,
-    this.child,
+    this.padding = const EdgeInsets.symmetric(
+      horizontal: 8.0,
+      vertical: 2.0,
+    ),
+    required this.children,
+    required this.decoration,
   });
 
   @override
   Widget build(context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8.0,
-        vertical: 2.0,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFF25C19B),
-        borderRadius: BorderRadius.circular(100.0),
-      ),
-      child: const Text(
-        "New",
-        style: TextStyle(color: Colors.white),
+      padding: padding,
+      decoration: decoration,
+      child: Row(
+        children: children,
       ),
     );
   }
