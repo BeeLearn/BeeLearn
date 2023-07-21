@@ -1,0 +1,5 @@
+flutter_native_splash:
+  color: "#FFFFFF"
+  branding: assets/branding_icon.png
+  image: assets/splash_icon.png
+  fullscree: true

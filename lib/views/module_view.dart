@@ -75,7 +75,7 @@ class _ModuleViewState extends State<ModuleView> {
 
                           return ListTile(
                             onTap: () {
-                              context.push("/topics/?lessonId=$lesson");
+                              context.push("/topics/?lessonId=${lesson.id}");
                             },
                             enabled: isUnlocked,
                             isThreeLine: true,

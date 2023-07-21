@@ -9,14 +9,16 @@ part of 'topic.dart';
 Topic _$TopicFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    requiredKeys: const ['id', 'is_liked', 'title', 'content', 'question'],
+    requiredKeys: const ['id', 'is_liked', 'title', 'content'],
   );
   return Topic(
     id: json['id'] as int,
     title: json['title'] as String,
     content: json['content'] as String,
     isLiked: json['is_liked'] as bool,
-    question: Question.fromJson(json['question'] as Map<String, dynamic>),
+    question: json['question'] == null
+        ? null
+        : Question.fromJson(json['question'] as Map<String, dynamic>),
   );
 }
 
