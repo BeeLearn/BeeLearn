@@ -19,6 +19,8 @@ Topic _$TopicFromJson(Map<String, dynamic> json) {
     question: json['question'] == null
         ? null
         : Question.fromJson(json['question'] as Map<String, dynamic>),
+    isComplete: json['is_complete'] as bool,
+    isUnlocked: json['is_unlocked'] as bool,
   );
 }
 
@@ -28,4 +30,6 @@ Map<String, dynamic> _$TopicToJson(Topic instance) => <String, dynamic>{
       'title': instance.title,
       'content': instance.content,
       'question': instance.question,
+      'is_complete': instance.isComplete,
+      'is_unlocked': instance.isUnlocked,
     };

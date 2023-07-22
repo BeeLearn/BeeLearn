@@ -65,6 +65,7 @@ class TopicModel extends ChangeNotifier {
         case HttpStatus.ok:
           return Topic.fromJson(jsonDecode(response.body));
         default:
+          print(response.body);
           throw Error();
       }
     });

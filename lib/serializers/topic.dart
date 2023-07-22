@@ -12,7 +12,7 @@ class Topic {
   final int id;
 
   @JsonKey(required: true, name: "is_liked")
-  bool isLiked;
+  final bool isLiked;
 
   @JsonKey(required: true)
   final String title;
@@ -23,22 +23,38 @@ class Topic {
   @JsonKey(required: false)
   final Question? question;
 
-  Topic({
+  @JsonKey(required: false, name: "is_complete")
+  final bool isComplete;
+
+  @JsonKey(required: false, name: "is_unlocked")
+  final bool isUnlocked;
+
+  const Topic({
     required this.id,
     required this.title,
     required this.content,
     required this.isLiked,
     required this.question,
+    required this.isComplete,
+    required this.isUnlocked,
   });
 
-  Future<bool> setIsLiked(User user, bool state) {
+  Future<Topic> setIsLiked(User user, bool state) {
     final action = state ? "add" : "remove";
 
     return TopicModel.updateTopic(id: id, data: {
       "likes": {
         action: [user.id]
       }
-    }).then((_) => state);
+    });
+  }
+
+  Future<Topic> setIsComplete(User user) {
+    return TopicModel.updateTopic(id: id, data: {
+      "topic_complete_users": {
+        "add": [user.id],
+      },
+    });
   }
 
   factory Topic.fromJson(Map<String, dynamic> json) => _$TopicFromJson(json);
