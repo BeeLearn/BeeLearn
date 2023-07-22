@@ -4,15 +4,13 @@ import 'package:provider/provider.dart';
 import '../../models/course_model.dart';
 import '../../views/components/course_card.dart';
 
-class CategorySingleTab<T extends BaseModel> extends StatefulWidget {
+class CategorySingleTab<T extends CourseModel> extends StatefulWidget {
   final Map<String, dynamic>? query;
   final Future<void> Function() initState;
-  final dynamic Function(dynamic)? resolver;
 
   const CategorySingleTab({
     super.key,
     this.query,
-    this.resolver,
     required this.initState,
   });
 
@@ -20,7 +18,7 @@ class CategorySingleTab<T extends BaseModel> extends StatefulWidget {
   State createState() => CategorySingleTabState<T>();
 }
 
-class CategorySingleTabState<T extends BaseModel> extends State<CategorySingleTab> with AutomaticKeepAliveClientMixin {
+class CategorySingleTabState<T extends CourseModel> extends State<CategorySingleTab> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
 
@@ -51,7 +49,7 @@ class CategorySingleTabState<T extends BaseModel> extends State<CategorySingleTa
               return SizedBox(
                 height: 200,
                 child: CourseCard(
-                  course: widget.resolver == null ? course : widget.resolver!(course),
+                  course: course,
                 ),
               );
             },

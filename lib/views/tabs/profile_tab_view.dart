@@ -2,6 +2,8 @@ import 'package:beelearn/views/components/reward_list.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../components/streak_card.dart';
+
 class ProfileTabView extends StatefulWidget {
   const ProfileTabView({Key? key}) : super(key: key);
   @override
@@ -45,14 +47,14 @@ class _ProfileTabViewState extends State<ProfileTabView> {
           )
         ];
       },
-      body: RefreshIndicator(
-        onRefresh: fetchRewards,
-        child: const Column(
+      body: const SingleChildScrollView(
+        child: Column(
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 RewardList(),
+                StreakCard(),
               ],
             ),
           ],

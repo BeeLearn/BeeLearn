@@ -2,13 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import "package:provider/provider.dart";
 
 import '../models/topic_model.dart';
-import '../serializers/topic.dart';
+import '../models/user_model.dart';
 import 'app_theme.dart';
 import 'components/page_view_indicators.dart';
 
-class TopicView extends StatefulWidget {
+class TopicView extends StatelessWidget {
   final int lessonId;
 
   const TopicView({
@@ -17,12 +18,32 @@ class TopicView extends StatefulWidget {
   });
 
   @override
-  State createState() => TopicViewState();
+  Widget build(context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => TopicModel(),
+        ),
+      ],
+      child: _TopicFragmentView(lessonId: lessonId),
+    );
+  }
 }
 
-class TopicViewState extends State<TopicView> {
+class _TopicFragmentView extends StatefulWidget {
+  final int lessonId;
+
+  const _TopicFragmentView({
+    super.key,
+    required this.lessonId,
+  });
+
+  @override
+  State createState() => _TopicFragmentViewState();
+}
+
+class _TopicFragmentViewState extends State<_TopicFragmentView> {
   String? _next;
-  List<Topic> _topics = [];
 
   final PageController _controller = PageController();
 
@@ -30,8 +51,8 @@ class TopicViewState extends State<TopicView> {
   void initState() {
     super.initState();
     TopicModel.getTopics(lessonId: widget.lessonId).then(
-      (response) => setState(() {
-        _topics = response.results;
+      (topics) => setState(() {
+        Provider.of<TopicModel>(context, listen: false).setAll(topics.results);
       }),
     );
   }
@@ -41,100 +62,113 @@ class TopicViewState extends State<TopicView> {
     return MaterialApp(
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      home: Scaffold(
-        extendBodyBehindAppBar: true,
-        extendBody: true,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          leading: BackButton(onPressed: context.pop),
-          title: LinearProgressPageIndicator(
-            itemCount: _topics.length,
-            pageController: _controller,
-          ),
-          actions: [
-            IconButton(
-              onPressed: () {},
-              icon: const Icon(CupertinoIcons.sparkles),
-            ),
-          ],
-          centerTitle: true,
-        ),
-        body: PageView.builder(
-          itemCount: _topics.length,
-          controller: _controller,
-          itemBuilder: (context, index) {
-            final topic = _topics[index];
+      home: Consumer<TopicModel>(builder: (context, model, child) {
+        final topics = model.topics;
 
-            return Stack(
-              children: [
-                SafeArea(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          extendBody: true,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            leading: BackButton(onPressed: context.pop),
+            title: LinearProgressPageIndicator(
+              itemCount: topics.length,
+              pageController: _controller,
+            ),
+            actions: [
+              IconButton(
+                onPressed: () {},
+                icon: const Icon(CupertinoIcons.sparkles),
+              ),
+            ],
+            centerTitle: true,
+          ),
+          body: PageView.builder(
+            itemCount: topics.length,
+            controller: _controller,
+            itemBuilder: (context, index) {
+              final topic = topics[index];
+
+              return Stack(
+                children: [
+                  SingleChildScrollView(
+                    child: SafeArea(
+                      child: Column(
                         children: [
-                          Text(
-                            topic.title,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.w900,
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                topic.title,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.albertSans(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.w900,
+                                  color: Theme.of(context).colorScheme.inverseSurface,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(top: 32.0),
+                            child: Text(
+                              topic.content,
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                    color: Theme.of(context).colorScheme.inverseSurface,
+                                  ),
                             ),
                           ),
                         ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(top: 32.0),
-                        child: Text(
-                          topic.content,
-                          style: GoogleFonts.albertSans(fontSize: 18),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: BottomAppBar(
-                    color: Colors.transparent,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(CupertinoIcons.chat_bubble),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              topic.setIsLiked(!topic.isLiked);
-                            });
-                          },
-                          isSelected: topic.isLiked,
-                          selectedIcon: const Icon(
-                            CupertinoIcons.heart_fill,
-                            color: Colors.red,
-                          ),
-                          icon: const Icon(CupertinoIcons.heart),
-                        ),
-                        IconButton(
-                          onPressed: () {},
-                          icon: const Icon(CupertinoIcons.share),
-                        ),
-                      ],
                     ),
                   ),
-                )
-              ],
-            );
-          },
-        ),
-      ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: BottomAppBar(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(CupertinoIcons.chat_bubble),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              final user = Provider.of<UserModel>(context, listen: false).user;
+                              setState(
+                                () {
+                                  topic.setIsLiked(user, !topic.isLiked).then(
+                                    (state) {
+                                      topic.isLiked = state;
+                                      model.updateOne(index, topic);
+                                    },
+                                  );
+                                },
+                              );
+                            },
+                            isSelected: topic.isLiked,
+                            selectedIcon: const Icon(
+                              CupertinoIcons.heart_fill,
+                              color: Colors.red,
+                            ),
+                            icon: const Icon(CupertinoIcons.heart),
+                          ),
+                          IconButton(
+                            onPressed: () {},
+                            icon: const Icon(CupertinoIcons.share),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      }),
     );
   }
 }

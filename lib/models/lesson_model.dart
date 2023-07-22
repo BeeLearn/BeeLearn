@@ -9,7 +9,7 @@ import '../serializers/paginate.dart';
 
 /// [LessonModel] provide [Lesson] API logic
 class LessonModel {
-  static const String apiURL = "${MainApplication.baseURL}/api/lessons/";
+  static const String apiURL = "${MainApplication.baseURL}/api/catalogue/lessons/";
 
   /// [getLessons] return filtered lesson for a particular course
   /// [courseId] required if [nextURL] is not provided

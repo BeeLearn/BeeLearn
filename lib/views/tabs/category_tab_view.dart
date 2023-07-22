@@ -1,3 +1,4 @@
+import 'package:beelearn/models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,8 @@ class CategoryTabView extends StatelessWidget {
 
   @override
   Widget build(context) {
+    final user = Provider.of<UserModel>(context, listen: false).user;
+
     return DefaultTabController(
       length: 4,
       child: NestedScrollView(
@@ -74,9 +77,11 @@ class CategoryTabView extends StatelessWidget {
               },
             ),
             CategorySingleTab<InProgressCourseModel>(
-              resolver: (userCourse) => userCourse.course,
               initState: () async {
-                UserCourseBaseModel.getCourses(query: {"is_complete": "false"}).then(
+                CourseModel.getCourses(query: {
+                  "course_enrolled_users__in": "${user.id}",
+                  "course_complete_users__not__in": "${user.id}",
+                }).then(
                   (courses) {
                     Provider.of<InProgressCourseModel>(
                       context,
@@ -87,9 +92,10 @@ class CategoryTabView extends StatelessWidget {
               },
             ),
             CategorySingleTab<CompletedCourseModel>(
-              resolver: (userCourse) => userCourse.course,
               initState: () async {
-                UserCourseBaseModel.getCourses(query: {"is_complete": "true"}).then(
+                CourseModel.getCourses(query: {
+                  "course_complete_users__in": "${user.id}",
+                }).then(
                   (courses) {
                     Provider.of<CompletedCourseModel>(
                       context,

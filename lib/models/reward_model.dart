@@ -25,8 +25,6 @@ class RewardModel extends ChangeNotifier {
   }
 
   static Future<Paginate<Reward>> getRewards({String? nextURL}) {
-    print("Hey what?");
-
     return get(Uri.parse(nextURL ?? apiURL), headers: {
       HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
     }).then((response) {

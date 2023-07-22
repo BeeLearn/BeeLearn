@@ -1,7 +1,8 @@
-import 'package:beelearn/models/module_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../main_application.dart';
+import '../models/module_model.dart';
 import '../serializers/module.dart';
 import 'app_theme.dart';
 import 'components/expanded_list.dart';
@@ -43,6 +44,8 @@ class _ModuleViewState extends State<ModuleView> {
                 return SingleChildScrollView(
                   child: ExpandedList(
                     itemCount: _modules.length,
+                    sharedPreferences: MainApplication.preferences,
+                    generateKey: (index) => "module_${index}_expansion_state",
                     headerBuilder: (context, index, isExpanded) {
                       final module = _modules[index];
                       final isUnlocked = index == 0 || module.isUnLocked;
@@ -51,7 +54,7 @@ class _ModuleViewState extends State<ModuleView> {
                         leading: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: isUnlocked ? Theme.of(context).colorScheme.primaryContainer : Colors.grey,
+                            color: isUnlocked ? Colors.green : Colors.grey,
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: const Icon(

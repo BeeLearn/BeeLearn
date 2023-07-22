@@ -1,6 +1,8 @@
-import 'package:beelearn/models/topic_model.dart';
 import 'package:beelearn/serializers/question.dart';
 import 'package:json_annotation/json_annotation.dart';
+
+import '../models/topic_model.dart';
+import "../serializers/user.dart";
 
 part 'topic.g.dart';
 
@@ -29,8 +31,14 @@ class Topic {
     required this.question,
   });
 
-  setIsLiked(bool state) {
-    return TopicModel.updateTopic(id: id, data: {});
+  Future<bool> setIsLiked(User user, bool state) {
+    final action = state ? "add" : "remove";
+
+    return TopicModel.updateTopic(id: id, data: {
+      "likes": {
+        action: [user.id]
+      }
+    }).then((_) => state);
   }
 
   factory Topic.fromJson(Map<String, dynamic> json) => _$TopicFromJson(json);

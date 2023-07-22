@@ -31,7 +31,7 @@ class _RewardListState extends State<RewardList> {
     return Consumer<RewardModel>(
       builder: (context, model, child) {
         return SizedBox(
-          height: 200,
+          height: 172,
           child: PageView.builder(
             itemCount: model.rewards.length,
             padEnds: false,

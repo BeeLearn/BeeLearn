@@ -1,14 +1,34 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:beelearn/serializers/topic.dart';
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' show get, patch;
 
 import '../../main_application.dart';
 import '../serializers/paginate.dart';
 
-class TopicModel {
+class TopicModel extends ChangeNotifier {
+  List<Topic> _topics = [];
   static const String apiURL = "${MainApplication.baseURL}/api/catalogue/topics/";
+
+  UnmodifiableListView<Topic> get topics => UnmodifiableListView(_topics);
+
+  setAll(List<Topic> topics) {
+    _topics = topics;
+    notifyListeners();
+  }
+
+  addAll(List<Topic> topics) {
+    _topics.addAll(topics);
+    notifyListeners();
+  }
+
+  updateOne(int index, Topic topic) {
+    _topics[index] = topic;
+    notifyListeners();
+  }
 
   static Future<Paginate<Topic>> getTopics({
     int? lessonId,
@@ -36,11 +56,17 @@ class TopicModel {
     return patch(
       Uri.parse("$apiURL$id/"),
       headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
         HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
       },
-      body: data,
+      body: jsonEncode(data),
     ).then((response) {
-      return Topic.fromJson(jsonDecode(response.body));
+      switch (response.statusCode) {
+        case HttpStatus.ok:
+          return Topic.fromJson(jsonDecode(response.body));
+        default:
+          throw Error();
+      }
     });
   }
 }

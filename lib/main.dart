@@ -1,7 +1,9 @@
+import 'package:beelearn/main_application.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models/category_model.dart';
 import 'models/course_model.dart';
@@ -46,9 +48,11 @@ GoRouter _router = GoRouter(
   ],
 );
 
-void main() {
+void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  MainApplication.sharedPreferences = await SharedPreferences.getInstance();
 
   runApp(
     MultiProvider(
