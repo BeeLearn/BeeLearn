@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' show get;
+import 'package:http/http.dart' show get, patch;
 
 import '../../main_application.dart';
 import '../serializers/course.dart';
@@ -25,10 +25,12 @@ class CourseModel<T> extends ChangeNotifier {
     notifyListeners();
   }
 
-  static getCourses({
-    Map<String, dynamic>? query,
-    String? nextURL,
-  }) {
+  updateOne(int index, T course) {
+    _courses[index] = course;
+    notifyListeners();
+  }
+
+  static getCourses({Map<String, dynamic>? query, String? nextURL}) {
     Uri uri = Uri.parse(nextURL ?? apiURL).replace(queryParameters: query);
     return get(
       uri,
@@ -40,6 +42,25 @@ class CourseModel<T> extends ChangeNotifier {
         jsonDecode(response.body),
         Course.fromJson,
       );
+    });
+  }
+
+  static Future<Course> updateCourse({required int id, required Map<String, dynamic> data}) {
+    return patch(
+      Uri.parse("$apiURL$id/"),
+      body: jsonEncode(data),
+      headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
+      },
+    ).then((response) {
+      switch (response.statusCode) {
+        case HttpStatus.ok:
+          return Course.fromJson(jsonDecode(response.body));
+        default:
+          print(response.body);
+          throw Error();
+      }
     });
   }
 }

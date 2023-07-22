@@ -13,8 +13,6 @@ class CategoryTabView extends StatelessWidget {
 
   @override
   Widget build(context) {
-    final user = Provider.of<UserModel>(context, listen: false).user;
-
     return DefaultTabController(
       length: 4,
       child: NestedScrollView(
@@ -61,51 +59,57 @@ class CategoryTabView extends StatelessWidget {
             )
           ];
         },
-        body: TabBarView(
-          children: [
-            const CategoryTab(),
-            CategorySingleTab<NewCourseModel>(
-              initState: () async {
-                CourseModel.getCourses(query: {}).then(
-                  (courses) {
-                    Provider.of<NewCourseModel>(
-                      context,
-                      listen: false,
-                    ).setAll(courses.results);
+        body: Consumer<UserModel>(
+          builder: (context, model, child) {
+            final user = model.user;
+
+            return TabBarView(
+              children: [
+                const CategoryTab(),
+                CategorySingleTab<NewCourseModel>(
+                  initState: () async {
+                    CourseModel.getCourses(query: {}).then(
+                      (courses) {
+                        Provider.of<NewCourseModel>(
+                          context,
+                          listen: false,
+                        ).setAll(courses.results);
+                      },
+                    );
                   },
-                );
-              },
-            ),
-            CategorySingleTab<InProgressCourseModel>(
-              initState: () async {
-                CourseModel.getCourses(query: {
-                  "course_enrolled_users__in": "${user.id}",
-                  "course_complete_users__not__in": "${user.id}",
-                }).then(
-                  (courses) {
-                    Provider.of<InProgressCourseModel>(
-                      context,
-                      listen: false,
-                    ).setAll(courses.results);
+                ),
+                CategorySingleTab<InProgressCourseModel>(
+                  initState: () async {
+                    CourseModel.getCourses(query: {
+                      "course_enrolled_users__in": "${user.id}",
+                      "course_complete_users": "!${user.id}",
+                    }).then(
+                      (courses) {
+                        Provider.of<InProgressCourseModel>(
+                          context,
+                          listen: false,
+                        ).setAll(courses.results);
+                      },
+                    );
                   },
-                );
-              },
-            ),
-            CategorySingleTab<CompletedCourseModel>(
-              initState: () async {
-                CourseModel.getCourses(query: {
-                  "course_complete_users__in": "${user.id}",
-                }).then(
-                  (courses) {
-                    Provider.of<CompletedCourseModel>(
-                      context,
-                      listen: false,
-                    ).setAll(courses.results);
+                ),
+                CategorySingleTab<CompletedCourseModel>(
+                  initState: () async {
+                    CourseModel.getCourses(query: {
+                      "course_complete_users": "${user.id}",
+                    }).then(
+                      (courses) {
+                        Provider.of<CompletedCourseModel>(
+                          context,
+                          listen: false,
+                        ).setAll(courses.results);
+                      },
+                    );
                   },
-                );
-              },
-            ),
-          ],
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

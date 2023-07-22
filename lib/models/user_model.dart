@@ -7,10 +7,10 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
 class UserModel extends ChangeNotifier {
-  late User _user;
+  User? _user;
   static const String apiURL = "${MainApplication.baseURL}/api/account/users/";
 
-  User get user => _user;
+  User get user => _user!;
 
   setUser(User user) {
     _user = user;

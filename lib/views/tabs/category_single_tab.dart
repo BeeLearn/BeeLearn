@@ -50,6 +50,9 @@ class CategorySingleTabState<T extends CourseModel> extends State<CategorySingle
                 height: 200,
                 child: CourseCard(
                   course: course,
+                  onUpdate: (course) {
+                    Provider.of<T>(context).updateOne(index, course);
+                  },
                 ),
               );
             },

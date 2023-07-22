@@ -37,8 +37,8 @@ class CategoryTabState extends State<CategoryTab> with AutomaticKeepAliveClientM
         builder: (context, model, child) {
           return ListView.builder(
             itemCount: model.categories.length,
-            itemBuilder: (context, index) {
-              final category = model.categories[index];
+            itemBuilder: (context, categoryIndex) {
+              final category = model.categories[categoryIndex];
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,7 +62,16 @@ class CategoryTabState extends State<CategoryTab> with AutomaticKeepAliveClientM
                       itemBuilder: (context, index) {
                         final course = category.courses[index];
 
-                        return CourseCard(course: course);
+                        return CourseCard(
+                          course: course,
+                          onUpdate: (course) {
+                            Provider.of<CategoryModel>(context, listen: false).updateCourse(
+                              categoryIndex: categoryIndex,
+                              courseIndex: index,
+                              course: course,
+                            );
+                          },
+                        );
                       },
                     ),
                   ),

@@ -1,3 +1,4 @@
+import 'package:beelearn/models/course_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -5,17 +6,34 @@ import '../../serializers/course.dart';
 
 class CourseCard extends StatelessWidget {
   final Course course;
+  final void Function(Course) onUpdate;
 
   const CourseCard({
     super.key,
     required this.course,
+    required this.onUpdate,
   });
+
+  void intentToModules(BuildContext context) {
+    context.push("/modules/?courseId=${course.id}&courseName=${course.name}");
+  }
 
   @override
   Widget build(context) {
     return GestureDetector(
       onTap: () {
-        context.push("/modules/?courseId=${course.id}&courseName=${course.name}");
+        if (course.isEnrolled) {
+          return intentToModules(context);
+        }
+
+        CourseModel.updateCourse(id: course.id, data: {
+          "course_enrolled_users": {
+            "add": [course.id]
+          },
+        }).then((course) {
+          onUpdate(course);
+          intentToModules(context);
+        });
       },
       child: Card(
         semanticContainer: true,
