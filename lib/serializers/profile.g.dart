@@ -9,13 +9,14 @@ part of 'profile.dart';
 Profile _$ProfileFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    requiredKeys: const ['id', 'lives', 'xp', 'bits'],
+    requiredKeys: const ['id', 'lives', 'xp', 'bits', 'daily_streak_minutes'],
   );
   return Profile(
     id: json['id'] as int,
     lives: json['lives'] as int,
     xp: json['xp'] as int,
     bits: json['bits'] as int,
+    dailyStreakMinutes: json['daily_streak_minutes'] as int,
   );
 }
 
@@ -24,4 +25,5 @@ Map<String, dynamic> _$ProfileToJson(Profile instance) => <String, dynamic>{
       'lives': instance.lives,
       'xp': instance.xp,
       'bits': instance.bits,
+      'daily_streak_minutes': instance.dailyStreakMinutes,
     };

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class LinearProgressPageIndicator extends StatefulWidget {
-  int itemCount;
-  double width, height;
+  final int itemCount;
+  final double width, height;
   final PageController pageController;
 
-  LinearProgressPageIndicator({
+  const LinearProgressPageIndicator({
     super.key,
     this.width = 256,
     this.height = 4,

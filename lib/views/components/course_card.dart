@@ -6,12 +6,14 @@ import '../../serializers/course.dart';
 
 class CourseCard extends StatelessWidget {
   final Course course;
-  final void Function(Course) onUpdate;
+  final void Function()? onTap;
+  final void Function(Course)? onUpdate;
 
   const CourseCard({
     super.key,
+    this.onTap,
+    this.onUpdate,
     required this.course,
-    required this.onUpdate,
   });
 
   void intentToModules(BuildContext context) {
@@ -22,18 +24,24 @@ class CourseCard extends StatelessWidget {
   Widget build(context) {
     return GestureDetector(
       onTap: () {
-        if (course.isEnrolled) {
-          return intentToModules(context);
-        }
+        if (onTap == null) {
+          if (course.isEnrolled) {
+            return intentToModules(context);
+          }
 
-        CourseModel.updateCourse(id: course.id, data: {
-          "course_enrolled_users": {
-            "add": [course.id]
-          },
-        }).then((course) {
-          onUpdate(course);
-          intentToModules(context);
-        });
+          CourseModel.updateCourse(id: course.id, data: {
+            "course_enrolled_users": {
+              "add": [course.id]
+            },
+          }).then((course) {
+            if (onUpdate != null) {
+              onUpdate!(course);
+            }
+            intentToModules(context);
+          });
+        } else {
+          onTap!();
+        }
       },
       child: Card(
         semanticContainer: true,

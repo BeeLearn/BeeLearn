@@ -1,9 +1,15 @@
 import "package:flutter/material.dart";
+import "package:intl/intl.dart";
+
+import "../../serializers/streak.dart";
 
 class StreakCalender extends StatelessWidget {
-  final List<String> days = ["M", "T", "W", "T", "F", "S", "S"];
+  final List<Streak> streaks;
 
-  StreakCalender({super.key});
+  const StreakCalender({
+    super.key,
+    required this.streaks,
+  });
 
   @override
   Widget build(context) {
@@ -11,22 +17,23 @@ class StreakCalender extends StatelessWidget {
       height: 48.0,
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: ListView.builder(
-        itemCount: days.length,
+        itemCount: streaks.length,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
-          final day = days[index];
+          final streak = streaks[index];
+          final activeColor = streak.isComplete ? Colors.green : Colors.grey;
 
           return Container(
             margin: const EdgeInsets.symmetric(horizontal: 4.0),
             padding: const EdgeInsets.all(10.0),
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.green),
+              border: Border.all(color: activeColor),
               shape: BoxShape.circle,
             ),
             child: Center(
               child: Text(
-                day,
-                style: const TextStyle(color: Colors.green),
+                DateFormat.d().format(streak.dateTime),
+                style: TextStyle(color: activeColor),
               ),
             ),
           );

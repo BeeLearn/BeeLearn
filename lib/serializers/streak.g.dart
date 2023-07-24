@@ -9,17 +9,19 @@ part of 'streak.dart';
 Streak _$StreakFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    requiredKeys: const ['id', 'day', 'isComplete'],
+    requiredKeys: const ['id', 'date', 'is_today', 'is_complete'],
   );
   return Streak(
     id: json['id'] as int,
-    day: json['day'] as String,
-    isComplete: json['isComplete'] as bool,
+    date: json['date'] as String,
+    isToday: json['is_today'] as bool,
+    isComplete: json['is_complete'] as bool,
   );
 }
 
 Map<String, dynamic> _$StreakToJson(Streak instance) => <String, dynamic>{
       'id': instance.id,
-      'day': instance.day,
-      'isComplete': instance.isComplete,
+      'date': instance.date,
+      'is_today': instance.isToday,
+      'is_complete': instance.isComplete,
     };

@@ -81,8 +81,8 @@ class CategoryTabView extends StatelessWidget {
                 CategorySingleTab<InProgressCourseModel>(
                   initState: () async {
                     CourseModel.getCourses(query: {
-                      "course_enrolled_users__in": "${user.id}",
-                      "course_complete_users": "!${user.id}",
+                      "course_enrolled_users": "${user.id}",
+                      "course_complete_users!": "${user.id}",
                     }).then(
                       (courses) {
                         Provider.of<InProgressCourseModel>(

@@ -30,7 +30,7 @@ class CourseModel<T> extends ChangeNotifier {
     notifyListeners();
   }
 
-  static getCourses({Map<String, dynamic>? query, String? nextURL}) {
+  static Future<Paginate<Course>> getCourses({Map<String, dynamic>? query, String? nextURL}) {
     Uri uri = Uri.parse(nextURL ?? apiURL).replace(queryParameters: query);
     return get(
       uri,
@@ -70,3 +70,5 @@ class NewCourseModel extends CourseModel {}
 class InProgressCourseModel extends CourseModel {}
 
 class CompletedCourseModel extends CourseModel {}
+
+class FavouriteCourseModel extends CourseModel {}

@@ -2,12 +2,12 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:beelearn/serializers/topic.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' show get, patch;
 
 import '../../main_application.dart';
 import '../serializers/paginate.dart';
+import '../serializers/topic.dart';
 
 class TopicModel extends ChangeNotifier {
   List<Topic> _topics = [];
@@ -31,13 +31,11 @@ class TopicModel extends ChangeNotifier {
   }
 
   static Future<Paginate<Topic>> getTopics({
-    int? lessonId,
+    Map<String, dynamic>? query,
     String? nextURL,
   }) {
-    final url = nextURL ?? "$apiURL?lesson=$lessonId";
-
     return get(
-      Uri.parse(url),
+      Uri.parse(nextURL ?? apiURL).replace(queryParameters: query),
       headers: {
         HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
       },

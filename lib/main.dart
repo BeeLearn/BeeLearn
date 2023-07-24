@@ -1,13 +1,14 @@
-import 'package:beelearn/main_application.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'main_application.dart';
 import 'models/category_model.dart';
 import 'models/course_model.dart';
 import 'models/reward_model.dart';
+import 'models/streak_model.dart';
 import 'models/user_model.dart';
 import 'views/main_view.dart';
 import 'views/module_view.dart';
@@ -22,9 +23,7 @@ GoRouter _router = GoRouter(
         GoRoute(
           path: "topics",
           builder: (context, state) {
-            return TopicView(
-              lessonId: int.parse(state.queryParameters["lessonId"]!),
-            );
+            return TopicView(query: state.queryParameters);
           },
         ),
         GoRoute(
@@ -38,7 +37,7 @@ GoRouter _router = GoRouter(
         ),
       ],
       redirect: (context, state) async {
-        UserModel.getCurrentUser().then((user) {
+        await UserModel.getCurrentUser().then((user) {
           Provider.of<UserModel>(context, listen: false).setUser(user);
         }).whenComplete(() => FlutterNativeSplash.remove());
 
@@ -53,6 +52,7 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   MainApplication.sharedPreferences = await SharedPreferences.getInstance();
+  await MainApplication.preferences.clear();
 
   runApp(
     MultiProvider(
@@ -62,7 +62,9 @@ void main() async {
         ChangeNotifierProvider(create: (context) => InProgressCourseModel()),
         ChangeNotifierProvider(create: (context) => CompletedCourseModel()),
         ChangeNotifierProvider(create: (context) => RewardModel()),
+        ChangeNotifierProvider(create: (context) => StreakModel()),
         ChangeNotifierProvider(create: (context) => UserModel()),
+        ChangeNotifierProvider(create: (context) => FavouriteCourseModel()),
       ],
       child: MaterialApp.router(
         routerConfig: _router,

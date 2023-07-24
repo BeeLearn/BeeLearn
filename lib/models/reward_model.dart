@@ -24,10 +24,13 @@ class RewardModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<Paginate<Reward>> getRewards({String? nextURL}) {
-    return get(Uri.parse(nextURL ?? apiURL), headers: {
-      HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
-    }).then((response) {
+  static Future<Paginate<Reward>> getRewards({String? nextURL, Map<String, dynamic>? query}) {
+    return get(
+      Uri.parse(nextURL ?? apiURL).replace(queryParameters: query),
+      headers: {
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
+      },
+    ).then((response) {
       return Paginate.fromJson(
         jsonDecode(response.body),
         Reward.fromJson,

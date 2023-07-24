@@ -10,13 +10,13 @@ import '../app_theme.dart';
 import '../components/page_view_indicators.dart';
 
 class TopicFragment extends StatefulWidget {
-  final int lessonId;
+  final Map<String, dynamic> query;
   final int? nextLessonIndex;
 
   const TopicFragment({
     super.key,
     this.nextLessonIndex,
-    required this.lessonId,
+    required this.query,
   });
 
   @override
@@ -32,7 +32,7 @@ class _TopicFragmentState extends State<TopicFragment> {
   @override
   void initState() {
     super.initState();
-    TopicModel.getTopics(lessonId: widget.lessonId).then(
+    TopicModel.getTopics(query: widget.query).then(
       (topics) => setState(() {
         Provider.of<TopicModel>(
           context,

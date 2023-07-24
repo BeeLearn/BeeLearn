@@ -16,11 +16,17 @@ class Profile {
   @JsonKey(required: true)
   final int bits;
 
+  @JsonKey(required: true, name: "daily_streak_minutes")
+  final int dailyStreakMinutes;
+
+  int get dailyStreakSeconds => dailyStreakMinutes * 60;
+
   const Profile({
     required this.id,
     required this.lives,
     required this.xp,
     required this.bits,
+    required this.dailyStreakMinutes,
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);

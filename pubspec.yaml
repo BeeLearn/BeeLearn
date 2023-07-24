@@ -50,6 +50,8 @@ dependencies:
   swipeable_card_stack: ^0.0.5
   flutter_native_splash: ^2.3.1
   shared_preferences: ^2.2.0
+  intl: ^0.18.1
+  workmanager: ^0.5.1
 
 dev_dependencies:
   flutter_test:
