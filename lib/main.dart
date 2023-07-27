@@ -1,3 +1,5 @@
+import 'package:beelearn/middlewares/api_middleware.dart';
+import 'package:beelearn/views/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
@@ -54,8 +56,27 @@ void main() async {
   MainApplication.sharedPreferences = await SharedPreferences.getInstance();
   await MainApplication.preferences.clear();
 
-  runApp(
-    MultiProvider(
+  runApp(const ApplicationView());
+}
+
+class ApplicationView extends StatefulWidget {
+  const ApplicationView({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _ApplicationViewState();
+}
+
+class _ApplicationViewState extends State<ApplicationView> {
+  @override
+  void initState() {
+    super.initState();
+
+    ApiMiddleware.run(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => CategoryModel()),
         ChangeNotifierProvider(create: (context) => NewCourseModel()),
@@ -66,9 +87,17 @@ void main() async {
         ChangeNotifierProvider(create: (context) => UserModel()),
         ChangeNotifierProvider(create: (context) => FavouriteCourseModel()),
       ],
-      child: MaterialApp.router(
-        routerConfig: _router,
+      child: MaterialApp(
+        theme: AppTheme.dark,
+        scaffoldMessengerKey: MainApplication.scaffoldKey,
+        home: Scaffold(
+          body: MaterialApp.router(
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            routerConfig: _router,
+          ),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

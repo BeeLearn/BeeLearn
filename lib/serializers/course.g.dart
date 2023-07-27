@@ -9,7 +9,14 @@ part of 'course.dart';
 Course _$CourseFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    requiredKeys: const ['id', 'is_new', 'name', 'image', 'is_enrolled'],
+    requiredKeys: const [
+      'id',
+      'is_new',
+      'name',
+      'image',
+      'is_enrolled',
+      'is_completed'
+    ],
   );
   return Course(
     id: json['id'] as int,
@@ -17,6 +24,7 @@ Course _$CourseFromJson(Map<String, dynamic> json) {
     image: json['image'] as String,
     isNew: json['is_new'] as bool,
     isEnrolled: json['is_enrolled'] as bool,
+    isCompleted: json['is_completed'] as bool,
   );
 }
 
@@ -26,4 +34,5 @@ Map<String, dynamic> _$CourseToJson(Course instance) => <String, dynamic>{
       'name': instance.name,
       'image': instance.image,
       'is_enrolled': instance.isEnrolled,
+      'is_completed': instance.isCompleted,
     };

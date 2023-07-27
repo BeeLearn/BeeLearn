@@ -9,12 +9,11 @@ class Module {
   @JsonKey(required: true)
   final int id;
 
-
   @JsonKey(required: true)
   final String name;
 
-  @JsonKey(required: true, name: "is_complete")
-  final bool isComplete;
+  @JsonKey(required: true, name: "is_completed")
+  final bool isCompleted;
 
   @JsonKey(required: true, name: "is_unlocked")
   final bool isUnLocked;
@@ -26,7 +25,7 @@ class Module {
     required this.id,
     required this.name,
     required this.isUnLocked,
-    required this.isComplete,
+    required this.isCompleted,
     required this.lessons,
   });
 

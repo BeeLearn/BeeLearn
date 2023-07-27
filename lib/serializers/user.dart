@@ -3,6 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:provider/provider.dart';
 
 import '../models/streak_model.dart';
+import '../models/user_model.dart';
 import 'profile.dart';
 
 part 'user.g.dart';
@@ -20,6 +21,13 @@ class User {
 
   @JsonKey(required: true)
   final Profile profile;
+
+  const User({
+    required this.id,
+    required this.username,
+    required this.email,
+    required this.profile,
+  });
 
   /// Update current daily streak spent seconds
   Future<int> increaseDailyStreakSeconds(BuildContext context) async {
@@ -46,12 +54,15 @@ class User {
     return todayStreak.currentStreakSeconds;
   }
 
-  const User({
-    required this.id,
-    required this.username,
-    required this.email,
-    required this.profile,
-  });
+  Future<User> setDailyStreakMinutes(int value) {
+    profile.dailyStreakMinutes = value;
+
+    return UserModel.updateOne(id, {
+      "profile": {
+        "daily_streak_minutes": value,
+      }
+    });
+  }
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }

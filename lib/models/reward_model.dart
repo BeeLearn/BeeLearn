@@ -14,13 +14,25 @@ class RewardModel extends ChangeNotifier {
 
   UnmodifiableListView<Reward> get rewards => UnmodifiableListView(_rewards);
 
-  setAll(List<Reward> rewards) {
+  void setAll(List<Reward> rewards) {
     _rewards = rewards;
     notifyListeners();
   }
 
-  addAll(List<Reward> rewards) {
+  void addAll(List<Reward> rewards) {
     _rewards.addAll(rewards);
+    notifyListeners();
+  }
+
+  void updateOrAddOne(Reward reward) {
+    final index = _rewards.indexWhere((element) => element.id == reward.id);
+
+    if (index < 0) {
+      _rewards.add(reward);
+    } else {
+      rewards[index] = reward;
+    }
+
     notifyListeners();
   }
 

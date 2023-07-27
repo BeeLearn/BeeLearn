@@ -27,4 +27,22 @@ class UserModel extends ChangeNotifier {
       return User.fromJson(jsonDecode(response.body));
     });
   }
+
+  static Future<User> updateOne(int id, Map<String, dynamic> data) {
+    return patch(
+      Uri.parse("$apiURL$id/"),
+      body: jsonEncode(data),
+      headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
+      },
+    ).then((response) {
+      switch (response.statusCode) {
+        case HttpStatus.ok:
+          return User.fromJson(jsonDecode(response.body));
+        default:
+          throw Error();
+      }
+    });
+  }
 }

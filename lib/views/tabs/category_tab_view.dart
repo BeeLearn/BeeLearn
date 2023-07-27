@@ -51,7 +51,7 @@ class CategoryTabView extends StatelessWidget {
                   onPressed: () {},
                   icon: Icon(
                     Icons.notifications_none,
-                    color: Theme.of(context).indicatorColor,
+                    color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).indicatorColor : Colors.black,
                   ),
                 ),
                 const SizedBox(width: 8),

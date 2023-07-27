@@ -13,14 +13,14 @@ class Lesson {
   @JsonKey(required: true, name: "is_unlocked")
   final bool isUnlocked;
 
-  @JsonKey(required: true, name: "is_complete")
-  final bool isComplete;
+  @JsonKey(required: true, name: "is_completed")
+  final bool isCompleted;
 
   const Lesson({
     required this.id,
     required this.name,
-    required this.isComplete,
     required this.isUnlocked,
+    required this.isCompleted,
   });
 
   factory Lesson.fromJson(Map<String, dynamic> json) => _$LessonFromJson(json);

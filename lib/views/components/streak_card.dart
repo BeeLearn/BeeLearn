@@ -1,3 +1,4 @@
+import "package:beelearn/views/fragments/set_goal_fragment.dart";
 import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -113,7 +114,14 @@ class _StreakCardState extends State<StreakCard> {
                   spacing: 8.0,
                   children: [
                     FilledButton.tonal(
-                      onPressed: () {},
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          builder: (context) {
+                            return const SetGoalFragment();
+                          },
+                        );
+                      },
                       child: const Text("Adjust goal"),
                     ),
                     FilledButton.tonal(

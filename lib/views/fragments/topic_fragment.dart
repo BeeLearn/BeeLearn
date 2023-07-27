@@ -75,7 +75,7 @@ class _TopicFragmentState extends State<TopicFragment> {
               final previousIndex = index - 1;
               final previousTopic = model.topics[previousIndex];
 
-              if (previousTopic.isComplete) return;
+              if (previousTopic.isCompleted) return;
 
               final nextTopic = model.topics[index];
               final user = Provider.of<UserModel>(context, listen: false).user;

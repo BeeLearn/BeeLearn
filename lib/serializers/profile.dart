@@ -17,11 +17,11 @@ class Profile {
   final int bits;
 
   @JsonKey(required: true, name: "daily_streak_minutes")
-  final int dailyStreakMinutes;
+  int dailyStreakMinutes;
 
   int get dailyStreakSeconds => dailyStreakMinutes * 60;
 
-  const Profile({
+  Profile({
     required this.id,
     required this.lives,
     required this.xp,
