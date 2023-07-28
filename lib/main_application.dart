@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MainApplication {
-  static const baseURL = "http://127.0.0.1:8000";
+  static const baseURL = "https://beelearn.onrender.com";
   static SharedPreferences? sharedPreferences;
   static String? get accessToken => preferences.getString("accessToken");
 

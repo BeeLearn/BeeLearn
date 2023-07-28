@@ -10,7 +10,6 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   MainApplication.sharedPreferences = await SharedPreferences.getInstance();
-  await MainApplication.preferences.clear();
 
   runApp(const ApplicationView());
 }
