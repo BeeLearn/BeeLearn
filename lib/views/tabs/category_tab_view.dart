@@ -38,13 +38,17 @@ class CategoryTabView extends StatelessWidget {
                     border: Border.all(color: Theme.of(context).splashColor),
                     borderRadius: BorderRadius.circular(100.0),
                   ),
-                  children: const [
-                    Icon(
+                  children: [
+                    const Icon(
                       CupertinoIcons.flame_fill,
                       color: Colors.green,
                     ),
-                    SizedBox(width: 8.0),
-                    Text("3"),
+                    const SizedBox(width: 8.0),
+                    Consumer<UserModel>(
+                      builder: (context, model, child) {
+                        return Text(model.user.profile.lives.toString());
+                      },
+                    ),
                   ],
                 ),
                 IconButton(

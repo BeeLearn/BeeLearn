@@ -80,6 +80,11 @@ class _SetGoalFragmentState extends State<SetGoalFragment> {
                 hideShadow: true,
               ),
               infoProperties: InfoProperties(
+                mainLabelStyle: TextStyle(
+                  fontWeight: FontWeight.w100,
+                  fontSize: 256 / 5.0,
+                  color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black,
+                ),
                 modifier: (percentage) {
                   return "${percentage.round()} min";
                 },

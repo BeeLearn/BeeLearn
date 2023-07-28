@@ -39,7 +39,7 @@ class StreakModel extends ChangeNotifier {
     return get(
       Uri.parse(nextURL ?? apiURL).replace(queryParameters: query),
       headers: {
-        HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
     ).then(
       (response) {
@@ -57,12 +57,13 @@ class StreakModel extends ChangeNotifier {
   }
 
   static Future<Streak> updateStreak(int id, {required Map<String, dynamic> data}) {
+    print(data);
     return patch(
       Uri.parse("$apiURL$id/"),
       body: jsonEncode(data),
       headers: {
         HttpHeaders.contentTypeHeader: "application/json",
-        HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
     ).then(
       (response) {
@@ -70,6 +71,7 @@ class StreakModel extends ChangeNotifier {
           case HttpStatus.ok:
             return Streak.fromJson(jsonDecode(response.body));
           default:
+            print(response.body);
             throw Error();
         }
       },

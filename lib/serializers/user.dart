@@ -43,7 +43,11 @@ class User {
     if (todayStreak.currentStreakSeconds >= profile.dailyStreakSeconds) {
       return StreakModel.updateStreak(
         todayStreak.id,
-        data: {"is_complete": true},
+        data: {
+          "streak_complete_users": {
+            "add": [id],
+          },
+        },
       ).then((streak) {
         streakModel.updateOne(streak);
         return streak.currentStreakSeconds;

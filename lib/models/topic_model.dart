@@ -37,7 +37,7 @@ class TopicModel extends ChangeNotifier {
     return get(
       Uri.parse(nextURL ?? apiURL).replace(queryParameters: query),
       headers: {
-        HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
     ).then((response) {
       return Paginate.fromJson(
@@ -55,7 +55,7 @@ class TopicModel extends ChangeNotifier {
       Uri.parse("$apiURL$id/"),
       headers: {
         HttpHeaders.contentTypeHeader: "application/json",
-        HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
       body: jsonEncode(data),
     ).then((response) {

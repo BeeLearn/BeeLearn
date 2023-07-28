@@ -91,7 +91,7 @@ class _ModuleFragmentState extends State<ModuleFragment> {
                               context: context,
                               useSafeArea: false,
                               builder: (context) {
-                                return TopicView(query: {"lesson_id": lesson.id});
+                                return TopicView(query: {"lesson_id": lesson.id.toString()});
                               },
                             );
                           },

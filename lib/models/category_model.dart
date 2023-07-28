@@ -40,7 +40,7 @@ class CategoryModel extends ChangeNotifier {
     return get(
       Uri.parse(next),
       headers: {
-        HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
     ).then(
       (response) => Paginate.fromJson(

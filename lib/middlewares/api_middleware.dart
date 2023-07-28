@@ -5,6 +5,7 @@ import 'package:socket_io_client/socket_io_client.dart';
 
 import '../djira_client/request.dart';
 import '../main_application.dart';
+import '../models/course_model.dart';
 import '../models/reward_model.dart';
 import '../models/streak_model.dart';
 import '../serializers/course.dart';
@@ -39,9 +40,9 @@ void showSnackBar({
 class ApiMiddleware {
   static void run(BuildContext context) {
     final socket = Request.createClient(
-      "http://localhost:8000",
+      MainApplication.baseURL,
       OptionBuilder().setAuth({
-        "token": MainApplication.testAccessToken,
+        "token": MainApplication.accessToken,
       }).setTransports(["websocket"]).build(),
     );
 
@@ -51,6 +52,30 @@ class ApiMiddleware {
         onError: (response) {},
         onSuccess: (response) {
           final course = Course.fromJson(response.data);
+          final inProgressCourseModel = Provider.of<InProgressCourseModel>(context, listen: false);
+          final completedCourseModel = Provider.of<CompletedCourseModel>(context, listen: false);
+
+          if (course.isCompleted) {
+            completedCourseModel.updateOrAddOne(course);
+            inProgressCourseModel.removeOne(course);
+          } else if (course.isEnrolled) {
+            inProgressCourseModel.updateOrAddOne(course);
+          }
+        },
+      );
+
+      Request.subscribe(
+        namespace: "favourites",
+        onError: (response) {},
+        onSuccess: (response) {
+          final course = Course.fromJson(response.data);
+          final favouriteCourseModel = Provider.of<FavouriteCourseModel>(context, listen: false);
+
+          if (course.isLiked) {
+            favouriteCourseModel.updateOrAddOne(course);
+          } else {
+            favouriteCourseModel.removeOne(course);
+          }
         },
       );
 
@@ -60,7 +85,7 @@ class ApiMiddleware {
         onSuccess: (response) {
           final reward = Reward.fromJson(response.data);
 
-          Provider.of<RewardModel>(context).updateOrAddOne(reward);
+          Provider.of<RewardModel>(context, listen: false).updateOrAddOne(reward);
           showSnackBar(
             leading: CircleAvatar(foregroundImage: NetworkImage(reward.icon)),
             title: reward.title,
@@ -90,11 +115,5 @@ class ApiMiddleware {
         },
       );
     });
-
-    socket.onError((data) {
-      print(data);
-    });
-
-    socket.onAny((event, data) => print(data));
   }
 }

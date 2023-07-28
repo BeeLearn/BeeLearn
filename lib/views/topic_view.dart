@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:beelearn/models/streak_model.dart';
 import 'package:beelearn/models/user_model.dart';
 import 'package:beelearn/views/fragments/topic_fragment.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,34 +23,41 @@ class TopicView extends StatefulWidget {
 }
 
 class _TopicViewState extends State<TopicView> {
-  late Timer _timer;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
 
-    _timer = Timer.periodic(
-      const Duration(seconds: 1),
-      (timer) async {
-        UserModel userModel = Provider.of<UserModel>(
-          context,
-          listen: false,
-        );
-
-        /// Increment dailyStreakSeconds
-        int currentStreakSeconds = await userModel.user.increaseDailyStreakSeconds(context);
-
-        // cancel timer when streak minute reached
-        if (currentStreakSeconds >= userModel.user.profile.dailyStreakSeconds) {
-          timer.cancel();
-        }
-      },
+    final streakModel = Provider.of<StreakModel>(
+      context,
+      listen: false,
     );
+
+    if (!streakModel.todayStreak.isComplete) {
+      _timer = Timer.periodic(
+        const Duration(seconds: 1),
+        (timer) async {
+          UserModel userModel = Provider.of<UserModel>(
+            context,
+            listen: false,
+          );
+
+          /// Increment dailyStreakSeconds
+          int currentStreakSeconds = await userModel.user.increaseDailyStreakSeconds(context);
+
+          // cancel timer when streak minute reached
+          if (currentStreakSeconds >= userModel.user.profile.dailyStreakSeconds) {
+            timer.cancel();
+          }
+        },
+      );
+    }
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 

@@ -26,7 +26,7 @@ class ModuleModel extends BaseModel<Module> {
     return get(
       Uri.parse(url),
       headers: {
-        HttpHeaders.authorizationHeader: "Token ${MainApplication.testAccessToken}",
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
     ).then((response) {
       return Paginate.fromJson(

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -11,11 +10,9 @@ import '../components/page_view_indicators.dart';
 
 class TopicFragment extends StatefulWidget {
   final Map<String, dynamic> query;
-  final int? nextLessonIndex;
 
   const TopicFragment({
     super.key,
-    this.nextLessonIndex,
     required this.query,
   });
 
@@ -53,7 +50,9 @@ class _TopicFragmentState extends State<TopicFragment> {
           extendBody: true,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            leading: BackButton(onPressed: context.pop),
+            leading: BackButton(onPressed: () {
+              Navigator.pop(context);
+            }),
             title: LinearProgressPageIndicator(
               itemCount: model.topics.length,
               pageController: _controller,

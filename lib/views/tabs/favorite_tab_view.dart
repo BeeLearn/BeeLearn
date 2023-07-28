@@ -64,14 +64,16 @@ class _FavoriteTabState extends State<FavoriteTab> {
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Consumer<FavouriteCourseModel>(
             builder: (context, model, child) {
+              final courses = model.items;
+
               return GridView.builder(
-                itemCount: model.courses.length,
+                itemCount: courses.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3, // large screen 5
                   childAspectRatio: 0.7, // large screen 1
                 ),
                 itemBuilder: (context, index) {
-                  final course = model.courses[index];
+                  final course = courses[index];
 
                   return CourseCard(
                     course: course,

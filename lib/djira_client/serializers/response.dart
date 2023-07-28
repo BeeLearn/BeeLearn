@@ -16,6 +16,16 @@ enum Method {
   subscription,
 }
 
+@JsonEnum()
+enum Type {
+  @JsonValue("added")
+  created,
+  @JsonValue("modified")
+  updated,
+  @JsonValue("removed")
+  removed,
+}
+
 @JsonSerializable()
 class Response {
   @JsonKey(required: true)
@@ -27,6 +37,9 @@ class Response {
   @JsonKey(required: true)
   final Method method;
 
+  @JsonKey()
+  final Type? type;
+
   @JsonKey(required: true)
   final dynamic data;
 
@@ -34,6 +47,7 @@ class Response {
     required this.status,
     required this.requestId,
     required this.method,
+    required this.type,
     required this.data,
   });
 

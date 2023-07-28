@@ -1,6 +1,8 @@
 import 'package:beelearn/models/course_model.dart';
+import 'package:beelearn/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 
 import '../../serializers/course.dart';
 
@@ -29,9 +31,11 @@ class CourseCard extends StatelessWidget {
             return intentToModules(context);
           }
 
+          final userModel = Provider.of<UserModel>(context, listen: false);
+
           CourseModel.updateCourse(id: course.id, data: {
             "course_enrolled_users": {
-              "add": [course.id]
+              "add": [userModel.user.id]
             },
           }).then((course) {
             if (onUpdate != null) {
@@ -53,24 +57,25 @@ class CourseCard extends StatelessWidget {
               course.image,
               fit: BoxFit.cover,
             ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                  vertical: 2.0,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF25C19B),
-                  borderRadius: BorderRadius.circular(100.0),
-                ),
-                child: const Text(
-                  "New",
-                  style: TextStyle(color: Colors.white),
+            if (course.isNew)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 2.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF25C19B),
+                    borderRadius: BorderRadius.circular(100.0),
+                  ),
+                  child: const Text(
+                    "New",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
-            ),
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(

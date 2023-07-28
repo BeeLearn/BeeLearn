@@ -5,8 +5,13 @@ import 'package:flutter/foundation.dart';
 class BaseModel<T> extends ChangeNotifier {
   Map<dynamic, T> _entities = {};
 
-  dynamic getEntityId(T item) {}
-  dynamic orderBy(T first, T second) {}
+  dynamic getEntityId(T item) {
+    throw UnimplementedError();
+  }
+
+  dynamic orderBy(T first, T second) {
+    throw UnimplementedError();
+  }
 
   UnmodifiableListView<T> get items => UnmodifiableListView(_entities.values);
 

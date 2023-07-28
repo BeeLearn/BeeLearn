@@ -14,6 +14,7 @@ Course _$CourseFromJson(Map<String, dynamic> json) {
       'is_new',
       'name',
       'image',
+      'is_liked',
       'is_enrolled',
       'is_completed'
     ],
@@ -23,6 +24,7 @@ Course _$CourseFromJson(Map<String, dynamic> json) {
     name: json['name'] as String,
     image: json['image'] as String,
     isNew: json['is_new'] as bool,
+    isLiked: json['is_liked'] as bool,
     isEnrolled: json['is_enrolled'] as bool,
     isCompleted: json['is_completed'] as bool,
   );
@@ -33,6 +35,7 @@ Map<String, dynamic> _$CourseToJson(Course instance) => <String, dynamic>{
       'is_new': instance.isNew,
       'name': instance.name,
       'image': instance.image,
+      'is_liked': instance.isLiked,
       'is_enrolled': instance.isEnrolled,
       'is_completed': instance.isCompleted,
     };

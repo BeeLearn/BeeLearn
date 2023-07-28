@@ -15,6 +15,7 @@ Response _$ResponseFromJson(Map<String, dynamic> json) {
     status: json['status'] as int,
     requestId: json['requestId'] as String,
     method: $enumDecode(_$MethodEnumMap, json['method']),
+    type: $enumDecodeNullable(_$TypeEnumMap, json['type']),
     data: json['data'],
   );
 }
@@ -23,6 +24,7 @@ Map<String, dynamic> _$ResponseToJson(Response instance) => <String, dynamic>{
       'status': instance.status,
       'requestId': instance.requestId,
       'method': _$MethodEnumMap[instance.method]!,
+      'type': _$TypeEnumMap[instance.type],
       'data': instance.data,
     };
 
@@ -32,4 +34,10 @@ const _$MethodEnumMap = {
   Method.put: 'PUT',
   Method.patch: 'PATCH',
   Method.subscription: 'SUBSCRIPTION',
+};
+
+const _$TypeEnumMap = {
+  Type.created: 'added',
+  Type.updated: 'modified',
+  Type.removed: 'removed',
 };

@@ -16,6 +16,9 @@ class Course {
   @JsonKey(required: true)
   final String image;
 
+  @JsonKey(required: true, name: "is_liked")
+  final bool isLiked;
+
   @JsonKey(required: true, name: "is_enrolled")
   final bool isEnrolled;
 
@@ -27,6 +30,7 @@ class Course {
     required this.name,
     required this.image,
     required this.isNew,
+    required this.isLiked,
     required this.isEnrolled,
     required this.isCompleted,
   });
