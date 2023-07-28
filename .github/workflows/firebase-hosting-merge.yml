@@ -3,7 +3,10 @@
 
 
 name: Analyze, Build and Deploy
-on: [push]
+on: 
+  push:
+    branches:
+      - main
 jobs:
   semantic-pull-request:
     name: "Semantic"
