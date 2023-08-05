@@ -16,7 +16,7 @@ class Module {
   final bool isCompleted;
 
   @JsonKey(required: true, name: "is_unlocked")
-  final bool isUnLocked;
+  final bool isUnlocked;
 
   @JsonKey(required: true, name: "lessons")
   final List<Lesson> lessons;
@@ -24,7 +24,7 @@ class Module {
   const Module({
     required this.id,
     required this.name,
-    required this.isUnLocked,
+    required this.isUnlocked,
     required this.isCompleted,
     required this.lessons,
   });

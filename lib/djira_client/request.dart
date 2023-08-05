@@ -121,7 +121,6 @@ class Request {
       data: data,
       query: query,
     ).then((response) {
-      print(response);
       addListener(
         method: method,
         requestId: response.requestId,

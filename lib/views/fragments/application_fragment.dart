@@ -16,8 +16,9 @@ class _ApplicationFragmentState extends State<ApplicationFragment> {
   @override
   void initState() {
     super.initState();
-    if(MainApplication.accessToken != null)
+    if (MainApplication.accessToken != null) {
       ApiMiddleware.run(context);
+    }
   }
 
   @override

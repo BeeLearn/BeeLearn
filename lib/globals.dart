@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'models/user_model.dart';
+import 'views/enhancement_view.dart';
 import 'views/main_view.dart';
 import 'views/module_view.dart';
 import 'views/topic_view.dart';
@@ -18,13 +19,21 @@ GoRouter router = GoRouter(
           builder: (context, state) {
             return TopicView(query: state.queryParameters);
           },
+          routes: [
+            GoRoute(
+              path: ":topicId/enhancements",
+              builder: (context, state) => EnhancementView(
+                topicId: state.pathParameters["topicId"] as int,
+              ),
+            ),
+          ],
         ),
         GoRoute(
           path: "modules",
           builder: (context, state) {
             return ModuleView(
               courseName: state.queryParameters["courseName"],
-              courseId: int.parse(state.queryParameters["courseId"]!),
+              query: state.queryParameters,
             );
           },
         ),

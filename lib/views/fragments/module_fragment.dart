@@ -1,17 +1,20 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../djira_client/request.dart';
 import '../../main_application.dart';
 import '../../models/module_model.dart';
+import '../../serializers/lesson.dart';
 import '../../serializers/module.dart';
 import '../components/expanded_list.dart';
 import '../topic_view.dart';
 
 class ModuleFragment extends StatefulWidget {
-  final int courseId;
+  final Map<String, dynamic> query;
 
-  const ModuleFragment({super.key, required this.courseId});
+  const ModuleFragment({super.key, required this.query});
 
   @override
   State<StatefulWidget> createState() => _ModuleFragmentState();
@@ -24,7 +27,7 @@ class _ModuleFragmentState extends State<ModuleFragment> {
 
     final moduleModel = Provider.of<ModuleModel>(context, listen: false);
 
-    ModuleModel.getModules(courseId: widget.courseId).then((response) {
+    ModuleModel.getModules(query: widget.query).then((response) {
       moduleModel.setAll(response.results);
     });
 
@@ -32,8 +35,32 @@ class _ModuleFragmentState extends State<ModuleFragment> {
       namespace: "modules",
       onError: (response) {},
       onSuccess: (response) {
-        final module = Module.fromJson(response.data);
-        moduleModel.updateOrAddOne(module);
+        moduleModel.updateOrAddOne(Module.fromJson(response.data));
+      },
+    );
+
+    Request.subscribe(
+      namespace: "lessons",
+      onError: (response) {},
+      onSuccess: (response) {
+        final lesson = Lesson.fromJson(response.data);
+
+        moduleModel.updateLessonOne(
+          moduleId: lesson.moduleId,
+          lesson: lesson,
+        );
+      },
+    );
+
+    Request.socket.onAny((event, data) => log(data));
+  }
+
+  showTopicViewDialog(Lesson lesson) {
+    showDialog(
+      context: context,
+      useSafeArea: false,
+      builder: (context) {
+        return TopicView(query: {"lesson_id": lesson.id.toString()});
       },
     );
   }
@@ -55,7 +82,7 @@ class _ModuleFragmentState extends State<ModuleFragment> {
                   generateKey: (index) => "module_${index}_expansion_state",
                   headerBuilder: (context, index, isExpanded) {
                     final module = modules[index];
-                    final isUnlocked = index == 0 || module.isUnLocked;
+                    final isUnlocked = index == 0 || module.isUnlocked;
 
                     return ListTile(
                       leading: Container(
@@ -74,8 +101,8 @@ class _ModuleFragmentState extends State<ModuleFragment> {
                       title: Text(module.name),
                     );
                   },
-                  bodyBuilder: (context, index) {
-                    final module = modules[index];
+                  bodyBuilder: (context, moduleIndex) {
+                    final module = modules[moduleIndex];
 
                     return ListView.builder(
                       itemCount: module.lessons.length,
@@ -83,18 +110,10 @@ class _ModuleFragmentState extends State<ModuleFragment> {
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, index) {
                         final lesson = module.lessons[index];
-                        final isUnlocked = index == 0 || module.isUnLocked;
+                        final isUnlocked = (moduleIndex == 0 && index == 0) || lesson.isUnlocked;
 
                         return ListTile(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              useSafeArea: false,
-                              builder: (context) {
-                                return TopicView(query: {"lesson_id": lesson.id.toString()});
-                              },
-                            );
-                          },
+                          onTap: () => showTopicViewDialog(lesson),
                           enabled: isUnlocked,
                           isThreeLine: true,
                           leading: const Icon(Icons.book_outlined),

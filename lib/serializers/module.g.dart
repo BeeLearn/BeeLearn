@@ -20,7 +20,7 @@ Module _$ModuleFromJson(Map<String, dynamic> json) {
   return Module(
     id: json['id'] as int,
     name: json['name'] as String,
-    isUnLocked: json['is_unlocked'] as bool,
+    isUnlocked: json['is_unlocked'] as bool,
     isCompleted: json['is_completed'] as bool,
     lessons: (json['lessons'] as List<dynamic>)
         .map((e) => Lesson.fromJson(e as Map<String, dynamic>))
@@ -32,6 +32,6 @@ Map<String, dynamic> _$ModuleToJson(Module instance) => <String, dynamic>{
       'id': instance.id,
       'name': instance.name,
       'is_completed': instance.isCompleted,
-      'is_unlocked': instance.isUnLocked,
+      'is_unlocked': instance.isUnlocked,
       'lessons': instance.lessons,
     };

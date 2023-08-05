@@ -1,19 +1,19 @@
-import 'package:beelearn/views/fragments/module_fragment.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../models/module_model.dart';
 import 'app_theme.dart';
+import 'fragments/module_fragment.dart';
 
 class ModuleView extends StatelessWidget {
-  final int courseId;
+  final Map<String, dynamic> query;
   final String? courseName;
 
   const ModuleView({
     super.key,
     this.courseName,
-    required this.courseId,
+    required this.query,
   });
 
   @override
@@ -30,7 +30,7 @@ class ModuleView extends StatelessWidget {
             leading: BackButton(onPressed: context.pop),
             title: Text(courseName ?? ""),
           ),
-          body: ModuleFragment(courseId: courseId),
+          body: ModuleFragment(query: query),
         ),
       ),
     );

@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';
-import 'package:http/http.dart' show get, patch;
+import 'package:http/http.dart' show get, patch, post;
 
 import '../../main_application.dart';
+import '../serializers/enhancement.dart';
 import '../serializers/paginate.dart';
 import '../serializers/topic.dart';
 
@@ -64,6 +65,17 @@ class TopicModel extends ChangeNotifier {
           return Topic.fromJson(jsonDecode(response.body));
         default:
           print(response.body);
+          throw Error();
+      }
+    });
+  }
+
+  static Future<Enhancement> enhanceTopic({int? id, String? nextURL}) {
+    return post(Uri.parse(nextURL ?? "$apiURL$id/enhance/")).then((response) {
+      switch (response.statusCode) {
+        case HttpStatus.created:
+          return Enhancement.fromJson(jsonDecode(response.body));
+        default:
           throw Error();
       }
     });

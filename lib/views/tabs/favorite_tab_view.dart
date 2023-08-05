@@ -66,27 +66,48 @@ class _FavoriteTabState extends State<FavoriteTab> {
             builder: (context, model, child) {
               final courses = model.items;
 
-              return GridView.builder(
-                itemCount: courses.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // large screen 5
-                  childAspectRatio: 0.7, // large screen 1
-                ),
-                itemBuilder: (context, index) {
-                  final course = courses[index];
+              return courses.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.favorite_outline,
+                            size: 32,
+                          ),
+                          const SizedBox(height: 8.0),
+                          Text(
+                            "No liked course",
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          Text(
+                            "All liked topics can be found here",
+                            style: Theme.of(context).textTheme.labelMedium,
+                          ),
+                        ],
+                      ),
+                    )
+                  : GridView.builder(
+                      itemCount: courses.length,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3, // large screen 5
+                        childAspectRatio: 0.7, // large screen 1
+                      ),
+                      itemBuilder: (context, index) {
+                        final course = courses[index];
 
-                  return CourseCard(
-                    course: course,
-                    onTap: () {
-                      final user = Provider.of<UserModel>(
-                        context,
-                        listen: false,
-                      ).user;
-                      context.go("/topics/?lesson__module__course=${course.id}&likes=${user.id}");
-                    },
-                  );
-                },
-              );
+                        return CourseCard(
+                          course: course,
+                          onTap: () {
+                            final user = Provider.of<UserModel>(
+                              context,
+                              listen: false,
+                            ).user;
+                            context.go("/topics/?lesson__module__course=${course.id}&likes=${user.id}");
+                          },
+                        );
+                      },
+                    );
             },
           ),
         ),

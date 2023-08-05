@@ -19,7 +19,7 @@ class CourseCard extends StatelessWidget {
   });
 
   void intentToModules(BuildContext context) {
-    context.push("/modules/?courseId=${course.id}&courseName=${course.name}");
+    context.push("/modules/?course=${course.id}&courseName=${course.name}");
   }
 
   @override

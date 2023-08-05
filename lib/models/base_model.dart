@@ -13,6 +13,8 @@ class BaseModel<T> extends ChangeNotifier {
     throw UnimplementedError();
   }
 
+  T? getEntityById(dynamic id) => _entities[id];
+
   UnmodifiableListView<T> get items => UnmodifiableListView(_entities.values);
 
   setAll(List<T> items) {

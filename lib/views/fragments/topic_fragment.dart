@@ -1,3 +1,4 @@
+import 'package:beelearn/views/enhancement_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -5,7 +6,6 @@ import 'package:provider/provider.dart';
 
 import '../../models/topic_model.dart';
 import '../../models/user_model.dart';
-import '../app_theme.dart';
 import '../components/page_view_indicators.dart';
 
 class TopicFragment extends StatefulWidget {
@@ -21,9 +21,7 @@ class TopicFragment extends StatefulWidget {
 }
 
 class _TopicFragmentState extends State<TopicFragment> {
-  String? _next;
-  int currentPage = 0;
-
+  final ValueNotifier<int> currentPage = ValueNotifier(0);
   final PageController _controller = PageController();
 
   @override
@@ -37,31 +35,53 @@ class _TopicFragmentState extends State<TopicFragment> {
         ).setAll(topics.results);
       }),
     );
+
+    _controller.addListener(() {
+      if (currentPage.value == _controller.page!.round()) {
+        return;
+      }
+
+      currentPage.value = _controller.page!.round();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      home: Consumer<TopicModel>(builder: (context, model, child) {
+    return Consumer<TopicModel>(
+      builder: (context, model, child) {
         return Scaffold(
           extendBodyBehindAppBar: true,
           extendBody: true,
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            leading: BackButton(onPressed: () {
-              Navigator.pop(context);
-            }),
+            leading: BackButton(onPressed: () => Navigator.pop(context)),
             title: LinearProgressPageIndicator(
               itemCount: model.topics.length,
               pageController: _controller,
             ),
             actions: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(CupertinoIcons.sparkles),
-              ),
+              ValueListenableBuilder<int>(
+                valueListenable: currentPage,
+                builder: (context, currentPage, child) {
+                  return IconButton(
+                    onPressed: () {
+                      if (currentPage > -1) {
+                        final topic = Provider.of<TopicModel>(
+                          context,
+                          listen: false,
+                        ).topics[currentPage];
+
+                        showDialog(
+                          context: context,
+                          useSafeArea: false,
+                          builder: (context) => EnhancementView(topicId: topic.id),
+                        );
+                      }
+                    },
+                    icon: const Icon(CupertinoIcons.sparkles),
+                  );
+                },
+              )
             ],
             centerTitle: true,
           ),
@@ -172,7 +192,7 @@ class _TopicFragmentState extends State<TopicFragment> {
             },
           ),
         );
-      }),
+      },
     );
   }
 }
