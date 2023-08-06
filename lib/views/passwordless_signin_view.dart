@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:beelearn/main_application.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
@@ -8,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:uni_links/uni_links.dart';
 
+import '../main_application.dart';
+import '../models/firebase_user_model.dart';
 import 'app_theme.dart';
 
 class PasswordLessSignInView extends StatefulWidget {
@@ -72,7 +73,7 @@ class _PasswordLessSignInViewState extends State<PasswordLessSignInView> {
         );
       }
 
-      _emailLink = link!;
+      _emailLink = link;
       verifyEmailSignInLink(email!);
     }
   }
@@ -85,13 +86,19 @@ class _PasswordLessSignInViewState extends State<PasswordLessSignInView> {
       email: email,
       emailLink: _emailLink,
     )
-        .then((userCredentials) {
+        .then((userCredential) {
       _scaffoldMessengerKey.currentState?.showSnackBar(
         const SnackBar(
           behavior: SnackBarBehavior.floating,
           content: Text("Wait some moment while we fetch your account"),
         ),
       );
+
+      FirebaseUserModel.setup(
+        context,
+        userCredential.user,
+        reconnect: true,
+      )?.then((value) => context.pushReplacement("/"));
     }).onError((error, stackTrace) {
       context.loaderOverlay.hide();
 

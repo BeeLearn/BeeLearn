@@ -1,4 +1,4 @@
-import 'package:beelearn/models/firebase_user_model.dart';
+import '../models/firebase_user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
@@ -114,8 +114,6 @@ class _SignInViewState extends State<SignInView> {
                                           userCredential.user,
                                           reconnect: true,
                                         )?.then((value) => context.pushReplacement("/"));
-
-                                        print("I have an isssue A real one");
                                       }).whenComplete(() => context.loaderOverlay.hide());
                                     }
                                   },
