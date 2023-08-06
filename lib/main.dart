@@ -20,11 +20,12 @@ void main() async {
       FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
       MainApplication.sharedPreferences = await SharedPreferences.getInstance();
-      MainApplication.preferences.clear();
 
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
+
+      FlutterNativeSplash.remove();
 
       runApp(const ApplicationView());
     },

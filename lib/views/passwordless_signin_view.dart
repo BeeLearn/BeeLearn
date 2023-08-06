@@ -40,7 +40,6 @@ class _PasswordLessSignInViewState extends State<PasswordLessSignInView> {
     super.initState();
 
     getInitialLink().then((String? link) {
-      print(link);
       resolveLinkIfEmailLink(link);
     });
 
@@ -87,7 +86,12 @@ class _PasswordLessSignInViewState extends State<PasswordLessSignInView> {
       emailLink: _emailLink,
     )
         .then((userCredentials) {
-      context.pushReplacement("/");
+      _scaffoldMessengerKey.currentState?.showSnackBar(
+        const SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text("Wait some moment while we fetch your account"),
+        ),
+      );
     }).onError((error, stackTrace) {
       context.loaderOverlay.hide();
 
@@ -109,13 +113,25 @@ class _PasswordLessSignInViewState extends State<PasswordLessSignInView> {
     )
         .then(
       (value) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        _scaffoldMessengerKey.currentState?.showSnackBar(
           const SnackBar(
             content: Text("Email link sent to your email successfully"),
           ),
         );
       },
-    ).whenComplete(() => context.loaderOverlay.hide());
+    ).onError((error, stackTrace) {
+      _scaffoldMessengerKey.currentState?.showSnackBar(
+        SnackBar(
+          content: const Text("An error occur, Can't send email link"),
+          action: SnackBarAction(
+            label: "Try again",
+            onPressed: () {
+              sendEmailSignInLink(email);
+            },
+          ),
+        ),
+      );
+    }).whenComplete(() => context.loaderOverlay.hide());
   }
 
   @override
@@ -135,10 +151,12 @@ class _PasswordLessSignInViewState extends State<PasswordLessSignInView> {
               child: Flex(
                 direction: Axis.vertical,
                 children: [
-                  const Image(
-                    height: 100,
-                    width: 100,
-                    image: AssetImage("assets/splash_icon.png"),
+                  const Center(
+                    child: Image(
+                      height: 100,
+                      width: 100,
+                      image: AssetImage("assets/splash_icon.png"),
+                    ),
                   ),
                   Flexible(
                     child: Form(
@@ -170,7 +188,13 @@ class _PasswordLessSignInViewState extends State<PasswordLessSignInView> {
                                 }
                               }
                             },
-                            child: const Text("Login to account"),
+                            child: const Text("Send email link"),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              context.push("/sign-in");
+                            },
+                            child: const Text("Login with password?"),
                           ),
                         ],
                       ),
