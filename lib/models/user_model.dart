@@ -12,6 +12,7 @@ class UserModel extends ChangeNotifier {
   static const String apiURL = "${MainApplication.baseURL}/api/account/users/";
 
   User get user => _user!;
+  User? get nullableUser => _user;
 
   setUser(User user) {
     _user = user;

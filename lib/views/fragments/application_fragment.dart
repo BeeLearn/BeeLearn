@@ -1,8 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:provider/provider.dart';
 
 import '../../globals.dart';
 import '../../main_application.dart';
 import '../../middlewares/api_middleware.dart';
+import '../../models/user_model.dart';
 import '../app_theme.dart';
 
 class ApplicationFragment extends StatefulWidget {
@@ -16,9 +20,29 @@ class _ApplicationFragmentState extends State<ApplicationFragment> {
   @override
   void initState() {
     super.initState();
-    if (MainApplication.accessToken != null) {
-      ApiMiddleware.run(context);
-    }
+
+    FirebaseAuth.instance.idTokenChanges().listen((idToken) {
+      MainApplication.accessToken = idToken;
+    });
+
+    FirebaseAuth.instance.authStateChanges().listen(
+      (user) {
+        user?.getIdToken().then(
+          (value) {
+            MainApplication.accessToken = value;
+            UserModel.getCurrentUser().then((user) {
+              Provider.of<UserModel>(
+                context,
+                listen: false,
+              ).setUser(user);
+              ApiMiddleware.run(context);
+
+              FlutterNativeSplash.remove();
+            });
+          },
+        );
+      },
+    );
   }
 
   @override

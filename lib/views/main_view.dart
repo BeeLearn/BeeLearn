@@ -1,4 +1,6 @@
+import 'package:beelearn/models/user_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import '../globals.dart';
@@ -30,9 +32,17 @@ class _MainViewState extends State<MainView> {
       home: ResponsiveBreakpoints.builder(
         breakpoints: defaultBreakpoints,
         child: Scaffold(
-          body: IndexedStack(
-            index: _currentIndex,
-            children: _tabs,
+          body: Consumer<UserModel>(
+            builder: (context, model, child) {
+              return model.nullableUser == null
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : IndexedStack(
+                      index: _currentIndex,
+                      children: _tabs,
+                    );
+            },
           ),
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: _currentIndex,

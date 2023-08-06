@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "555382338219",
+    "project_id": "bee-learn",
+    "storage_bucket": "bee-learn.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:555382338219:android:fb54ddba50113ff54d7dee",
+        "android_client_info": {
+          "package_name": "com.oasis.beelearn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "555382338219-qep8h303lu78d3vmg2r9e8104dp66rqn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNoa1tIYB4wxos9RrsFEBsZJHc1gwgWHs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "555382338219-qep8h303lu78d3vmg2r9e8104dp66rqn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
