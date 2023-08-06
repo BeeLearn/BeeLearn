@@ -16,6 +16,17 @@ class EnhancementModel extends BaseModel<Enhancement> {
   @override
   orderBy(Enhancement first, Enhancement second) => true ? 1 : -1;
 
+  static Future<void> deleteEnhancement(int id) {
+    return delete(Uri.parse("$apiURL$id/")).then((response) {
+      switch (response.statusCode) {
+        case HttpStatus.noContent:
+          break;
+        default:
+          throw Error();
+      }
+    });
+  }
+
   static Future<Paginate<Enhancement>> fetchEnhancements({Map<String, dynamic>? query}) {
     return get(
       Uri.parse(apiURL).replace(queryParameters: query),

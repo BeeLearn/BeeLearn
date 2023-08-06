@@ -1,9 +1,10 @@
-import 'package:beelearn/models/user_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/course_model.dart';
+import '../../models/user_model.dart';
 import '../components/pill_chip.dart';
 import 'category_single_tab.dart';
 import 'category_tab.dart';
@@ -22,7 +23,15 @@ class CategoryTabView extends StatelessWidget {
               floating: true,
               pinned: true,
               snap: true,
-              title: const CupertinoSearchTextField(),
+              title: GestureDetector(
+                onTap: () => context.go("/search"),
+                child: const AbsorbPointer(
+                  absorbing: true,
+                  child: CupertinoSearchTextField(
+                    enabled: false,
+                  ),
+                ),
+              ),
               bottom: const TabBar(
                 isScrollable: true,
                 tabs: [

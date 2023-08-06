@@ -1,3 +1,4 @@
+import 'package:beelearn/serializers/enhancement.dart';
 import 'package:beelearn/views/enhancement_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -64,18 +65,20 @@ class _TopicFragmentState extends State<TopicFragment> {
                 valueListenable: currentPage,
                 builder: (context, currentPage, child) {
                   return IconButton(
-                    onPressed: () {
+                    onPressed: () async {
                       if (currentPage > -1) {
-                        final topic = Provider.of<TopicModel>(
+                        final topicModel = Provider.of<TopicModel>(
                           context,
                           listen: false,
-                        ).topics[currentPage];
-
-                        showDialog(
+                        );
+                        final topic = topicModel.topics[currentPage];
+                        final Enhancement? enhancement = await showDialog(
                           context: context,
                           useSafeArea: false,
                           builder: (context) => EnhancementView(topicId: topic.id),
                         );
+
+                        topicModel.setEnhancement(currentPage, enhancement);
                       }
                     },
                     icon: const Icon(CupertinoIcons.sparkles),
@@ -123,24 +126,38 @@ class _TopicFragmentState extends State<TopicFragment> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text(
-                                topic.title,
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.albertSans(
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.w900,
-                                  color: Theme.of(context).colorScheme.inverseSurface,
+                              Expanded(
+                                child: Text(
+                                  topic.title,
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.albertSans(
+                                    fontSize: 20.0,
+                                    fontWeight: FontWeight.w900,
+                                    color: Theme.of(context).colorScheme.inverseSurface,
+                                  ),
                                 ),
                               ),
+                              if (topic.enhancement != null)
+                                IconButton(
+                                  icon: const Icon(Icons.refresh),
+                                  onPressed: () {
+                                    Provider.of<TopicModel>(
+                                      context,
+                                      listen: false,
+                                    ).setEnhancement(index, null);
+                                  },
+                                )
                             ],
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(top: 32.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(top: 16.0),
                             child: Text(
-                              topic.content,
-                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    color: Theme.of(context).colorScheme.inverseSurface,
-                                  ),
+                              topic.enhancement == null ? topic.content : topic.enhancement!.content,
+                              style: GoogleFonts.openSans(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w300,
+                                color: Theme.of(context).colorScheme.inverseSurface,
+                              ),
                             ),
                           ),
                         ],

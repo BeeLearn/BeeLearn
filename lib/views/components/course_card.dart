@@ -18,19 +18,21 @@ class CourseCard extends StatelessWidget {
     required this.course,
   });
 
-  void intentToModules(BuildContext context) {
+  static void intentToModules(BuildContext context, Course course) {
     context.push("/modules/?course=${course.id}&courseName=${course.name}");
+  }
+
+  intent(BuildContext context) {
+    (onTap == null) ? intentToModules(context, course) : onTap!();
   }
 
   @override
   Widget build(context) {
     return GestureDetector(
       onTap: () {
-        if (onTap == null) {
-          if (course.isEnrolled) {
-            return intentToModules(context);
-          }
-
+        if (course.isEnrolled) {
+          intent(context);
+        } else {
           final userModel = Provider.of<UserModel>(context, listen: false);
 
           CourseModel.updateCourse(id: course.id, data: {
@@ -41,10 +43,9 @@ class CourseCard extends StatelessWidget {
             if (onUpdate != null) {
               onUpdate!(course);
             }
-            intentToModules(context);
+
+            intent(context);
           });
-        } else {
-          onTap!();
         }
       },
       child: Card(

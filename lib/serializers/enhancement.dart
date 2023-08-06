@@ -3,10 +3,21 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'enhancement.g.dart';
 
+@JsonEnum()
+enum EnhancementType {
+  @JsonValue("ENHANCE")
+  enhance,
+  @JsonValue("SUMMARIZE")
+  summarize,
+}
+
 @JsonSerializable()
 class Enhancement {
   @JsonKey(required: true)
   final int id;
+
+  @JsonKey(required: true)
+  final EnhancementType type;
 
   @JsonKey(required: true)
   final String content;
@@ -19,6 +30,7 @@ class Enhancement {
 
   const Enhancement({
     required this.id,
+    required this.type,
     required this.content,
     required this.createAt,
     required this.topic,

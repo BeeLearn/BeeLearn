@@ -1,3 +1,4 @@
+import 'package:beelearn/serializers/enhancement.dart';
 import 'package:beelearn/serializers/question.dart';
 import 'package:json_annotation/json_annotation.dart';
 
@@ -23,15 +24,16 @@ class Topic {
   @JsonKey(required: false)
   final Question? question;
 
-
   @JsonKey(required: false, name: "is_unlocked")
   final bool isUnlocked;
-
 
   @JsonKey(required: false, name: "is_completed")
   final bool isCompleted;
 
-  const Topic({
+  @JsonKey(includeToJson: false)
+  Enhancement? enhancement;
+
+  Topic({
     required this.id,
     required this.title,
     required this.content,
@@ -39,7 +41,6 @@ class Topic {
     required this.question,
     required this.isUnlocked,
     required this.isCompleted,
-
   });
 
   Future<Topic> setIsLiked(User user, bool state) {

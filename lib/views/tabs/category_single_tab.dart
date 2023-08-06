@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 import '../../models/course_model.dart';
 import '../../views/components/course_card.dart';
@@ -39,23 +40,24 @@ class CategorySingleTabState<T extends CourseModel> extends State<CategorySingle
         builder: (context, model, child) {
           final courses = model.items;
 
-          return GridView.builder(
+          return ResponsiveGridView.builder(
             itemCount: courses.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // large screen 5
-              childAspectRatio: 0.8, // large screen 1
+            gridDelegate: const ResponsiveGridDelegate(
+              //crossAxisCount: 2, // large screen 5
+              //childAspectRatio: 0.8, // large screen 1
+              //crossAxisSpacing: 10,
+              // mainAxisSpacing: 2,
+              maxCrossAxisExtent: 180,
+              childAspectRatio: 0.8,
             ),
             itemBuilder: (context, index) {
               final course = courses[index];
 
-              return SizedBox(
-                height: 200,
-                child: CourseCard(
-                  course: course,
-                  onUpdate: (course) {
-                    Provider.of<T>(context, listen: false).updateOne(course);
-                  },
-                ),
+              return CourseCard(
+                course: course,
+                onUpdate: (course) {
+                  Provider.of<T>(context, listen: false).updateOne(course);
+                },
               );
             },
           );

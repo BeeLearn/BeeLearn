@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 
 import '../../models/category_model.dart';
 import '../components/course_card.dart';
@@ -58,7 +59,9 @@ class CategoryTabState extends State<CategoryTab> with AutomaticKeepAliveClientM
                     child: PageView.builder(
                       padEnds: false,
                       itemCount: category.courses.length,
-                      controller: PageController(viewportFraction: 0.4), // large 0.6
+                      controller: PageController(
+                        viewportFraction: ResponsiveBreakpoints.of(context).isMobile ? 0.4 : 0.6,
+                      ),
                       itemBuilder: (context, index) {
                         final course = category.courses[index];
 

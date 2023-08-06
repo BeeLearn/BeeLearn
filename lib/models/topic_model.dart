@@ -10,6 +10,7 @@ import '../serializers/enhancement.dart';
 import '../serializers/paginate.dart';
 import '../serializers/topic.dart';
 
+// Todo Fix Bug When Extending BaseModel
 class TopicModel extends ChangeNotifier {
   List<Topic> _topics = [];
   static const String apiURL = "${MainApplication.baseURL}/api/catalogue/topics/";
@@ -21,6 +22,12 @@ class TopicModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  addOne(Topic topic) {
+    _topics.add(topic);
+
+    notifyListeners();
+  }
+
   addAll(List<Topic> topics) {
     _topics.addAll(topics);
     notifyListeners();
@@ -28,6 +35,11 @@ class TopicModel extends ChangeNotifier {
 
   updateOne(int index, Topic topic) {
     _topics[index] = topic;
+    notifyListeners();
+  }
+
+  setEnhancement(int index, Enhancement? enhancement) {
+    _topics[index].enhancement = enhancement;
     notifyListeners();
   }
 
@@ -70,14 +82,27 @@ class TopicModel extends ChangeNotifier {
     });
   }
 
-  static Future<Enhancement> enhanceTopic({int? id, String? nextURL}) {
-    return post(Uri.parse(nextURL ?? "$apiURL$id/enhance/")).then((response) {
-      switch (response.statusCode) {
-        case HttpStatus.created:
-          return Enhancement.fromJson(jsonDecode(response.body));
-        default:
-          throw Error();
-      }
-    });
+  static Future<Enhancement> enhanceTopic({
+    int? id,
+    String? nextURL,
+    required EnhancementType type,
+  }) {
+    final path = type == EnhancementType.enhance ? "enhance" : "summarize";
+
+    return post(
+      Uri.parse(nextURL ?? "$apiURL$id/$path/"),
+      headers: {
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
+      },
+    ).then(
+      (response) {
+        switch (response.statusCode) {
+          case HttpStatus.created:
+            return Enhancement.fromJson(jsonDecode(response.body));
+          default:
+            throw Error();
+        }
+      },
+    );
   }
 }
