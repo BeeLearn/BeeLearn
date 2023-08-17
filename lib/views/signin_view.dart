@@ -1,10 +1,10 @@
-import '../models/firebase_user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
+import '../models/firebase_user_model.dart';
 import 'app_theme.dart';
 
 class SignInView extends StatefulWidget {
@@ -139,6 +139,7 @@ class _SignInViewState extends State<SignInView> {
                         ),
                         const SizedBox(height: 16.0),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Flexible(
                               child: Text.rich(

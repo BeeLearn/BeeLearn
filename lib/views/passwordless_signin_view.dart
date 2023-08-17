@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:go_router/go_router.dart';
@@ -44,9 +45,11 @@ class _PasswordLessSignInViewState extends State<PasswordLessSignInView> {
       resolveLinkIfEmailLink(link);
     });
 
-    deepLinkSubscription = linkStream.listen((link) {
-      resolveLinkIfEmailLink(link);
-    });
+    if (!kIsWeb) {
+      deepLinkSubscription = linkStream.listen((link) {
+        resolveLinkIfEmailLink(link);
+      });
+    }
   }
 
   @override
@@ -221,6 +224,7 @@ class _PasswordLessSignInViewState extends State<PasswordLessSignInView> {
                   ),
                   const SizedBox(height: 16.0),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Flexible(
                         child: Text.rich(

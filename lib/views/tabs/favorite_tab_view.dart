@@ -1,10 +1,12 @@
-import 'package:beelearn/models/course_model.dart';
-import 'package:beelearn/models/user_model.dart';
-import 'package:beelearn/views/components/course_card.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_framework/responsive_framework.dart';
+
+import '../../models/course_model.dart';
+import '../../models/user_model.dart';
+import '../../views/components/course_card.dart';
 
 class FavoriteTab extends StatefulWidget {
   const FavoriteTab({super.key}) : super();
@@ -87,11 +89,11 @@ class _FavoriteTabState extends State<FavoriteTab> {
                         ],
                       ),
                     )
-                  : GridView.builder(
+                  : ResponsiveGridView.builder(
                       itemCount: courses.length,
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3, // large screen 5
-                        childAspectRatio: 0.7, // large screen 1
+                      gridDelegate: const ResponsiveGridDelegate(
+                        maxCrossAxisExtent: 180,
+                        childAspectRatio: 0.8,
                       ),
                       itemBuilder: (context, index) {
                         final course = courses[index];

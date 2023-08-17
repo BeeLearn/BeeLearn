@@ -43,10 +43,6 @@ class CategorySingleTabState<T extends CourseModel> extends State<CategorySingle
           return ResponsiveGridView.builder(
             itemCount: courses.length,
             gridDelegate: const ResponsiveGridDelegate(
-              //crossAxisCount: 2, // large screen 5
-              //childAspectRatio: 0.8, // large screen 1
-              //crossAxisSpacing: 10,
-              // mainAxisSpacing: 2,
               maxCrossAxisExtent: 180,
               childAspectRatio: 0.8,
             ),

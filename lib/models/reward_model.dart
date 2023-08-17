@@ -2,11 +2,12 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:beelearn/main_application.dart';
-import 'package:beelearn/serializers/paginate.dart';
-import 'package:beelearn/serializers/reward.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:http/http.dart' show get;
+
+import '../main_application.dart';
+import '../serializers/paginate.dart';
+import '../serializers/reward.dart';
 
 class RewardModel extends ChangeNotifier {
   List<Reward> _rewards = [];

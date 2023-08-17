@@ -24,49 +24,92 @@ class _MainViewState extends State<MainView> {
     const ProfileTabView(),
   ];
 
+  get smallScreenNavigation {
+    return BottomNavigationBar(
+      currentIndex: _currentIndex,
+      onTap: (index) {
+        setState(() {
+          _currentIndex = index;
+        });
+      },
+      items: const [
+        BottomNavigationBarItem(
+          label: "Category",
+          activeIcon: Icon(Icons.category),
+          icon: Icon(Icons.category_outlined),
+        ),
+        BottomNavigationBarItem(
+          label: "Liked",
+          activeIcon: Icon(Icons.favorite),
+          icon: Icon(Icons.favorite_outline),
+        ),
+        BottomNavigationBarItem(
+          label: "Profile",
+          icon: CircleAvatar(radius: 16),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(context) {
-    return MaterialApp(
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      home: ResponsiveBreakpoints.builder(
-        breakpoints: defaultBreakpoints,
-        child: Scaffold(
+    return ResponsiveBreakpoints.builder(
+      breakpoints: defaultBreakpoints,
+      child: MaterialApp(
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        home: Scaffold(
+          bottomNavigationBar: LayoutBuilder(
+            builder: (context, constraints) {
+              return constraints.maxWidth < 640 ? smallScreenNavigation : const Row();
+            },
+          ),
           body: Consumer<UserModel>(
             builder: (context, model, child) {
               return model.nullableUser == null
                   ? const Center(
                       child: CircularProgressIndicator(),
                     )
-                  : IndexedStack(
-                      index: _currentIndex,
-                      children: _tabs,
+                  : Row(
+                      children: [
+                        ResponsiveVisibility(
+                          visible: !ResponsiveBreakpoints.of(context).isMobile,
+                          child: NavigationRail(
+                            selectedIndex: _currentIndex,
+                            groupAlignment: 0,
+                            onDestinationSelected: (index) {
+                              setState(() {
+                                _currentIndex = index;
+                              });
+                            },
+                            labelType: NavigationRailLabelType.all,
+                            destinations: const [
+                              NavigationRailDestination(
+                                icon: Icon(Icons.category_outlined),
+                                selectedIcon: Icon(Icons.category),
+                                label: Text("Categories"),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.favorite_outline),
+                                selectedIcon: Icon(Icons.favorite),
+                                label: Text("Favourite"),
+                              ),
+                              NavigationRailDestination(
+                                icon: CircleAvatar(radius: 16),
+                                label: Text("Profile"),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: IndexedStack(
+                            index: _currentIndex,
+                            children: _tabs,
+                          ),
+                        ),
+                      ],
                     );
             },
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) {
-              setState(() {
-                _currentIndex = index;
-              });
-            },
-            items: const [
-              BottomNavigationBarItem(
-                label: "Category",
-                activeIcon: Icon(Icons.category),
-                icon: Icon(Icons.category_outlined),
-              ),
-              BottomNavigationBarItem(
-                label: "Liked",
-                activeIcon: Icon(Icons.favorite),
-                icon: Icon(Icons.favorite_outline),
-              ),
-              BottomNavigationBarItem(
-                label: "Profile",
-                icon: CircleAvatar(radius: 16),
-              ),
-            ],
           ),
         ),
       ),

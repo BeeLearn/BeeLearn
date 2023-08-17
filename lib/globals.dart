@@ -54,7 +54,6 @@ GoRouter router = GoRouter(
       ],
       redirect: (context, state) async {
         if (MainApplication.accessToken == null) {
-          print(state.location);
           if (state.location!.contains("sign-in")) return null;
 
           return "/passwordless-sign-in";

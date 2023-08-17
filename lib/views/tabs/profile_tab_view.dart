@@ -1,6 +1,7 @@
 import 'package:beelearn/views/components/reward_list.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:responsive_framework/responsive_breakpoints.dart';
 
 import '../components/streak_card.dart';
 
@@ -47,18 +48,22 @@ class _ProfileTabViewState extends State<ProfileTabView> {
           )
         ];
       },
-      body: const SingleChildScrollView(
-        child: Column(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RewardList(),
-                StreakCard(),
-              ],
-            ),
-          ],
-        ),
+      body: SingleChildScrollView(
+        child: ResponsiveBreakpoints.of(context).smallerOrEqualTo(MOBILE)
+            ? const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  RewardList(),
+                  StreakCard(),
+                ],
+              )
+            : const Flex(
+                direction: Axis.horizontal,
+                children: [
+                  Flexible(child: RewardList()),
+                  Flexible(child: StreakCard()),
+                ],
+              ),
       ),
     );
   }
