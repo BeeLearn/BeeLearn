@@ -25,7 +25,10 @@ class CategoryTabState extends State<CategoryTab> with AutomaticKeepAliveClientM
 
   Future<void> fetchCategories() async {
     final model = Provider.of<CategoryModel>(context, listen: false);
-    CategoryModel.getCategories().then((response) => model.setAll(response.results));
+    return CategoryModel.getCategories().then((response) {
+      model.loading = false;
+      model.setAll(response.results);
+    });
   }
 
   @override
@@ -38,52 +41,56 @@ class CategoryTabState extends State<CategoryTab> with AutomaticKeepAliveClientM
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Consumer<CategoryModel>(
           builder: (context, model, child) {
-            return ListView.builder(
-              itemCount: model.categories.length,
-              itemBuilder: (context, categoryIndex) {
-                final category = model.categories[categoryIndex];
+            final categories = model.categories;
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text(
-                        category.name,
-                        style: GoogleFonts.albertSans(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 188,
-                      child: PageView.builder(
-                        padEnds: false,
-                        itemCount: category.courses.length,
-                        controller: PageController(
-                          viewportFraction: ResponsiveBreakpoints.of(context).smallerOrEqualTo(MOBILE) ? 0.4 : 0.28,
-                        ),
-                        itemBuilder: (context, index) {
-                          final course = category.courses[index];
+            return model.loading
+                ? const Center(child: CircularProgressIndicator())
+                : ListView.builder(
+                    itemCount: model.categories.length,
+                    itemBuilder: (context, categoryIndex) {
+                      final category = model.categories[categoryIndex];
 
-                          return CourseCard(
-                            course: course,
-                            onUpdate: (course) {
-                              Provider.of<CategoryModel>(context, listen: false).updateCourse(
-                                categoryIndex: categoryIndex,
-                                courseIndex: index,
-                                course: course,
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              category.name,
+                              style: GoogleFonts.albertSans(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 188,
+                            child: PageView.builder(
+                              padEnds: false,
+                              itemCount: category.courses.length,
+                              controller: PageController(
+                                viewportFraction: ResponsiveBreakpoints.of(context).smallerOrEqualTo(MOBILE) ? 0.4 : 0.28,
+                              ),
+                              itemBuilder: (context, index) {
+                                final course = category.courses[index];
+
+                                return CourseCard(
+                                  course: course,
+                                  onUpdate: (course) {
+                                    Provider.of<CategoryModel>(context, listen: false).updateCourse(
+                                      categoryIndex: categoryIndex,
+                                      courseIndex: index,
+                                      course: course,
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
           },
         ),
       ),

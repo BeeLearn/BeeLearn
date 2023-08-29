@@ -26,6 +26,7 @@ class ModuleView extends StatelessWidget {
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         home: Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: AppBar(
             leading: BackButton(onPressed: context.pop),
             title: Text(courseName ?? ""),

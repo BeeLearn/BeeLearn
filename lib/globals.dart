@@ -1,5 +1,6 @@
 import 'package:beelearn/views/passwordless_signin_view.dart';
 import 'package:beelearn/views/signin_view.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:go_router/go_router.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
@@ -54,6 +55,8 @@ GoRouter router = GoRouter(
       ],
       redirect: (context, state) async {
         if (MainApplication.accessToken == null) {
+          FlutterNativeSplash.remove();
+
           if (state.location!.contains("sign-in")) return null;
 
           return "/passwordless-sign-in";

@@ -80,6 +80,7 @@ class _StreakCardState extends State<StreakCard> {
                     return CircularStepProgressIndicator(
                       width: 156,
                       height: 156,
+                      padding: 0,
                       totalSteps: user.profile.dailyStreakSeconds,
                       currentStep: dailyStreakSeconds,
                       selectedColor: Colors.green,

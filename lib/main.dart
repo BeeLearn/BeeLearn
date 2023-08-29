@@ -1,7 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,28 +11,23 @@ import 'main_application.dart';
 import 'views/application_view.dart';
 
 void main() async {
+  await dotenv.load(fileName: ".env");
+
   await SentryFlutter.init(
     (options) {
-      options.dsn = 'https://4d8cc37455e948168ef47d19b80aa79c@o4504537892192256.ingest.sentry.io/4505607252738048';
-
+      options.dsn = dotenv.env['SENTRY_DNS'];
       options.tracesSampleRate = 1.0;
     },
     appRunner: () async {
       WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-      FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
       MainApplication.sharedPreferences = await SharedPreferences.getInstance();
 
+      FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
 
-      if (FirebaseAuth.instance.currentUser == null) {
-        MainApplication.preferences.clear();
-      }
-
-      FlutterNativeSplash.remove();
-
+      MobileAds.instance.initialize();
       runApp(const ApplicationView());
     },
   );

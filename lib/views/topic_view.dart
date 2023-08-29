@@ -45,7 +45,7 @@ class _TopicViewState extends State<TopicView> {
           /// Increment dailyStreakSeconds
           int currentStreakSeconds = await userModel.user.increaseDailyStreakSeconds(context);
 
-          // cancel timer when streak minute reached
+          /// cancel timer when streak minute reached
           if (currentStreakSeconds >= userModel.user.profile.dailyStreakSeconds) {
             timer.cancel();
           }

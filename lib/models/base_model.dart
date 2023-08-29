@@ -3,7 +3,18 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 
 class BaseModel<T> extends ChangeNotifier {
+  bool _loading = true;
+
+  bool get loading => _loading;
+
+  set loading(bool value) {
+    _loading = value;
+    notifyListeners();
+  }
+
   Map<dynamic, T> _entities = {};
+
+  UnmodifiableListView<T> get items => UnmodifiableListView(_entities.values);
 
   dynamic getEntityId(T item) {
     throw UnimplementedError();
@@ -14,8 +25,6 @@ class BaseModel<T> extends ChangeNotifier {
   }
 
   T? getEntityById(dynamic id) => _entities[id];
-
-  UnmodifiableListView<T> get items => UnmodifiableListView(_entities.values);
 
   setAll(List<T> items) {
     _entities = {};

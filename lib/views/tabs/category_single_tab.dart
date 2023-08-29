@@ -8,10 +8,12 @@ import '../../views/components/course_card.dart';
 class CategorySingleTab<T extends CourseModel> extends StatefulWidget {
   final Map<String, dynamic>? query;
   final Future<void> Function() initState;
+  final Widget emptyState;
 
   const CategorySingleTab({
     super.key,
     this.query,
+    required this.emptyState,
     required this.initState,
   });
 
@@ -40,23 +42,32 @@ class CategorySingleTabState<T extends CourseModel> extends State<CategorySingle
         builder: (context, model, child) {
           final courses = model.items;
 
-          return ResponsiveGridView.builder(
-            itemCount: courses.length,
-            gridDelegate: const ResponsiveGridDelegate(
-              maxCrossAxisExtent: 180,
-              childAspectRatio: 0.8,
-            ),
-            itemBuilder: (context, index) {
-              final course = courses[index];
+          return model.loading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : courses.isEmpty
+                  ? widget.emptyState
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: ResponsiveGridView.builder(
+                        itemCount: courses.length,
+                        gridDelegate: const ResponsiveGridDelegate(
+                          maxCrossAxisExtent: 180,
+                          childAspectRatio: 0.8,
+                        ),
+                        itemBuilder: (context, index) {
+                          final course = courses[index];
 
-              return CourseCard(
-                course: course,
-                onUpdate: (course) {
-                  Provider.of<T>(context, listen: false).updateOne(course);
-                },
-              );
-            },
-          );
+                          return CourseCard(
+                            course: course,
+                            onUpdate: (course) {
+                              Provider.of<T>(context, listen: false).updateOne(course);
+                            },
+                          );
+                        },
+                      ),
+                    );
         },
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -12,10 +13,17 @@ import 'category_tab.dart';
 class CategoryTabView extends StatelessWidget {
   const CategoryTabView({super.key}) : super();
 
+  List<Tab> get _tabs => [
+        const Tab(child: Text("For you")),
+        const Tab(child: Text("New")),
+        const Tab(child: Text("In progress")),
+        const Tab(child: Text("Completed")),
+      ];
+
   @override
   Widget build(context) {
     return DefaultTabController(
-      length: 4,
+      length: _tabs.length,
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
@@ -32,14 +40,9 @@ class CategoryTabView extends StatelessWidget {
                   ),
                 ),
               ),
-              bottom: const TabBar(
+              bottom: TabBar(
                 isScrollable: true,
-                tabs: [
-                  Tab(child: Text("For you")),
-                  Tab(child: Text("New")),
-                  Tab(child: Text("In progress")),
-                  Tab(child: Text("Completed")),
-                ],
+                tabs: _tabs,
               ),
               actions: [
                 PillChip(
@@ -83,13 +86,37 @@ class CategoryTabView extends StatelessWidget {
                   initState: () async {
                     CourseModel.getCourses(query: {}).then(
                       (courses) {
-                        Provider.of<NewCourseModel>(
+                        final newCourseModel = Provider.of<NewCourseModel>(
                           context,
                           listen: false,
-                        ).setAll(courses.results);
+                        );
+
+                        newCourseModel.loading = false;
+                        newCourseModel.setAll(courses.results);
                       },
                     );
                   },
+                  emptyState: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          "assets/illustrations/il_notification.svg",
+                          width: 124,
+                          height: 124,
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          "No new course found",
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        Text(
+                          "New add and updated courses will be found here",
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 CategorySingleTab<InProgressCourseModel>(
                   initState: () async {
@@ -98,13 +125,37 @@ class CategoryTabView extends StatelessWidget {
                       "course_complete_users!": "${user.id}",
                     }).then(
                       (courses) {
-                        Provider.of<InProgressCourseModel>(
+                        final inProgressCourseModel = Provider.of<InProgressCourseModel>(
                           context,
                           listen: false,
-                        ).setAll(courses.results);
+                        );
+
+                        inProgressCourseModel.loading = false;
+                        inProgressCourseModel.setAll(courses.results);
                       },
                     );
                   },
+                  emptyState: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          "assets/illustrations/il_adventure.svg",
+                          width: 164,
+                          height: 164,
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          "Course in progress",
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        Text(
+                          "Start a course to record progress here",
+                          style: Theme.of(context).textTheme.labelMedium,
+                        )
+                      ],
+                    ),
+                  ),
                 ),
                 CategorySingleTab<CompletedCourseModel>(
                   initState: () async {
@@ -112,13 +163,37 @@ class CategoryTabView extends StatelessWidget {
                       "course_complete_users": "${user.id}",
                     }).then(
                       (courses) {
-                        Provider.of<CompletedCourseModel>(
+                        final completedCourseModel = Provider.of<CompletedCourseModel>(
                           context,
                           listen: false,
-                        ).setAll(courses.results);
+                        );
+
+                        completedCourseModel.loading = false;
+                        completedCourseModel.setAll(courses.results);
                       },
                     );
                   },
+                  emptyState: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset(
+                          "assets/illustrations/il_awesome.svg",
+                          width: 124,
+                          height: 124,
+                        ),
+                        const SizedBox(height: 8.0),
+                        Text(
+                          "No Course completed",
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                        Text(
+                          "Complete a course to get saved here",
+                          style: Theme.of(context).textTheme.labelMedium,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -16,28 +17,57 @@ class FavoriteTab extends StatefulWidget {
 }
 
 class _FavoriteTabState extends State<FavoriteTab> {
+  late UserModel _userModel;
+
   @override
   void initState() {
     super.initState();
+
+    _userModel = Provider.of<UserModel>(
+      context,
+      listen: false,
+    );
 
     fetchFavourites();
   }
 
   Future<void> fetchFavourites() async {
-    final user = Provider.of<UserModel>(
-      context,
-      listen: false,
-    ).user;
+    final user = _userModel.user;
 
     CourseModel.getCourses(
       query: {"module__lesson__topic__likes": "${user.id}"},
     ).then((response) {
-      Provider.of<FavouriteCourseModel>(
+      final favouriteCourseModel = Provider.of<FavouriteCourseModel>(
         context,
         listen: false,
-      ).setAll(response.results);
+      );
+
+      favouriteCourseModel.loading = false;
+      favouriteCourseModel.setAll(response.results);
     });
   }
+
+  Widget get _emptyState => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              "assets/illustrations/il_love.svg",
+              width: 120,
+              height: 120,
+            ),
+            const SizedBox(height: 8.0),
+            Text(
+              "No liked course",
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            Text(
+              "All liked topics can be found here",
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+          ],
+        ),
+      );
 
   @override
   Widget build(context) {
@@ -68,48 +98,29 @@ class _FavoriteTabState extends State<FavoriteTab> {
             builder: (context, model, child) {
               final courses = model.items;
 
-              return courses.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.favorite_outline,
-                            size: 32,
-                          ),
-                          const SizedBox(height: 8.0),
-                          Text(
-                            "No liked course",
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                          Text(
-                            "All liked topics can be found here",
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                        ],
-                      ),
+              return model.loading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
                     )
-                  : ResponsiveGridView.builder(
-                      itemCount: courses.length,
-                      gridDelegate: const ResponsiveGridDelegate(
-                        maxCrossAxisExtent: 180,
-                        childAspectRatio: 0.8,
-                      ),
-                      itemBuilder: (context, index) {
-                        final course = courses[index];
+                  : courses.isEmpty
+                      ? _emptyState
+                      : ResponsiveGridView.builder(
+                          itemCount: courses.length,
+                          gridDelegate: const ResponsiveGridDelegate(
+                            maxCrossAxisExtent: 180,
+                            childAspectRatio: 0.8,
+                          ),
+                          itemBuilder: (context, index) {
+                            final course = courses[index];
 
-                        return CourseCard(
-                          course: course,
-                          onTap: () {
-                            final user = Provider.of<UserModel>(
-                              context,
-                              listen: false,
-                            ).user;
-                            context.go("/topics/?lesson__module__course=${course.id}&likes=${user.id}");
+                            return CourseCard(
+                              course: course,
+                              onTap: () => context.go(
+                                "/topics/?lesson__module__course=${course.id}&likes=${_userModel.user.id}",
+                              ),
+                            );
                           },
                         );
-                      },
-                    );
             },
           ),
         ),

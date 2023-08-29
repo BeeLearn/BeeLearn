@@ -13,6 +13,15 @@ import '../serializers/paginate.dart';
 class CategoryModel extends ChangeNotifier {
   static const String apiURL = "${MainApplication.baseURL}/api/catalogue/categories/";
 
+  bool _loading = true;
+
+  bool get loading => _loading;
+
+  set loading(value) {
+    _loading = value;
+    notifyListeners();
+  }
+
   List<Category> _categories = [];
 
   UnmodifiableListView<Category> get categories => UnmodifiableListView(_categories);

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -21,15 +19,19 @@ class ModuleFragment extends StatefulWidget {
 }
 
 class _ModuleFragmentState extends State<ModuleFragment> {
+  late ModuleModel moduleModel;
   @override
   initState() {
     super.initState();
 
-    final moduleModel = Provider.of<ModuleModel>(context, listen: false);
+    moduleModel = Provider.of<ModuleModel>(
+      context,
+      listen: false,
+    );
 
-    ModuleModel.getModules(query: widget.query).then((response) {
-      moduleModel.setAll(response.results);
-    });
+    fetchModules().then(
+      (value) => moduleModel.loading = false,
+    );
 
     Request.subscribe(
       namespace: "modules",
@@ -51,8 +53,12 @@ class _ModuleFragmentState extends State<ModuleFragment> {
         );
       },
     );
+  }
 
-    Request.socket.onAny((event, data) => log(data));
+  Future<void> fetchModules() {
+    return ModuleModel.getModules(query: widget.query).then((response) {
+      moduleModel.setAll(response.results);
+    });
   }
 
   showTopicViewDialog(Lesson lesson) {
@@ -60,7 +66,7 @@ class _ModuleFragmentState extends State<ModuleFragment> {
       context: context,
       useSafeArea: false,
       builder: (context) {
-        return TopicView(query: {"lesson_id": lesson.id.toString()});
+        return TopicView(query: {"lesson": lesson.id.toString()});
       },
     );
   }
@@ -71,64 +77,68 @@ class _ModuleFragmentState extends State<ModuleFragment> {
       builder: (context, models, child) {
         final modules = models.items;
 
-        return modules.isEmpty
+        return models.loading
             ? const Center(
                 child: CircularProgressIndicator(),
               )
-            : SingleChildScrollView(
-                child: ExpandedList(
-                  itemCount: modules.length,
-                  sharedPreferences: MainApplication.preferences,
-                  generateKey: (index) => "module_${index}_expansion_state",
-                  headerBuilder: (context, index, isExpanded) {
-                    final module = modules[index];
-                    final isUnlocked = index == 0 || module.isUnlocked;
+            : RefreshIndicator(
+                onRefresh: fetchModules,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: ExpandedList(
+                    itemCount: modules.length,
+                    sharedPreferences: MainApplication.preferences,
+                    generateKey: (index) => "module_${index}_expansion_state",
+                    headerBuilder: (context, index, isExpanded) {
+                      final module = modules[index];
+                      final isUnlocked = index == 0 || module.isUnlocked;
 
-                    return ListTile(
-                      leading: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: isUnlocked ? Colors.green : Colors.grey,
-                          borderRadius: BorderRadius.circular(8.0),
+                      return ListTile(
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: isUnlocked ? Colors.green : Colors.grey,
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: isUnlocked
+                              ? const Icon(
+                                  Icons.play_arrow,
+                                  color: Colors.white,
+                                )
+                              : const Icon(Icons.lock),
                         ),
-                        child: isUnlocked
-                            ? const Icon(
-                                Icons.play_arrow,
-                                color: Colors.white,
-                              )
-                            : const Icon(Icons.lock),
-                      ),
-                      title: Text(module.name),
-                    );
-                  },
-                  bodyBuilder: (context, moduleIndex) {
-                    final module = modules[moduleIndex];
+                        title: Text(module.name),
+                      );
+                    },
+                    bodyBuilder: (context, moduleIndex) {
+                      final module = modules[moduleIndex];
 
-                    return ListView.builder(
-                      itemCount: module.lessons.length,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        final lesson = module.lessons[index];
-                        final isUnlocked = (moduleIndex == 0 && index == 0) || lesson.isUnlocked;
+                      return ListView.builder(
+                        itemCount: module.lessons.length,
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemBuilder: (context, index) {
+                          final lesson = module.lessons[index];
+                          final isUnlocked = (moduleIndex == 0 && index == 0) || lesson.isUnlocked;
 
-                        return ListTile(
-                          onTap: () => showTopicViewDialog(lesson),
-                          enabled: isUnlocked,
-                          isThreeLine: true,
-                          leading: const Icon(Icons.book_outlined),
-                          title: const Text("Lesson"),
-                          subtitle: Text(lesson.name),
-                          trailing: isUnlocked
-                              ? null
-                              : const Icon(
-                                  Icons.lock,
-                                  size: 18,
-                                ),
-                        );
-                      },
-                    );
-                  },
+                          return ListTile(
+                            onTap: () => showTopicViewDialog(lesson),
+                            enabled: isUnlocked,
+                            isThreeLine: true,
+                            leading: const Icon(Icons.book_outlined),
+                            title: const Text("Lesson"),
+                            subtitle: Text(lesson.name),
+                            trailing: isUnlocked
+                                ? null
+                                : const Icon(
+                                    Icons.lock,
+                                    size: 18,
+                                  ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               );
       },
