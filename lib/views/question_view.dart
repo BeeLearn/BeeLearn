@@ -1,6 +1,6 @@
 import 'package:beelearn/serializers/question.dart';
-import 'package:beelearn/views/components/question_drag_sort.dart';
 import 'package:beelearn/views/components/question_single_choice.dart';
+import 'package:beelearn/views/components/question_text_option.dart';
 import 'package:flutter/material.dart';
 
 import '../services/code_question_parser.dart';
@@ -36,10 +36,10 @@ class _QuestionViewState extends State<QuestionView> {
           onSelected: (question) {},
         );
       case QuestionType.textOption:
-        return QuestionDragSortChoice(
-          items: const [],
-          onReorder: (oldIndex, newIndex) {},
-          getText: (choice) => choice.name,
+        TextOptionQuestion question = widget.question as TextOptionQuestion;
+
+        return QuestionTextOption(
+          question: question.question,
         );
       default:
         return const Placeholder();

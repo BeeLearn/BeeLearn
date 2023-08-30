@@ -1,7 +1,11 @@
+import 'package:beelearn/services/ad_loader.dart';
+import 'package:beelearn/views/components/animation_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:horizontal_blocked_scroll_physics/horizontal_blocked_scroll_physics.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/topic_model.dart';
@@ -9,6 +13,8 @@ import '../../models/user_model.dart';
 import '../../serializers/topic.dart';
 import '../components/page_view_indicators.dart';
 import '../question_view.dart';
+
+enum _TopicFragmentViewType { topicView, questionView }
 
 class TopicFragment extends StatefulWidget {
   final Map<String, dynamic> query;
@@ -22,56 +28,57 @@ class TopicFragment extends StatefulWidget {
   State createState() => _TopicFragmentState();
 }
 
-enum _TopicFragmentViewType { topicView, questionView }
-
 class _TopicFragmentState extends State<TopicFragment> {
-  late UserModel _userModel;
-  late TopicModel _topicModel;
+  late UserModel userModel;
+  late TopicModel topicModel;
 
-  final ValueNotifier<int> currentPage = ValueNotifier(0);
-  final PageController _controller = PageController();
+  int currentPage = 0;
+
+  final String adUnitId = "45261f3464c633f7";
+  final PageController controller = PageController();
+  final RewardedAdLoader adLoader = RewardedAdLoader();
 
   @override
   void initState() {
     super.initState();
-    _userModel = Provider.of<UserModel>(
+    userModel = Provider.of<UserModel>(
       context,
       listen: false,
     );
-    _topicModel = Provider.of<TopicModel>(
+    topicModel = Provider.of<TopicModel>(
       context,
       listen: false,
     );
 
-    TopicModel.getTopics(query: widget.query).then(
-      (topics) {
-        print("Hey Hulu Hulu Hulu");
-        print(topics);
-        print(topics.results.length);
-        _topicModel.setAll(topics.results);
-      },
-    ).catchError((error) => print(error));
-
-    _controller.addListener(() {
-      final page = _controller.page!.round();
-
-      if (currentPage.value == page) return;
-
-      currentPage.value = page;
+    TopicModel.getTopics(query: widget.query).then((topics) {
+      topicModel.setAll(topics.results);
+      topicModel.loading = false;
     });
+
+    adLoader.setRewardedAdListener(
+      onAdLoadFailedCallback: (adUnit, error) {
+        context.loaderOverlay.hide();
+      },
+      onAdReceivedRewardCallback: (ad, reward) {
+        context.loaderOverlay.hide();
+        controller.nextPage(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      },
+    );
+
+    adLoader.loadAd(adUnitId);
   }
 
   /// Set current visible topic as completed
   setCurrentTopicAsCompleted() {
-    final index = currentPage.value;
-    final topic = _topicModel.topics[index];
+    final topic = topicModel.items[currentPage];
 
-    if (!topic.isCompleted) topic.setIsComplete(_userModel.user);
+    if (!topic.isCompleted) topic.setIsComplete(userModel.user);
   }
 
   Widget getTopicView(Topic topic, int index) {
-    print(topic.content);
-
     return Stack(
       children: [
         SafeArea(
@@ -92,16 +99,6 @@ class _TopicFragmentState extends State<TopicFragment> {
                       ),
                     ),
                   ),
-                  // if (topic.enhancement != null)
-                  //   IconButton(
-                  //     icon: const Icon(Icons.refresh),
-                  //     onPressed: () {
-                  //       Provider.of<TopicModel>(
-                  //         context,
-                  //         listen: false,
-                  //       ).setEnhancement(index, null);
-                  //     },
-                  //   )
                 ],
               ),
               Flexible(
@@ -109,11 +106,6 @@ class _TopicFragmentState extends State<TopicFragment> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(top: 16.0),
                   child: Markdown(
                     data: topic.content,
-                    // style: GoogleFonts.openSans(
-                    //   fontSize: 16,
-                    //   fontWeight: FontWeight.w300,
-                    //   color: Theme.of(context).colorScheme.inverseSurface,
-                    // ),
                   ),
                 ),
               ),
@@ -139,7 +131,7 @@ class _TopicFragmentState extends State<TopicFragment> {
                       () {
                         topic.setIsLiked(user, !topic.isLiked).then(
                           (topic) {
-                            _topicModel.updateOne(index, topic);
+                            topicModel.updateOne(topic);
                           },
                         );
                       },
@@ -185,6 +177,17 @@ class _TopicFragmentState extends State<TopicFragment> {
     return [viewTypes, items];
   }
 
+  bool canScrollNext(List<_TopicFragmentViewType> viewTypes) {
+    final viewType = viewTypes[currentPage];
+
+    switch (viewType) {
+      case _TopicFragmentViewType.topicView:
+        return true;
+      case _TopicFragmentViewType.questionView:
+        return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -196,88 +199,80 @@ class _TopicFragmentState extends State<TopicFragment> {
       },
       child: Consumer<TopicModel>(
         builder: (context, model, child) {
-          final [viewTypes, topics] = getViewTypes(model.topics);
+          final [viewTypes, topics] = getViewTypes(model.items);
+
+          Topic? currentTopic;
+          _TopicFragmentViewType? currentViewType;
+
+          if (topics.isNotEmpty) currentTopic = topics[currentPage];
+          if (viewTypes.isNotEmpty) currentViewType = viewTypes[currentPage];
 
           return Scaffold(
             extendBody: true,
             extendBodyBehindAppBar: true,
             appBar: AppBar(
+              centerTitle: true,
               backgroundColor: Colors.transparent,
               leading: BackButton(
                 onPressed: () => Navigator.pop(context),
               ),
               title: LinearProgressPageIndicator(
                 itemCount: topics.length,
-                pageController: _controller,
+                pageController: controller,
               ),
-              actions: const [
-                /// Legacy code, remove course enhancement
-                /// Todo, Brainstorm on a better approach
-                // ValueListenableBuilder<int>(
-                //   valueListenable: currentPage,
-                //   builder: (context, currentPage, child) {
-                //     return IconButton(
-                //       onPressed: () async {
-                //         final topicModel = Provider.of<TopicModel>(
-                //           context,
-                //           listen: false,
-                //         );
-                //         final topic = topicModel.topics[currentPage];
-                //         final Enhancement? enhancement = await showDialog(
-                //           context: context,
-                //           useSafeArea: false,
-                //           builder: (context) => EnhancementView(topicId: topic.id),
-                //         );
-                //
-                //         topicModel.setEnhancement(currentPage, enhancement);
-                //       },
-                //       icon: const Icon(CupertinoIcons.sparkles),
-                //     );
-                //   },
-                // )
+              actions: [
+                Visibility(
+                  visible: currentPage == topics.length - 1,
+                  child: TextButton(
+                    onPressed: () {
+                      // Todo
+                      /// show lesson completion dialog with animations
+                    },
+                    child: const Text("Continue"),
+                  ),
+                ),
+                Visibility(
+                  visible: currentViewType != null && currentViewType == _TopicFragmentViewType.questionView,
+                  child: TextButton(
+                    onPressed: () {
+                      // Todo
+                      /// Show ads if not premium user
+                      /// If premium skip to next page
+                      /// Record progress
+                      adLoader.showAd(adUnitId);
+                    },
+                    child: const Text("Skip"),
+                  ),
+                ),
               ],
-              centerTitle: true,
             ),
-            body: PageView.builder(
-              itemCount: topics.length,
-              controller: _controller,
-              physics: currentPage.value == 0 || model.topics[currentPage.value].isCompleted ? null : const NeverScrollableScrollPhysics(),
+            body: model.loading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : LoaderOverlay(
+                    child: PageView.builder(
+                      itemCount: topics.length,
+                      controller: controller,
+                      physics: topics.isNotEmpty && canScrollNext(viewTypes) ? null : const LeftBlockedScrollPhysics(),
+                      onPageChanged: (index) {
+                        setState(() {
+                          currentPage = index;
+                        });
+                      },
+                      itemBuilder: (context, index) {
+                        final viewType = viewTypes[index];
+                        final topic = topics[index];
 
-              /// Todo Prevent scrolling if course is not unlocked
-              onPageChanged: (index) async {
-                //   if (index == 0) return;
-                //
-                //   final previousIndex = index - 1;
-                //   final previousTopic = model.topics[previousIndex];
-                //
-                //   if (previousTopic.isCompleted) return;
-                //
-                //   final user = _userModel.user;
-                //   final nextTopic = model.topics[index];
-                //
-                //   previousTopic.setIsComplete(user).then((topic) {
-                //     _topicModel.updateOne(previousIndex, topic);
-                //     _topicModel.updateOne(index, nextTopic);
-                //   });
-                //
-                //   if (index == model.topics.length - 1 && !nextTopic.isCompleted) {
-                //     nextTopic.setIsComplete(user).then((topic) {
-                //       _topicModel.updateOne(index, topic);
-                //     });
-                //   }
-              },
-              itemBuilder: (context, index) {
-                final viewType = viewTypes[index];
-                final topic = topics[index];
-
-                switch (viewType) {
-                  case _TopicFragmentViewType.topicView:
-                    return getTopicView(topic, index);
-                  case _TopicFragmentViewType.questionView:
-                    return getQuestionView(topic, index);
-                }
-              },
-            ),
+                        switch (viewType) {
+                          case _TopicFragmentViewType.topicView:
+                            return getTopicView(topic, index);
+                          case _TopicFragmentViewType.questionView:
+                            return getQuestionView(topic, index);
+                        }
+                      },
+                    ),
+                  ),
           );
         },
       ),

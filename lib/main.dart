@@ -1,8 +1,8 @@
+import 'package:applovin_max/applovin_max.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,7 +27,7 @@ void main() async {
         options: DefaultFirebaseOptions.currentPlatform,
       );
 
-      MobileAds.instance.initialize();
+      await AppLovinMAX.initialize(dotenv.env["APP_LOVIN_SDK_KEY"]!);
       runApp(const ApplicationView());
     },
   );

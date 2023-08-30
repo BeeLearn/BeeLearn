@@ -14,13 +14,17 @@ class BaseModel<T> extends ChangeNotifier {
 
   Map<dynamic, T> _entities = {};
 
-  UnmodifiableListView<T> get items => UnmodifiableListView(_entities.values);
+  UnmodifiableListView<T> get items {
+    List<T> values = _entities.values.toList();
+    values.sort(orderBy);
+    return UnmodifiableListView(values);
+  }
 
   dynamic getEntityId(T item) {
     throw UnimplementedError();
   }
 
-  dynamic orderBy(T first, T second) {
+  int orderBy(T first, T second) {
     throw UnimplementedError();
   }
 

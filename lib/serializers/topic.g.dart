@@ -21,6 +21,9 @@ Topic _$TopicFromJson(Map<String, dynamic> json) {
         : Question.fromJson(json['question'] as Map<String, dynamic>),
     isUnlocked: json['is_unlocked'] as bool,
     isCompleted: json['is_completed'] as bool,
+    hasAssessment: json['has_assessment'] as bool? ?? false,
+    createdAt: DateTime.parse(json['created_at'] as String),
+    updatedAt: DateTime.parse(json['updated_at'] as String),
   )..enhancement = json['enhancement'] == null
       ? null
       : Enhancement.fromJson(json['enhancement'] as Map<String, dynamic>);
@@ -34,4 +37,7 @@ Map<String, dynamic> _$TopicToJson(Topic instance) => <String, dynamic>{
       'question': instance.question,
       'is_unlocked': instance.isUnlocked,
       'is_completed': instance.isCompleted,
+      'has_assessment': instance.hasAssessment,
+      'created_at': instance.createdAt.toIso8601String(),
+      'updated_at': instance.updatedAt.toIso8601String(),
     };

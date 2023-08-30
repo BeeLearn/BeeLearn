@@ -1,8 +1,7 @@
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/widgets.dart';
+import 'package:beelearn/models/base_model.dart';
 import 'package:http/http.dart' show get, patch, post;
 
 import '../../main_application.dart';
@@ -11,36 +10,19 @@ import '../serializers/paginate.dart';
 import '../serializers/topic.dart';
 
 // Todo Fix Bug When Extending BaseModel
-class TopicModel extends ChangeNotifier {
-  List<Topic> _topics = [];
+class TopicModel extends BaseModel<Topic> {
   static const String apiURL = "${MainApplication.baseURL}/api/catalogue/topics/";
 
-  UnmodifiableListView<Topic> get topics => UnmodifiableListView(_topics);
+  @override
+  int getEntityId(item) => item.id;
 
-  setAll(List<Topic> topics) {
-    _topics = topics;
-    notifyListeners();
-  }
-
-  addOne(Topic topic) {
-    _topics.add(topic);
-
-    notifyListeners();
-  }
-
-  addAll(List<Topic> topics) {
-    _topics.addAll(topics);
-    notifyListeners();
-  }
-
-  updateOne(int index, Topic topic) {
-    _topics[index] = topic;
-    notifyListeners();
-  }
+  @override
+  int orderBy(first, second) => second.createdAt.compareTo(first.createdAt);
 
   setEnhancement(int index, Enhancement? enhancement) {
-    _topics[index].enhancement = enhancement;
-    notifyListeners();
+    final topic = items[index];
+    topic.enhancement = enhancement;
+    return updateOne(topic);
   }
 
   static Future<Paginate<Topic>> getTopics({

@@ -64,6 +64,8 @@ dependencies:
   in_app_purchase: ^3.1.8
   google_mobile_ads: ^3.0.0
   flutter_markdown: ^0.6.17+1
+  horizontal_blocked_scroll_physics: ^4.0.1
+  applovin_max: ^3.2.0
 
 dev_dependencies:
   flutter_test:

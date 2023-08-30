@@ -30,8 +30,21 @@ class Topic {
   @JsonKey(required: false, name: "is_completed")
   final bool isCompleted;
 
+  @JsonKey(
+    required: false,
+    name: "has_assessment",
+    defaultValue: false,
+  )
+  final bool hasAssessment;
+
   @JsonKey(includeToJson: false)
   Enhancement? enhancement;
+
+  @JsonKey(required: false, name: "created_at")
+  DateTime createdAt;
+
+  @JsonKey(required: false, name: "updated_at")
+  DateTime updatedAt;
 
   Topic({
     required this.id,
@@ -41,6 +54,9 @@ class Topic {
     required this.question,
     required this.isUnlocked,
     required this.isCompleted,
+    required this.hasAssessment,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   Future<Topic> setIsLiked(User user, bool state) {
