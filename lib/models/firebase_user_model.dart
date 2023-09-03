@@ -14,6 +14,8 @@ class FirebaseUserModel {
     return user?.getIdToken().then(
       (value) {
         MainApplication.accessToken = value;
+
+        // This is called when app if first initialized
         if (reconnect ?? false) {
           UserModel.getCurrentUser().then((user) {
             Provider.of<UserModel>(
@@ -24,6 +26,8 @@ class FirebaseUserModel {
             ApiMiddleware.run(context);
           });
         }
+
+        // Remove splash screen
         FlutterNativeSplash.remove();
       },
     );

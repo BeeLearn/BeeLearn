@@ -1,7 +1,7 @@
+import 'package:beelearn/socket_client.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../djira_client/request.dart';
 import '../../main_application.dart';
 import '../../models/module_model.dart';
 import '../../serializers/lesson.dart';
@@ -33,7 +33,7 @@ class _ModuleFragmentState extends State<ModuleFragment> {
       (value) => moduleModel.loading = false,
     );
 
-    Request.subscribe(
+    client?.subscribe(
       namespace: "modules",
       onError: (response) {},
       onSuccess: (response) {
@@ -41,7 +41,7 @@ class _ModuleFragmentState extends State<ModuleFragment> {
       },
     );
 
-    Request.subscribe(
+    client?.subscribe(
       namespace: "lessons",
       onError: (response) {},
       onSuccess: (response) {

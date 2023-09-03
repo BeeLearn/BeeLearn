@@ -1,6 +1,7 @@
-import 'package:beelearn/services/code_parser.dart';
-import 'package:beelearn/services/text_input_parser.dart';
 import 'package:flutter/material.dart';
+
+import '../../services/code_parser.dart';
+import '../../services/text_input_parser.dart';
 
 class QuestionTextOption extends StatefulWidget {
   final String question;

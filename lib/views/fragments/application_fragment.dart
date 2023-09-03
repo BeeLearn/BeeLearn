@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:beelearn/models/firebase_user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../globals.dart';
 import '../../main_application.dart';
+import '../../models/firebase_user_model.dart';
 import '../app_theme.dart';
 
 class ApplicationFragment extends StatefulWidget {

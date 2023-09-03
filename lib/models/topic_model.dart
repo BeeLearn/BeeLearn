@@ -17,7 +17,7 @@ class TopicModel extends BaseModel<Topic> {
   int getEntityId(item) => item.id;
 
   @override
-  int orderBy(first, second) => second.createdAt.compareTo(first.createdAt);
+  int orderBy(first, second) => first.createdAt.compareTo(second.createdAt);
 
   setEnhancement(int index, Enhancement? enhancement) {
     final topic = items[index];

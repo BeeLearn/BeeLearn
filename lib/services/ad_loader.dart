@@ -40,8 +40,6 @@ class RewardedAdLoader {
           if (onAdDisplayFailedCallback != null) onAdDisplayFailedCallback(ad, error);
         },
         onAdLoadFailedCallback: (adUnitId, error) {
-          print(adUnitId);
-          print(error);
           onAdLoadFailedCallback(adUnitId, error);
 
           Future.delayed(Duration(milliseconds: 1000 * _retryAttempt), () => loadAd(adUnitId));

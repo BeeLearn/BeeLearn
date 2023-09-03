@@ -46,8 +46,6 @@ dependencies:
   shared_preferences: ^2.2.0
   intl: ^0.18.1
   sleek_circular_slider: ^2.0.1
-  socket_io_client: ^2.0.2
-  uuid: ^3.0.7
   sentry_flutter: ^7.9.0
   timeago: ^3.5.0
   responsive_framework: ^1.1.0
@@ -66,6 +64,10 @@ dependencies:
   flutter_markdown: ^0.6.17+1
   horizontal_blocked_scroll_physics: ^4.0.1
   applovin_max: ^3.2.0
+  djira_client: ^1.0.1
+  socket_io_client: ^2.0.3+1
+  markdown_viewer: ^0.6.2
+  flutter_prism: ^0.2.2
 
 dev_dependencies:
   flutter_test:

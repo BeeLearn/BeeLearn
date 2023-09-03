@@ -1,9 +1,9 @@
+import 'package:beelearn/socket_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
-import '../djira_client/request.dart';
 import '../main_application.dart';
 import '../models/course_model.dart';
 import '../models/reward_model.dart';
@@ -39,15 +39,10 @@ void showSnackBar({
 
 class ApiMiddleware {
   static void run(BuildContext context) {
-    final socket = Request.createClient(
-      MainApplication.baseURL,
-      OptionBuilder().setAuth({
-        "token": MainApplication.accessToken,
-      }).setTransports(["websocket"]).build(),
-    );
+    createClient(MainApplication.accessToken);
 
-    socket.onConnect((data) {
-      Request.subscribe(
+    client?.socket.onConnect((data) {
+      client?.subscribe(
         namespace: "courses",
         onError: (response) {},
         onSuccess: (response) {
@@ -64,7 +59,7 @@ class ApiMiddleware {
         },
       );
 
-      Request.subscribe(
+      client?.subscribe(
         namespace: "favourites",
         onError: (response) {},
         onSuccess: (response) {
@@ -79,7 +74,7 @@ class ApiMiddleware {
         },
       );
 
-      Request.subscribe(
+      client?.subscribe(
         namespace: "rewards",
         onError: (response) {},
         onSuccess: (response) {
@@ -94,7 +89,7 @@ class ApiMiddleware {
         },
       );
 
-      Request.subscribe(
+      client?.subscribe(
         namespace: "streaks",
         onError: (response) {},
         onSuccess: (response) {

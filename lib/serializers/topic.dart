@@ -70,11 +70,25 @@ class Topic {
   }
 
   Future<Topic> setIsComplete(User user) {
-    return TopicModel.updateTopic(id: id, data: {
-      "topic_complete_users": {
-        "add": [user.id],
+    return TopicModel.updateTopic(
+      id: id,
+      data: {
+        "topic_complete_users": {
+          "add": [user.id],
+        },
       },
-    });
+    );
+  }
+
+  Future<Topic> setIsUnlocked(User user) {
+    return TopicModel.updateTopic(
+      id: id,
+      data: {
+        "entitled_users": {
+          "add": [user.id],
+        },
+      },
+    );
   }
 
   factory Topic.fromJson(Map<String, dynamic> json) => _$TopicFromJson(json);

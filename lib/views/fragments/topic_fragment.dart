@@ -1,15 +1,16 @@
-import 'package:beelearn/services/ad_loader.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_prism/flutter_prism.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:horizontal_blocked_scroll_physics/horizontal_blocked_scroll_physics.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:markdown_viewer/markdown_viewer.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/topic_model.dart';
 import '../../models/user_model.dart';
 import '../../serializers/topic.dart';
+import '../../services/ad_loader.dart';
 import '../components/page_view_indicators.dart';
 import '../question_view.dart';
 
@@ -49,11 +50,12 @@ class _TopicFragmentState extends State<TopicFragment> {
       listen: false,
     );
 
-    TopicModel.getTopics(query: widget.query).then((topics) {
-      topicModel.setAll(topics.results);
-      topicModel.loading = false;
-    });
-
+    TopicModel.getTopics(query: widget.query).then(
+      (topics) {
+        topicModel.setAll(topics.results);
+        topicModel.loading = false;
+      },
+    );
     adLoader.setRewardedAdListener(
       onAdLoadFailedCallback: (adUnit, error) {
         context.loaderOverlay.hide();
@@ -68,13 +70,6 @@ class _TopicFragmentState extends State<TopicFragment> {
     );
 
     adLoader.loadAd(adUnitId);
-  }
-
-  /// Set current visible topic as completed
-  setCurrentTopicAsCompleted() {
-    final topic = topicModel.items[currentPage];
-
-    if (!topic.isCompleted) topic.setIsComplete(userModel.user);
   }
 
   Widget getTopicView(Topic topic, int index) {
@@ -103,8 +98,18 @@ class _TopicFragmentState extends State<TopicFragment> {
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(top: 16.0),
-                  child: Markdown(
-                    data: topic.content,
+                  child: MarkdownViewer(
+                    topic.content,
+                    styleSheet: MarkdownStyle(
+                      textStyle: GoogleFonts.notoSans(fontWeight: FontWeight.w300),
+                    ),
+                    highlightBuilder: (text, language, infoString) {
+                      final prism = Prism(
+                        mouseCursor: SystemMouseCursors.text,
+                        style: Theme.of(context).brightness == Brightness.dark ? const PrismStyle.dark() : const PrismStyle(),
+                      );
+                      return prism.render(text, language ?? 'plain');
+                    },
                   ),
                 ),
               ),
@@ -159,9 +164,9 @@ class _TopicFragmentState extends State<TopicFragment> {
     return QuestionView(question: topic.question!);
   }
 
-  List<dynamic> getViewTypes(List<Topic> topics) {
+  (List<_TopicFragmentViewType>, List<Topic>) getViewTypes(List<Topic> topics) {
     final List<_TopicFragmentViewType> viewTypes = [];
-    final List<dynamic> items = [];
+    final List<Topic> items = [];
 
     for (int index = 0; index < topics.length; index++) {
       viewTypes.add(_TopicFragmentViewType.topicView);
@@ -173,108 +178,152 @@ class _TopicFragmentState extends State<TopicFragment> {
       }
     }
 
-    return [viewTypes, items];
+    return (viewTypes, items);
   }
 
-  bool canScrollNext(List<_TopicFragmentViewType> viewTypes) {
+  /// Check if user can scroll left
+  bool _canScrollNext(
+    List<Topic> topics,
+    List<_TopicFragmentViewType> viewTypes,
+  ) {
     final viewType = viewTypes[currentPage];
 
     switch (viewType) {
       case _TopicFragmentViewType.topicView:
         return true;
       case _TopicFragmentViewType.questionView:
+        if (currentPage < topics.length - 1) {
+          final nextTopic = topics[currentPage + 1];
+          return nextTopic.isUnlocked;
+        }
+
         return false;
+    }
+  }
+
+  /// complete topic
+  Future<void> completeTopic(Topic topic) async {
+    if (!topic.isCompleted) {
+      final newTopic = await topic.setIsComplete(userModel.user);
+      topicModel.updateOne(newTopic);
+    }
+  }
+
+  /// unlock topic
+  Future<void> unlockTopic(Topic topic) async {
+    if (!topic.isUnlocked) {
+      final newTopic = await topic.setIsUnlocked(userModel.user);
+      topicModel.updateOne(newTopic);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        /// Todo if event not sent resend
-        /// Show modal that if quit progress will be reset
-        /// Only premium user can save progress when not quit
-        return Future.value(true);
-      },
-      child: Consumer<TopicModel>(
-        builder: (context, model, child) {
-          final [viewTypes, topics] = getViewTypes(model.items);
+    return Consumer<TopicModel>(
+      builder: (context, model, child) {
+        final (viewTypes, topics) = getViewTypes(model.items);
 
-          Topic? currentTopic;
-          _TopicFragmentViewType? currentViewType;
+        _TopicFragmentViewType? currentViewType;
 
-          if (topics.isNotEmpty) currentTopic = topics[currentPage];
-          if (viewTypes.isNotEmpty) currentViewType = viewTypes[currentPage];
+        if (viewTypes.isNotEmpty) currentViewType = viewTypes[currentPage];
 
-          return Scaffold(
-            extendBody: true,
-            extendBodyBehindAppBar: true,
-            appBar: AppBar(
-              centerTitle: true,
-              backgroundColor: Colors.transparent,
-              leading: BackButton(
-                onPressed: () => Navigator.pop(context),
-              ),
-              title: LinearProgressPageIndicator(
-                itemCount: topics.length,
-                pageController: controller,
-              ),
-              actions: [
-                Visibility(
-                  visible: currentPage == topics.length - 1,
-                  child: TextButton(
-                    onPressed: () {
-                      // Todo
-                      /// show lesson completion dialog with animations
-                    },
-                    child: const Text("Continue"),
-                  ),
-                ),
-                Visibility(
-                  visible: currentViewType != null && currentViewType == _TopicFragmentViewType.questionView,
-                  child: TextButton(
-                    onPressed: () {
-                      // Todo
-                      /// Show ads if not premium user
-                      /// If premium skip to next page
-                      /// Record progress
-                      adLoader.showAd(adUnitId);
-                    },
-                    child: const Text("Skip"),
-                  ),
-                ),
-              ],
+        return Scaffold(
+          extendBody: true,
+          extendBodyBehindAppBar: true,
+          appBar: AppBar(
+            centerTitle: true,
+            backgroundColor: Colors.transparent,
+            leading: BackButton(
+              onPressed: () => Navigator.pop(context),
             ),
-            body: model.loading
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : LoaderOverlay(
-                    child: PageView.builder(
-                      itemCount: topics.length,
-                      controller: controller,
-                      physics: topics.isNotEmpty && canScrollNext(viewTypes) ? null : const LeftBlockedScrollPhysics(),
-                      onPageChanged: (index) {
-                        setState(() {
-                          currentPage = index;
-                        });
-                      },
-                      itemBuilder: (context, index) {
-                        final viewType = viewTypes[index];
-                        final topic = topics[index];
+            title: LinearProgressPageIndicator(
+              itemCount: topics.length,
+              pageController: controller,
+            ),
+            actions: [
+              Visibility(
+                visible: topics.isNotEmpty && currentPage == topics.length - 1 && !(topics[currentPage].isUnlocked || topics[currentPage].isCompleted),
+                child: TextButton(
+                  onPressed: () async {
+                    final topic = topics[currentPage];
 
-                        switch (viewType) {
-                          case _TopicFragmentViewType.topicView:
-                            return getTopicView(topic, index);
-                          case _TopicFragmentViewType.questionView:
-                            return getQuestionView(topic, index);
-                        }
-                      },
-                    ),
+                    // Ignore if error
+                    unlockTopic(topic);
+                    completeTopic(topic);
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        duration: const Duration(seconds: 2),
+                        padding: EdgeInsets.zero,
+                        content: ListTile(
+                          leading: const Icon(CupertinoIcons.sparkles),
+                          title: const Text("Hurray, Lesson completed"),
+                          trailing: Text(
+                            "+8xp",
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                          ),
+                        ),
+                        backgroundColor: Colors.black,
+                      ),
+                    );
+
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Continue"),
+                ),
+              ),
+              Visibility(
+                visible: currentViewType != null && currentPage != topics.length - 1 && currentViewType == _TopicFragmentViewType.questionView,
+                child: TextButton(
+                  onPressed: () async {
+                    await unlockTopic(topics[currentPage + 1]);
+
+                    controller.nextPage(
+                      duration: const Duration(milliseconds: 500),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: const Text("Skip"),
+                ),
+              ),
+            ],
+          ),
+          body: model.loading
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : LoaderOverlay(
+                  child: PageView.builder(
+                    itemCount: topics.length,
+                    controller: controller,
+                    physics: topics.isNotEmpty && _canScrollNext(topics, viewTypes) ? null : const LeftBlockedScrollPhysics(),
+                    onPageChanged: (index) {
+                      if (index > 0) {
+                        final currentIndex = index - 1;
+                        final viewType = viewTypes[currentIndex];
+                        if (viewType == _TopicFragmentViewType.topicView) completeTopic(topics[currentIndex]);
+                      }
+                      setState(() => currentPage = index);
+                    },
+                    itemBuilder: (context, index) {
+                      final viewType = viewTypes[index];
+                      final topic = topics[index];
+
+                      switch (viewType) {
+                        case _TopicFragmentViewType.topicView:
+                          return getTopicView(topic, index);
+                        case _TopicFragmentViewType.questionView:
+                          return getQuestionView(topic, index);
+                        default:
+                          throw UnimplementedError("viewType not implemented");
+                      }
+                    },
                   ),
-          );
-        },
-      ),
+                ),
+        );
+      },
     );
   }
 }
