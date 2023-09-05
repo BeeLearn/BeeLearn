@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 class BorderColor {
@@ -26,6 +28,7 @@ class CustomOutlinedButton extends StatefulWidget {
   final Widget child;
   final bool selected, preventGesture;
   final Color? backgroundColor;
+  final Color? selectedBackgroundColor;
   final BorderColor borderColor;
   final void Function()? onTap;
 
@@ -34,6 +37,7 @@ class CustomOutlinedButton extends StatefulWidget {
     required this.child,
     this.onTap,
     this.backgroundColor,
+    this.selectedBackgroundColor,
     this.selected = false,
     this.preventGesture = false,
     this.borderColor = const BorderColor(),
@@ -44,6 +48,7 @@ class CustomOutlinedButton extends StatefulWidget {
 }
 
 class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
+  Timer? clickTimer;
   double insetBorderSize = 3.0;
   double insetBottomBorderSize = 6.0;
 
@@ -56,17 +61,22 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
   }
 
   _updateButtonAppearance(bool update) {
+    clickTimer?.cancel();
+
     if (update) {
       setState(() {
         insetBottomBorderSize = 4.0;
         backgroundColor = Theme.of(context).colorScheme.primaryContainer.withAlpha(128);
       });
     } else {
-      setState(() {
-        insetBorderSize = 3.0;
-        insetBottomBorderSize = 6.0;
-        backgroundColor = widget.backgroundColor;
-      });
+      clickTimer = Timer(
+        const Duration(milliseconds: 100),
+        () => setState(() {
+          insetBorderSize = 3.0;
+          insetBottomBorderSize = 6.0;
+          backgroundColor = widget.backgroundColor;
+        }),
+      );
     }
   }
 
@@ -99,32 +109,48 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
     return _getWidget(
       AnimatedContainer(
         curve: Curves.bounceInOut,
-        duration: const Duration(microseconds: 200),
+        duration: const Duration(microseconds: 500),
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8.0),
-          color: widget.selected ? Theme.of(context).colorScheme.primaryContainer.withAlpha(128) : widget.backgroundColor,
+          color: widget.selected ? (widget.selectedBackgroundColor ?? Theme.of(context).colorScheme.primaryContainer).withAlpha(64) : widget.backgroundColor,
           border: Border(
             top: BorderSide(
               width: insetBorderSize,
-              color: widget.selected ? Theme.of(context).colorScheme.primaryContainer : widget.borderColor.top ?? defaultColor,
+              color: widget.selected ? widget.selectedBackgroundColor?.withAlpha(100) ?? Theme.of(context).colorScheme.primaryContainer : widget.borderColor.top ?? defaultColor,
             ),
             bottom: BorderSide(
               width: insetBottomBorderSize,
-              color: widget.selected ? Theme.of(context).colorScheme.primaryContainer : widget.borderColor.bottom ?? defaultColor,
+              color: widget.selected ? widget.selectedBackgroundColor?.withAlpha(100) ?? widget.selectedBackgroundColor ?? Theme.of(context).colorScheme.primaryContainer : widget.borderColor.bottom ?? defaultColor,
             ),
             left: BorderSide(
               width: insetBorderSize,
-              color: widget.selected ? Theme.of(context).colorScheme.primaryContainer : widget.borderColor.left ?? defaultColor,
+              color: widget.selected ? widget.selectedBackgroundColor?.withAlpha(100) ?? widget.selectedBackgroundColor ?? Theme.of(context).colorScheme.primaryContainer : widget.borderColor.left ?? defaultColor,
             ),
             right: BorderSide(
               width: insetBorderSize,
-              color: widget.selected ? Theme.of(context).colorScheme.primaryContainer : widget.borderColor.right ?? defaultColor,
+              color: widget.selected ? widget.selectedBackgroundColor?.withAlpha(100) ?? widget.selectedBackgroundColor ?? Theme.of(context).colorScheme.primaryContainer : widget.borderColor.right ?? defaultColor,
             ),
           ),
         ),
-        child: widget.child,
+        child: GestureDetector(
+          onTap: () {
+            if (!widget.selected) {
+              widget.onTap!();
+            }
+          },
+          onTapUp: (details) {
+            _updateButtonAppearance(false);
+          },
+          onTapDown: (details) {
+            _updateButtonAppearance(true);
+          },
+          onTapCancel: () {
+            _updateButtonAppearance(false);
+          },
+          child: widget.child,
+        ),
       ),
     );
   }

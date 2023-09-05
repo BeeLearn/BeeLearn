@@ -41,8 +41,8 @@ class ApiMiddleware {
   static void run(BuildContext context) {
     createClient(MainApplication.accessToken);
 
-    client?.socket.onConnect((data) {
-      client?.subscribe(
+    client?.socket.onConnect((data) async {
+      final unsubscribeCourseListener = await client?.subscribe(
         namespace: "courses",
         onError: (response) {},
         onSuccess: (response) {
@@ -59,7 +59,7 @@ class ApiMiddleware {
         },
       );
 
-      client?.subscribe(
+      final unsubscribeFavouriteListener = await client?.subscribe(
         namespace: "favourites",
         onError: (response) {},
         onSuccess: (response) {
@@ -74,7 +74,7 @@ class ApiMiddleware {
         },
       );
 
-      client?.subscribe(
+      final unsubscribeRewardListener = await client?.subscribe(
         namespace: "rewards",
         onError: (response) {},
         onSuccess: (response) {
@@ -89,7 +89,7 @@ class ApiMiddleware {
         },
       );
 
-      client?.subscribe(
+      final unsubscribeStreakListener = await client?.subscribe(
         namespace: "streaks",
         onError: (response) {},
         onSuccess: (response) {
@@ -109,6 +109,13 @@ class ApiMiddleware {
           );
         },
       );
+
+      client?.socket.onDisconnect((data) {
+        unsubscribeCourseListener!();
+        unsubscribeFavouriteListener!();
+        unsubscribeRewardListener!();
+        unsubscribeStreakListener!();
+      });
     });
   }
 }

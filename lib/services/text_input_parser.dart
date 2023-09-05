@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:form_validator/form_validator.dart';
 
 import 'text_parser.dart';
 
@@ -25,10 +26,18 @@ class TextInputParser {
                                   child: ConstrainedBox(
                                     constraints: const BoxConstraints(
                                       maxWidth: 98,
+                                      minWidth: 32,
+                                      maxHeight: 98,
                                     ),
-                                    child: const TextField(
+                                    child: TextFormField(
                                       textAlign: TextAlign.center,
-                                      decoration: InputDecoration(
+                                      validator: ValidationBuilder().required().add(
+                                        (value) {
+                                          if ("%$value%" != token) return "";
+                                          return null;
+                                        },
+                                      ).build(),
+                                      decoration: const InputDecoration(
                                         contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
                                         border: OutlineInputBorder(),
                                       ),

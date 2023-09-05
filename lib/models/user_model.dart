@@ -32,7 +32,7 @@ class UserModel extends ChangeNotifier {
           return Token.fromJson(jsonDecode(response.body));
         default:
           print(response.body);
-          throw Error();
+          return Future.error(() => response);
       }
     });
   }

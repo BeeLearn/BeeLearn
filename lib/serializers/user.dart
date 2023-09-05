@@ -22,10 +22,14 @@ class User {
   @JsonKey(required: true)
   final Profile profile;
 
+  @JsonKey(includeIfNull: true, required: true)
+  final String? avatar;
+
   const User({
     required this.id,
     required this.username,
     required this.email,
+    required this.avatar,
     required this.profile,
   });
 

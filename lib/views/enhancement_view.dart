@@ -33,44 +33,41 @@ class EnhancementView extends StatelessWidget {
 
   @override
   Widget build(context) {
-    return LoaderOverlay(
-      disableBackButton: false,
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => EnhancementModel(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => EnhancementModel(),
+        ),
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          leading: BackButton(
+            onPressed: () => Navigator.pop(context),
           ),
-        ],
-        child: Scaffold(
-          appBar: AppBar(
-            leading: BackButton(
-              onPressed: () => Navigator.pop(context),
+          centerTitle: true,
+          title: const Text("AI Enhancement History"),
+          actions: [
+            PopupMenuButton<EnhancementType>(
+              icon: const Icon(Icons.add),
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem(
+                    child: const Text("Enhance lesson"),
+                    onTap: () => onMenuSelected(context, EnhancementType.enhance),
+                  ),
+                  const PopupMenuDivider(),
+                  PopupMenuItem(
+                    child: const Text("Summarize"),
+                    onTap: () => onMenuSelected(context, EnhancementType.summarize),
+                  ),
+                ];
+              },
             ),
-            centerTitle: true,
-            title: const Text("AI Enhancement History"),
-            actions: [
-              PopupMenuButton<EnhancementType>(
-                icon: const Icon(Icons.add),
-                itemBuilder: (context) {
-                  return [
-                    PopupMenuItem(
-                      child: const Text("Enhance lesson"),
-                      onTap: () => onMenuSelected(context, EnhancementType.enhance),
-                    ),
-                    const PopupMenuDivider(),
-                    PopupMenuItem(
-                      child: const Text("Summarize"),
-                      onTap: () => onMenuSelected(context, EnhancementType.summarize),
-                    ),
-                  ];
-                },
-              ),
-            ],
-          ),
-          body: EnhanceViewFragment(
-            topicId: topicId,
-            onSelected: (enhancement) => Navigator.pop(context, enhancement),
-          ),
+          ],
+        ),
+        body: EnhanceViewFragment(
+          topicId: topicId,
+          onSelected: (enhancement) => Navigator.pop(context, enhancement),
         ),
       ),
     );

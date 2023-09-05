@@ -1,4 +1,5 @@
 import 'package:beelearn/serializers/question.dart';
+import 'package:beelearn/views/app_theme.dart';
 import 'package:beelearn/views/components/question_single_choice.dart';
 import 'package:beelearn/views/components/question_text_option.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class QuestionView extends StatefulWidget {
 }
 
 class _QuestionViewState extends State<QuestionView> {
+  void Function()? onAnswer;
   late CodeQuestionParser codeQuestionParser = CodeQuestionParser();
 
   @override
@@ -33,13 +35,28 @@ class _QuestionViewState extends State<QuestionView> {
         return QuestionSingleChoice<Choice>(
           items: question.choices,
           getText: (choice) => choice.name,
-          onSelected: (question) {},
+          onSelected: (value, onSubmit) {
+            setState(() {
+              onAnswer = () {
+                /// If correct and has Answer before
+                /// Next Page
+                onSubmit();
+              };
+            });
+          },
         );
       case QuestionType.textOption:
         TextOptionQuestion question = widget.question as TextOptionQuestion;
 
         return QuestionTextOption(
           question: question.question,
+          onChanged: (formKey) {
+            setState(() {
+              onAnswer = () {
+                formKey.currentState?.validate();
+              };
+            });
+          },
         );
       default:
         return const Placeholder();
@@ -76,16 +93,21 @@ class _QuestionViewState extends State<QuestionView> {
                   icon: const Icon(Icons.lock_outline),
                   label: const Text("Answer"),
                 ),
-                SizedBox(
+                Container(
                   width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () {},
-                    style: FilledButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                  margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Theme(
+                    data: AppTheme.light,
+                    child: FilledButton(
+                      onPressed: onAnswer,
+                      style: FilledButton.styleFrom(
+                        disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.primary.withAlpha(200) : Theme.of(context).colorScheme.primaryContainer,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
                       ),
+                      child: const Text("Continue"),
                     ),
-                    child: const Text("Continue"),
                   ),
                 )
               ],

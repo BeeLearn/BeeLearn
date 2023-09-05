@@ -20,6 +20,8 @@ class ModuleFragment extends StatefulWidget {
 
 class _ModuleFragmentState extends State<ModuleFragment> {
   late ModuleModel moduleModel;
+  dynamic unsubscribeLessonListener, unsubscribeModuleListener;
+
   @override
   initState() {
     super.initState();
@@ -33,7 +35,11 @@ class _ModuleFragmentState extends State<ModuleFragment> {
       (value) => moduleModel.loading = false,
     );
 
-    client?.subscribe(
+    initialize();
+  }
+
+  initialize() async {
+    unsubscribeModuleListener = await client?.subscribe(
       namespace: "modules",
       onError: (response) {},
       onSuccess: (response) {
@@ -41,7 +47,7 @@ class _ModuleFragmentState extends State<ModuleFragment> {
       },
     );
 
-    client?.subscribe(
+    unsubscribeLessonListener = await client?.subscribe(
       namespace: "lessons",
       onError: (response) {},
       onSuccess: (response) {
@@ -53,6 +59,14 @@ class _ModuleFragmentState extends State<ModuleFragment> {
         );
       },
     );
+  }
+
+  @override
+  dispose() {
+    super.dispose();
+
+    unsubscribeLessonListener();
+    unsubscribeModuleListener();
   }
 
   Future<void> fetchModules() {

@@ -4,6 +4,7 @@ import 'package:beelearn/models/streak_model.dart';
 import 'package:beelearn/models/user_model.dart';
 import 'package:beelearn/views/fragments/topic_fragment.dart';
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import "package:provider/provider.dart";
 
 import '../models/topic_model.dart';
@@ -62,13 +63,20 @@ class _TopicViewState extends State<TopicView> {
 
   @override
   Widget build(context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => TopicModel(),
+    return Scaffold(
+      body: LoaderOverlay(
+        closeOnBackButton: true,
+        child: MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+              create: (context) => TopicModel(),
+            ),
+          ],
+          child: SafeArea(
+            child: TopicFragment(query: widget.query),
+          ),
         ),
-      ],
-      child: TopicFragment(query: widget.query),
+      ),
     );
   }
 }

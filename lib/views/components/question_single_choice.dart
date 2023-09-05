@@ -1,11 +1,15 @@
+import 'package:beelearn/serializers/question.dart';
 import 'package:flutter/material.dart';
 
 import 'buttons.dart';
 
-class QuestionSingleChoice<T> extends StatefulWidget {
+class QuestionSingleChoice<T extends Choice> extends StatefulWidget {
   final List<T> items;
-  final String Function(dynamic value) getText;
-  final void Function(dynamic value) onSelected;
+  final String Function(T value) getText;
+  final void Function(
+    T value,
+    void Function() onSubmit,
+  ) onSelected;
 
   const QuestionSingleChoice({
     super.key,
@@ -15,11 +19,12 @@ class QuestionSingleChoice<T> extends StatefulWidget {
   });
 
   @override
-  State createState() => _QuestionSingleChoiceState();
+  State createState() => _QuestionSingleChoiceState<T>();
 }
 
-class _QuestionSingleChoiceState extends State<QuestionSingleChoice> {
+class _QuestionSingleChoiceState<T extends Choice> extends State<QuestionSingleChoice> {
   int? selectedIndex;
+  bool isSubmitted = false;
 
   @override
   Widget build(BuildContext context) {
@@ -28,20 +33,32 @@ class _QuestionSingleChoiceState extends State<QuestionSingleChoice> {
       shrinkWrap: false,
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
-        final value = widget.items[index];
+        final Choice choice = widget.items[index];
+        final isSelected = selectedIndex == index;
 
         return CustomOutlinedButton(
           onTap: () {
             setState(() {
+              isSubmitted = false;
               selectedIndex = index;
             });
 
-            widget.onSelected(widget.items[index]);
+            widget.onSelected(
+              widget.items[index],
+              () => setState(
+                () => isSubmitted = true,
+              ),
+            );
           },
-          selected: selectedIndex == index,
+          selected: isSelected,
+          selectedBackgroundColor: isSelected && isSubmitted
+              ? choice.isAnswer
+                  ? Colors.greenAccent
+                  : Colors.redAccent
+              : null,
           child: Center(
             child: Text(
-              widget.getText(value),
+              widget.getText(choice),
               style: TextStyle(
                 color: Theme.of(context).brightness == Brightness.light ? null : Theme.of(context).colorScheme.inverseSurface,
               ),

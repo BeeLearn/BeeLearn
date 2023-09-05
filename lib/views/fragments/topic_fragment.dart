@@ -1,16 +1,18 @@
+import 'package:beelearn/models/topic_comment_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_prism/flutter_prism.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:horizontal_blocked_scroll_physics/horizontal_blocked_scroll_physics.dart';
 import 'package:loader_overlay/loader_overlay.dart';
-import 'package:markdown_viewer/markdown_viewer.dart';
+import 'package:markdown_widget/markdown_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../models/topic_model.dart';
 import '../../models/user_model.dart';
 import '../../serializers/topic.dart';
 import '../../services/ad_loader.dart';
+import '../../views/topic_comment_view.dart';
 import '../components/page_view_indicators.dart';
 import '../question_view.dart';
 
@@ -73,6 +75,10 @@ class _TopicFragmentState extends State<TopicFragment> {
   }
 
   Widget getTopicView(Topic topic, int index) {
+    // final isDark = Theme.of(context).brightness == Brightness.dark;
+    // final config = isDark ? MarkdownConfig.darkConfig : MarkdownConfig.defaultConfig;
+    // codeWrapper(child, text) => CodeWrapperWidget(child: child, text: text);
+
     return Stack(
       children: [
         SafeArea(
@@ -98,18 +104,22 @@ class _TopicFragmentState extends State<TopicFragment> {
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(top: 16.0),
-                  child: MarkdownViewer(
-                    topic.content,
-                    styleSheet: MarkdownStyle(
-                      textStyle: GoogleFonts.notoSans(fontWeight: FontWeight.w300),
-                    ),
-                    highlightBuilder: (text, language, infoString) {
-                      final prism = Prism(
-                        mouseCursor: SystemMouseCursors.text,
-                        style: Theme.of(context).brightness == Brightness.dark ? const PrismStyle.dark() : const PrismStyle(),
-                      );
-                      return prism.render(text, language ?? 'plain');
-                    },
+                  child: MarkdownWidget(
+                    data: topic.content,
+                    // config: config.copy(
+                    //   configs: [
+                    //     isDark ? PreConfig.darkConfig.copy(wrapper: codeWrapper) : const PreConfig().copy(wrapper: codeWrapper),
+                    //   ],
+                    // )
+
+                    //  styleSheet: MarkdownStyle(),
+                    //   highlightBuilder: (text, language, infoString) {
+                    //     final prism = Prism(
+                    //       mouseCursor: SystemMouseCursors.text,
+                    //       style: Theme.of(context).brightness == Brightness.dark ? const PrismStyle.dark() : const PrismStyle(),
+                    //     );
+                    //     return prism.render(text, language ?? 'plain');
+                    //   },
                   ),
                 ),
               ),
@@ -125,19 +135,23 @@ class _TopicFragmentState extends State<TopicFragment> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                      useSafeArea: false,
+                      context: context,
+                      builder: (context) => ChangeNotifierProvider(
+                        create: (context) => TopicCommentModel(),
+                        child: TopicCommentView(topicId: topic.id),
+                      ),
+                    );
+                  },
                   icon: const Icon(CupertinoIcons.chat_bubble),
                 ),
                 IconButton(
-                  onPressed: () {
-                    final user = Provider.of<UserModel>(context, listen: false).user;
-                    setState(
-                      () {
-                        topic.setIsLiked(user, !topic.isLiked).then(
-                          (topic) {
-                            topicModel.updateOne(topic);
-                          },
-                        );
+                  onPressed: () async {
+                    await topic.setIsLiked(userModel.user, !topic.isLiked).then(
+                      (topic) {
+                        topicModel.updateOne(topic);
                       },
                     );
                   },
@@ -149,7 +163,12 @@ class _TopicFragmentState extends State<TopicFragment> {
                   icon: const Icon(CupertinoIcons.heart),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    context.loaderOverlay.show();
+                    Share.shareWithResult("Check out this course on BeeLearn", subject: "We are").whenComplete(
+                      () => context.loaderOverlay.hide(),
+                    );
+                  },
                   icon: const Icon(CupertinoIcons.share),
                 ),
               ],
@@ -294,33 +313,31 @@ class _TopicFragmentState extends State<TopicFragment> {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : LoaderOverlay(
-                  child: PageView.builder(
-                    itemCount: topics.length,
-                    controller: controller,
-                    physics: topics.isNotEmpty && _canScrollNext(topics, viewTypes) ? null : const LeftBlockedScrollPhysics(),
-                    onPageChanged: (index) {
-                      if (index > 0) {
-                        final currentIndex = index - 1;
-                        final viewType = viewTypes[currentIndex];
-                        if (viewType == _TopicFragmentViewType.topicView) completeTopic(topics[currentIndex]);
-                      }
-                      setState(() => currentPage = index);
-                    },
-                    itemBuilder: (context, index) {
-                      final viewType = viewTypes[index];
-                      final topic = topics[index];
+              : PageView.builder(
+                  itemCount: topics.length,
+                  controller: controller,
+                  physics: topics.isNotEmpty && _canScrollNext(topics, viewTypes) ? null : const LeftBlockedScrollPhysics(),
+                  onPageChanged: (index) {
+                    if (index > 0) {
+                      final currentIndex = index - 1;
+                      final viewType = viewTypes[currentIndex];
+                      if (viewType == _TopicFragmentViewType.topicView) completeTopic(topics[currentIndex]);
+                    }
+                    setState(() => currentPage = index);
+                  },
+                  itemBuilder: (context, index) {
+                    final viewType = viewTypes[index];
+                    final topic = topics[index];
 
-                      switch (viewType) {
-                        case _TopicFragmentViewType.topicView:
-                          return getTopicView(topic, index);
-                        case _TopicFragmentViewType.questionView:
-                          return getQuestionView(topic, index);
-                        default:
-                          throw UnimplementedError("viewType not implemented");
-                      }
-                    },
-                  ),
+                    switch (viewType) {
+                      case _TopicFragmentViewType.topicView:
+                        return getTopicView(topic, index);
+                      case _TopicFragmentViewType.questionView:
+                        return getQuestionView(topic, index);
+                      default:
+                        throw UnimplementedError("viewType not implemented");
+                    }
+                  },
                 ),
         );
       },

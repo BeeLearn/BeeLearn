@@ -21,14 +21,20 @@ class BaseModel<T> extends ChangeNotifier {
   }
 
   dynamic getEntityId(T item) {
-    throw UnimplementedError();
+    throw UnimplementedError("getEntityId is not implemented");
   }
 
   int orderBy(T first, T second) {
-    throw UnimplementedError();
+    throw UnimplementedError("orderBy is not implemented");
   }
 
   T? getEntityById(dynamic id) => _entities[id];
+
+  setOne(T value) {
+    final id = getEntityId(value);
+    _entities[id] = value;
+    notifyListeners();
+  }
 
   setAll(List<T> items) {
     _entities = {};
