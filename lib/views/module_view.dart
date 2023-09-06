@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../models/module_model.dart';
-import 'app_theme.dart';
 import 'fragments/module_fragment.dart';
 
 class ModuleView extends StatelessWidget {
@@ -22,17 +21,13 @@ class ModuleView extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => ModuleModel()),
       ],
-      child: MaterialApp(
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        home: Scaffold(
-          resizeToAvoidBottomInset: false,
-          appBar: AppBar(
-            leading: BackButton(onPressed: context.pop),
-            title: Text(courseName ?? ""),
-          ),
-          body: ModuleFragment(query: query),
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          leading: BackButton(onPressed: context.pop),
+          title: Text(courseName ?? ""),
         ),
+        body: ModuleFragment(query: query),
       ),
     );
   }

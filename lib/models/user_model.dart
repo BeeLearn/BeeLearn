@@ -1,14 +1,42 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
-import 'package:beelearn/main_application.dart';
-import 'package:beelearn/serializers/token.dart';
-import 'package:beelearn/serializers/user.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase show User;
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 
+import '../main_application.dart';
+import '../serializers/token.dart';
+import '../serializers/user.dart';
+import '../socket_client.dart';
+
 class UserModel extends ChangeNotifier {
   User? _user;
+
+  // firebase authentication state
+  String? firebaseIdToken;
+  firebase.User? firebaseUser;
+
+  /// A setter wrapper to getIdToken when firebase user is set
+  Future<void> setFirebaseUser(firebase.User? user) async {
+    firebaseUser = user;
+
+    /// Todo remove
+    log("firebaseUser mutated", error: user);
+
+    final idToken = await user?.getIdToken();
+
+    /// Todo remove
+    log("idToken gotten", error: idToken);
+
+    firebaseIdToken = idToken;
+    MainApplication.accessToken = idToken;
+
+    updateClient(idToken);
+    notifyListeners();
+  }
+
   static const String apiURL = "${MainApplication.baseURL}/api/account/users/";
 
   User get user => _user!;
@@ -19,7 +47,7 @@ class UserModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  static Future<Token> getOrCreateUser(Map<String, dynamic> data) {
+  static Future<Token> getUserToken(Map<String, dynamic> data) {
     return post(
       Uri.parse("${apiURL}create-user/"),
       body: jsonEncode(data),
@@ -31,8 +59,7 @@ class UserModel extends ChangeNotifier {
         case HttpStatus.ok:
           return Token.fromJson(jsonDecode(response.body));
         default:
-          print(response.body);
-          return Future.error(() => response);
+          return Future.error(response);
       }
     });
   }
@@ -43,9 +70,16 @@ class UserModel extends ChangeNotifier {
       headers: {
         HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
-    ).then((response) {
-      return User.fromJson(jsonDecode(response.body));
-    });
+    ).then(
+      (response) {
+        switch (response.statusCode) {
+          case HttpStatus.ok:
+            return User.fromJson(jsonDecode(response.body));
+          default:
+            return Future.error(response);
+        }
+      },
+    );
   }
 
   static Future<User> updateOne(int id, Map<String, dynamic> data) {
@@ -53,7 +87,7 @@ class UserModel extends ChangeNotifier {
       Uri.parse("$apiURL$id/"),
       body: jsonEncode(data),
       headers: {
-        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
         HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
     ).then((response) {
@@ -61,7 +95,7 @@ class UserModel extends ChangeNotifier {
         case HttpStatus.ok:
           return User.fromJson(jsonDecode(response.body));
         default:
-          throw Error();
+          return Future.error(response);
       }
     });
   }

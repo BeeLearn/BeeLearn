@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-import '../globals.dart';
-import 'app_theme.dart';
 import 'tabs/category_tab_view.dart';
 import 'tabs/favorite_tab_view.dart';
 import 'tabs/profile_tab_view.dart';
@@ -53,65 +51,58 @@ class _MainViewState extends State<MainView> {
 
   @override
   Widget build(context) {
-    return ResponsiveBreakpoints.builder(
-      breakpoints: defaultBreakpoints,
-      child: MaterialApp(
-        theme: AppTheme.light,
-        darkTheme: AppTheme.dark,
-        home: Scaffold(
-          bottomNavigationBar: LayoutBuilder(
-            builder: (context, constraints) {
-              return constraints.maxWidth < 640 ? smallScreenNavigation : const Row();
-            },
-          ),
-          body: Consumer<UserModel>(
-            builder: (context, model, child) {
-              return model.nullableUser == null
-                  ? const Center(
-                      child: CircularProgressIndicator(),
-                    )
-                  : Row(
-                      children: [
-                        ResponsiveVisibility(
-                          visible: !ResponsiveBreakpoints.of(context).isMobile,
-                          child: NavigationRail(
-                            selectedIndex: _currentIndex,
-                            groupAlignment: 0,
-                            onDestinationSelected: (index) {
-                              setState(() {
-                                _currentIndex = index;
-                              });
-                            },
-                            labelType: NavigationRailLabelType.all,
-                            destinations: const [
-                              NavigationRailDestination(
-                                icon: Icon(Icons.category_outlined),
-                                selectedIcon: Icon(Icons.category),
-                                label: Text("Categories"),
-                              ),
-                              NavigationRailDestination(
-                                icon: Icon(Icons.favorite_outline),
-                                selectedIcon: Icon(Icons.favorite),
-                                label: Text("Favourite"),
-                              ),
-                              NavigationRailDestination(
-                                icon: CircleAvatar(radius: 16),
-                                label: Text("Profile"),
-                              ),
-                            ],
+    return Scaffold(
+      bottomNavigationBar: LayoutBuilder(
+        builder: (context, constraints) {
+          return constraints.maxWidth < 640 ? smallScreenNavigation : const Row();
+        },
+      ),
+      body: Consumer<UserModel>(
+        builder: (context, model, child) {
+          return model.nullableUser == null
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : Row(
+                  children: [
+                    ResponsiveVisibility(
+                      visible: !ResponsiveBreakpoints.of(context).isMobile,
+                      child: NavigationRail(
+                        selectedIndex: _currentIndex,
+                        groupAlignment: 0,
+                        onDestinationSelected: (index) {
+                          setState(() {
+                            _currentIndex = index;
+                          });
+                        },
+                        labelType: NavigationRailLabelType.all,
+                        destinations: const [
+                          NavigationRailDestination(
+                            icon: Icon(Icons.category_outlined),
+                            selectedIcon: Icon(Icons.category),
+                            label: Text("Categories"),
                           ),
-                        ),
-                        Expanded(
-                          child: IndexedStack(
-                            index: _currentIndex,
-                            children: _tabs,
+                          NavigationRailDestination(
+                            icon: Icon(Icons.favorite_outline),
+                            selectedIcon: Icon(Icons.favorite),
+                            label: Text("Favourite"),
                           ),
-                        ),
-                      ],
-                    );
-            },
-          ),
-        ),
+                          NavigationRailDestination(
+                            icon: CircleAvatar(radius: 16),
+                            label: Text("Profile"),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: IndexedStack(
+                        index: _currentIndex,
+                        children: _tabs,
+                      ),
+                    ),
+                  ],
+                );
+        },
       ),
     );
   }

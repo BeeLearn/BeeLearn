@@ -25,10 +25,15 @@ class CourseModel extends BaseModel<Course> {
         HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
     ).then((response) {
-      return Paginate.fromJson(
-        jsonDecode(response.body),
-        Course.fromJson,
-      );
+      switch (response.statusCode) {
+        case HttpStatus.ok:
+          return Paginate.fromJson(
+            jsonDecode(response.body),
+            Course.fromJson,
+          );
+        default:
+          return Future.error(response);
+      }
     });
   }
 
@@ -45,8 +50,7 @@ class CourseModel extends BaseModel<Course> {
         case HttpStatus.ok:
           return Course.fromJson(jsonDecode(response.body));
         default:
-          print(response.body);
-          throw Error();
+          throw Future.error(response);
       }
     });
   }

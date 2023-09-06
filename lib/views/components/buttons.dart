@@ -61,22 +61,17 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
   }
 
   _updateButtonAppearance(bool update) {
-    clickTimer?.cancel();
-
     if (update) {
       setState(() {
         insetBottomBorderSize = 4.0;
         backgroundColor = Theme.of(context).colorScheme.primaryContainer.withAlpha(128);
       });
     } else {
-      clickTimer = Timer(
-        const Duration(milliseconds: 100),
-        () => setState(() {
-          insetBorderSize = 3.0;
-          insetBottomBorderSize = 6.0;
-          backgroundColor = widget.backgroundColor;
-        }),
-      );
+      setState(() {
+        insetBorderSize = 3.0;
+        insetBottomBorderSize = 6.0;
+        backgroundColor = widget.backgroundColor;
+      });
     }
   }
 
@@ -109,7 +104,7 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
     return _getWidget(
       AnimatedContainer(
         curve: Curves.bounceInOut,
-        duration: const Duration(microseconds: 500),
+        duration: const Duration(microseconds: 5000),
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(

@@ -1,3 +1,4 @@
+import 'package:beelearn/models/streak_model.dart';
 import 'package:beelearn/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,15 +13,19 @@ class SetGoalFragment extends StatefulWidget {
 
 class _SetGoalFragmentState extends State<SetGoalFragment> {
   bool isLoading = false;
+  late UserModel userModel;
+  late StreakModel streakModel;
   late int dailyStreakMinutesGoal;
 
   @override
   void initState() {
     super.initState();
-    final user = Provider.of<UserModel>(context, listen: false).user;
-    setState(() {
-      dailyStreakMinutesGoal = user.profile.dailyStreakMinutes;
-    });
+    userModel = Provider.of<UserModel>(context, listen: false);
+    streakModel = Provider.of<StreakModel>(context, listen: false);
+
+    setState(
+      () => dailyStreakMinutesGoal = userModel.user.profile.dailyStreakMinutes,
+    );
   }
 
   @override
@@ -39,18 +44,16 @@ class _SetGoalFragmentState extends State<SetGoalFragment> {
                   isLoading = true;
                 });
 
-                UserModel userModel = Provider.of<UserModel>(context, listen: false);
                 final user = userModel.user;
 
                 return user.setDailyStreakMinutes(dailyStreakMinutesGoal).then(
                   (user) {
                     userModel.setUser(user);
+                    streakModel.todayStreak.currentStreakSeconds = 0;
                     Navigator.of(context).pop();
                   },
                 ).whenComplete(() {
-                  setState(() {
-                    isLoading = false;
-                  });
+                  setState(() => isLoading = false);
                 });
               },
               child: isLoading

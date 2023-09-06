@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../main_application.dart';
 import '../models/category_model.dart';
 import '../models/course_model.dart';
 import '../models/reward_model.dart';
 import '../models/streak_model.dart';
 import '../models/user_model.dart';
+import 'app_theme.dart';
 import 'fragments/application_fragment.dart';
 
 class ApplicationView extends StatelessWidget {
@@ -24,7 +26,13 @@ class ApplicationView extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => UserModel()),
         ChangeNotifierProvider(create: (context) => FavouriteCourseModel()),
       ],
-      child: const ApplicationFragment(),
+      child: MaterialApp(
+        theme: AppTheme.dark,
+        scaffoldMessengerKey: MainApplication.scaffoldKey,
+        home: const Scaffold(
+          body: ApplicationFragment(),
+        ),
+      ),
     );
   }
 }

@@ -50,19 +50,18 @@ class StreakModel extends ChangeNotifier {
               Streak.fromJson,
             );
           default:
-            throw Error();
+            return Future.error(response);
         }
       },
     );
   }
 
   static Future<Streak> updateStreak(int id, {required Map<String, dynamic> data}) {
-    print(data);
     return patch(
       Uri.parse("$apiURL$id/"),
       body: jsonEncode(data),
       headers: {
-        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
         HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
     ).then(
@@ -71,8 +70,7 @@ class StreakModel extends ChangeNotifier {
           case HttpStatus.ok:
             return Streak.fromJson(jsonDecode(response.body));
           default:
-            print(response.body);
-            throw Error();
+            return Future.error(response);
         }
       },
     );

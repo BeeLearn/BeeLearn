@@ -4,12 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MainApplication {
   static const isDevelopment = true;
   static const baseURL = isDevelopment ? "http://127.0.0.1:8000" : "https://beelearn.onrender.com";
-  static SharedPreferences? sharedPreferences;
-  static String? get accessToken => preferences.getString("accessToken");
 
-  static set accessToken(token) {
-    preferences.setString("accessToken", token);
-  }
+  static SharedPreferences? sharedPreferences;
+  static String? accessToken;
 
   static final GlobalKey<ScaffoldMessengerState> scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 

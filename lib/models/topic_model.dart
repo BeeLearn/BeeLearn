@@ -82,7 +82,7 @@ class TopicModel extends BaseModel<Topic> {
           case HttpStatus.created:
             return Enhancement.fromJson(jsonDecode(response.body));
           default:
-            throw Error();
+            return Future.error(response);
         }
       },
     );

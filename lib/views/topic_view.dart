@@ -64,6 +64,8 @@ class _TopicViewState extends State<TopicView> {
   @override
   Widget build(context) {
     return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       body: LoaderOverlay(
         closeOnBackButton: true,
         child: MultiProvider(
@@ -73,6 +75,7 @@ class _TopicViewState extends State<TopicView> {
             ),
           ],
           child: SafeArea(
+            bottom: false,
             child: TopicFragment(query: widget.query),
           ),
         ),

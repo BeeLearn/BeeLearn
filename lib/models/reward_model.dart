@@ -43,11 +43,18 @@ class RewardModel extends ChangeNotifier {
       headers: {
         HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
-    ).then((response) {
-      return Paginate.fromJson(
-        jsonDecode(response.body),
-        Reward.fromJson,
-      );
-    });
+    ).then(
+      (response) {
+        switch (response.statusCode) {
+          case HttpStatus.ok:
+            return Paginate.fromJson(
+              jsonDecode(response.body),
+              Reward.fromJson,
+            );
+          default:
+            return Future.error(response);
+        }
+      },
+    );
   }
 }

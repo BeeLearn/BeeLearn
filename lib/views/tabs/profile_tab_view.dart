@@ -1,5 +1,6 @@
 import 'package:beelearn/views/components/reward_list.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
 
@@ -41,7 +42,7 @@ class _ProfileTabViewState extends State<ProfileTabView> {
             ),
             actions: [
               IconButton(
-                onPressed: () {},
+                onPressed: () => context.go("/settings"),
                 icon: const Icon(Icons.settings_outlined),
               ),
             ],

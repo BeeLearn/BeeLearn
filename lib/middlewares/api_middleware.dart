@@ -1,4 +1,4 @@
-import 'package:beelearn/socket_client.dart';
+import 'package:djira_client/djira_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +11,7 @@ import '../models/streak_model.dart';
 import '../serializers/course.dart';
 import '../serializers/reward.dart';
 import '../serializers/streak.dart';
+import '../socket_client.dart';
 
 void showSnackBar({
   String? subtitle,
@@ -47,8 +48,14 @@ class ApiMiddleware {
         onError: (response) {},
         onSuccess: (response) {
           final course = Course.fromJson(response.data);
-          final inProgressCourseModel = Provider.of<InProgressCourseModel>(context, listen: false);
-          final completedCourseModel = Provider.of<CompletedCourseModel>(context, listen: false);
+          final inProgressCourseModel = Provider.of<InProgressCourseModel>(
+            context,
+            listen: false,
+          );
+          final completedCourseModel = Provider.of<CompletedCourseModel>(
+            context,
+            listen: false,
+          );
 
           if (course.isCompleted) {
             completedCourseModel.updateOrAddOne(course);
@@ -64,7 +71,10 @@ class ApiMiddleware {
         onError: (response) {},
         onSuccess: (response) {
           final course = Course.fromJson(response.data);
-          final favouriteCourseModel = Provider.of<FavouriteCourseModel>(context, listen: false);
+          final favouriteCourseModel = Provider.of<FavouriteCourseModel>(
+            context,
+            listen: false,
+          );
 
           if (course.isLiked) {
             favouriteCourseModel.updateOrAddOne(course);
@@ -80,7 +90,10 @@ class ApiMiddleware {
         onSuccess: (response) {
           final reward = Reward.fromJson(response.data);
 
-          Provider.of<RewardModel>(context, listen: false).updateOrAddOne(reward);
+          Provider.of<RewardModel>(
+            context,
+            listen: false,
+          ).updateOrAddOne(reward);
           showSnackBar(
             leading: CircleAvatar(foregroundImage: NetworkImage(reward.icon)),
             title: reward.title,
@@ -94,19 +107,24 @@ class ApiMiddleware {
         onError: (response) {},
         onSuccess: (response) {
           final streak = Streak.fromJson(response.data);
-          Provider.of<StreakModel>(context, listen: false).updateOne(streak);
+          Provider.of<StreakModel>(
+            context,
+            listen: false,
+          ).updateOne(streak);
 
-          showSnackBar(
-            leading: const Icon(
-              CupertinoIcons.flame_fill,
-              color: Colors.green,
-            ),
-            title: "You achieved a new streak! Way to go!",
-            action: SnackBarAction(
-              label: "Share",
-              onPressed: () {},
-            ),
-          );
+          if (response.type == Type.updated) {
+            showSnackBar(
+              leading: const Icon(
+                CupertinoIcons.flame_fill,
+                color: Colors.green,
+              ),
+              title: "You achieved a new streak! Way to go!",
+              action: SnackBarAction(
+                label: "Share",
+                onPressed: () {},
+              ),
+            );
+          }
         },
       );
 

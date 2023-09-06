@@ -63,10 +63,10 @@ class _ModuleFragmentState extends State<ModuleFragment> {
 
   @override
   dispose() {
-    super.dispose();
+    if (unsubscribeModuleListener != null) unsubscribeLessonListener();
+    if (unsubscribeModuleListener != null) unsubscribeModuleListener();
 
-    unsubscribeLessonListener();
-    unsubscribeModuleListener();
+    super.dispose();
   }
 
   Future<void> fetchModules() {

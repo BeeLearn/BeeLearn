@@ -52,10 +52,12 @@ class User {
             "add": [id],
           },
         },
-      ).then((streak) {
-        streakModel.updateOne(streak);
-        return streak.currentStreakSeconds;
-      });
+      ).then(
+        (streak) {
+          streakModel.updateOne(streak);
+          return streak.currentStreakSeconds;
+        },
+      );
     }
 
     streakModel.updateOne(todayStreak);

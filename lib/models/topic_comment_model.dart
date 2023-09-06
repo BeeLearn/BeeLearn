@@ -70,7 +70,6 @@ class TopicCommentModel extends BaseModel<TopicComment> {
               jsonDecode(response.body),
             );
           default:
-            print(response.body);
             return Future.error(response);
         }
       },

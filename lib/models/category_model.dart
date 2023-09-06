@@ -52,10 +52,17 @@ class CategoryModel extends ChangeNotifier {
         HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
     ).then(
-      (response) => Paginate.fromJson(
-        jsonDecode(response.body),
-        Category.fromJson,
-      ),
+      (response) {
+        switch (response.statusCode) {
+          case HttpStatus.ok:
+            return Paginate.fromJson(
+              jsonDecode(response.body),
+              Category.fromJson,
+            );
+          default:
+            return Future.error(response);
+        }
+      },
     );
   }
 }
