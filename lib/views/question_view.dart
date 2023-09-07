@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import '../serializers/question.dart';
@@ -91,7 +93,8 @@ class _QuestionViewState extends State<QuestionView> {
               validate = () {
                 if (formKey.currentState!.validate()) {
                   bool isCorrect = fragmentKeys.every((key) => key.currentState!.validateField());
-                  if (isCorrect) validate = widget.nextPage;
+                  log(isCorrect.toString());
+                  if (isCorrect) setState(() => validate = widget.nextPage);
 
                   /// Todo show success message
                 }

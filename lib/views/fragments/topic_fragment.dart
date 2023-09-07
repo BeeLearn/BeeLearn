@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:beelearn/models/topic_comment_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,6 +9,7 @@ import 'package:markdown_widget/markdown_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../models/topic_comment_model.dart';
 import '../../models/topic_model.dart';
 import '../../models/user_model.dart';
 import '../../serializers/topic.dart';
@@ -185,16 +185,25 @@ class _TopicFragmentState extends State<TopicFragment> {
     );
   }
 
-  Widget getQuestionView(Topic topic, int index) {
+  Future<void> _nextPage(List<Topic> topics, List<_TopicFragmentViewType> viewTypes) async {
+    if (currentPage < topics.length - 1) {
+      final nextViewType = viewTypes[currentPage + 1];
+      if (nextViewType == _TopicFragmentViewType.topicView) {
+        context.loaderOverlay.show();
+        unlockTopic(topics[currentPage + 1]).then((value) {
+          controller.nextPage(
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.bounceIn,
+          );
+        }).whenComplete(() => context.loaderOverlay.hide());
+      }
+    }
+  }
+
+  Widget getQuestionView(List<Topic> topics, List<_TopicFragmentViewType> viewTypes, int index) {
     return QuestionView(
-      question: topic.question!,
-      nextPage: () {
-        log("Habbii");
-        controller.nextPage(
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.bounceIn,
-        );
-      },
+      question: topics[index].question!,
+      nextPage: () => _nextPage(topics, viewTypes),
     );
   }
 
@@ -348,7 +357,7 @@ class _TopicFragmentState extends State<TopicFragment> {
                       case _TopicFragmentViewType.topicView:
                         return getTopicView(topic, index);
                       case _TopicFragmentViewType.questionView:
-                        return getQuestionView(topic, index);
+                        return getQuestionView(topics, viewTypes, index);
                       default:
                         throw UnimplementedError("viewType not implemented");
                     }
