@@ -5,7 +5,7 @@ part 'question.g.dart';
 enum QuestionType {
   @JsonValue("TEXT_OPTION")
   textOption,
-  @JsonValue("DRAG_DROP_OPTION")
+  @JsonValue("DRAG_DROP")
   dragDrop,
   @JsonValue("SORT_CHOICE")
   sortChoice,
@@ -74,7 +74,7 @@ class ChoiceQuestion extends Question {
   @JsonKey(required: true)
   final List<Choice> choices;
 
-  ChoiceQuestion({
+  const ChoiceQuestion({
     required super.id,
     required super.title,
     required super.type,
@@ -84,7 +84,7 @@ class ChoiceQuestion extends Question {
 
 @JsonSerializable()
 class MultiChoiceQuestion extends ChoiceQuestion {
-  MultiChoiceQuestion({
+  const MultiChoiceQuestion({
     required super.id,
     required super.title,
     required super.type,
@@ -96,7 +96,7 @@ class MultiChoiceQuestion extends ChoiceQuestion {
 
 @JsonSerializable()
 class SingleChoiceQuestion extends ChoiceQuestion {
-  SingleChoiceQuestion({
+  const SingleChoiceQuestion({
     required super.id,
     required super.title,
     required super.type,
@@ -108,10 +108,20 @@ class SingleChoiceQuestion extends ChoiceQuestion {
 
 @JsonSerializable()
 class DragDropQuestion extends Question {
-  DragDropQuestion({
+  @JsonKey(required: true, name: "choices")
+  final String choicesValue;
+
+  @JsonKey(required: true, name: "question")
+  final String question;
+
+  List<String> get choices => choicesValue.split(",");
+
+  const DragDropQuestion({
     required super.id,
     required super.title,
     required super.type,
+    required this.question,
+    required this.choicesValue,
   });
 
   factory DragDropQuestion.fromJson(Map<String, dynamic> json) => _$DragDropQuestionFromJson(json);
@@ -121,7 +131,7 @@ class DragDropQuestion extends Question {
 class TextOptionQuestion extends Question {
   final String question;
 
-  TextOptionQuestion({
+  const TextOptionQuestion({
     required super.id,
     required super.title,
     required super.type,

@@ -28,7 +28,7 @@ class _MessageTextFieldState extends State<MessageTextField> {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 500),
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(bottom: kBottomNavigationBarHeight),
       color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorDark : Theme.of(context).highlightColor.withAlpha(50),
       child: Row(
         children: [

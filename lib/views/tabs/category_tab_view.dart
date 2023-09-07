@@ -27,52 +27,65 @@ class CategoryTabView extends StatelessWidget {
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
-            SliverAppBar(
-              floating: true,
-              pinned: true,
-              snap: true,
-              title: GestureDetector(
-                onTap: () => context.go("/search"),
-                child: const AbsorbPointer(
-                  absorbing: true,
-                  child: CupertinoSearchTextField(
-                    enabled: false,
+            Consumer<UserModel>(
+              builder: (context, model, child) {
+                return SliverAppBar(
+                  floating: true,
+                  pinned: true,
+                  snap: true,
+                  title: GestureDetector(
+                    onTap: () => context.go("/search"),
+                    child: const CupertinoSearchTextField(
+                      enabled: false,
+                      backgroundColor: Colors.red,
+                    ),
                   ),
-                ),
-              ),
-              bottom: TabBar(
-                isScrollable: true,
-                tabs: _tabs,
-              ),
-              actions: [
-                PillChip(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Theme.of(context).splashColor),
-                    borderRadius: BorderRadius.circular(100.0),
+                  bottom: TabBar(
+                    isScrollable: true,
+                    tabs: _tabs,
                   ),
-                  children: [
-                    const Icon(
-                      CupertinoIcons.flame_fill,
-                      color: Colors.green,
+                  actions: [
+                    PillChip(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Theme.of(context).splashColor),
+                        borderRadius: BorderRadius.circular(100.0),
+                      ),
+                      children: [
+                        const Icon(
+                          Icons.favorite,
+                          color: Colors.redAccent,
+                        ),
+                        const SizedBox(width: 8.0),
+                        Text(model.user.profile.lives.toString())
+                      ],
                     ),
                     const SizedBox(width: 8.0),
-                    Consumer<UserModel>(
-                      builder: (context, model, child) {
-                        return Text(model.user.profile.lives.toString());
-                      },
+                    PillChip(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Theme.of(context).splashColor),
+                        borderRadius: BorderRadius.circular(100.0),
+                      ),
+                      children: [
+                        const Icon(
+                          CupertinoIcons.flame_fill,
+                          color: Colors.greenAccent,
+                        ),
+                        const SizedBox(width: 8.0),
+                        Text(model.user.profile.streaks.toString()),
+                      ],
                     ),
+                    IconButton(
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.notifications_none,
+                        color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).indicatorColor : Colors.black,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                   ],
-                ),
-                IconButton(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.notifications_none,
-                    color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).indicatorColor : Colors.black,
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
-            )
+                );
+              },
+            ),
           ];
         },
         body: Consumer<UserModel>(

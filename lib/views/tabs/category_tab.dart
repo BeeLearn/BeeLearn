@@ -14,21 +14,25 @@ class CategoryTab extends StatefulWidget {
 }
 
 class CategoryTabState extends State<CategoryTab> with AutomaticKeepAliveClientMixin {
+  late CategoryModel categoryModel;
+
   @override
   bool get wantKeepAlive => true;
 
   @override
   initState() {
     super.initState();
+    categoryModel = Provider.of<CategoryModel>(context, listen: false);
     fetchCategories();
   }
 
   Future<void> fetchCategories() async {
-    final model = Provider.of<CategoryModel>(context, listen: false);
-    return CategoryModel.getCategories().then((response) {
-      model.loading = false;
-      model.setAll(response.results);
-    });
+    return CategoryModel.getCategories().then(
+      (response) {
+        categoryModel.loading = false;
+        categoryModel.setAll(response.results);
+      },
+    );
   }
 
   @override
@@ -46,9 +50,9 @@ class CategoryTabState extends State<CategoryTab> with AutomaticKeepAliveClientM
             return model.loading
                 ? const Center(child: CircularProgressIndicator())
                 : ListView.builder(
-                    itemCount: model.categories.length,
+                    itemCount: categories.length,
                     itemBuilder: (context, categoryIndex) {
-                      final category = model.categories[categoryIndex];
+                      final category = categories[categoryIndex];
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,7 +81,7 @@ class CategoryTabState extends State<CategoryTab> with AutomaticKeepAliveClientM
                                 return CourseCard(
                                   course: course,
                                   onUpdate: (course) {
-                                    Provider.of<CategoryModel>(context, listen: false).updateCourse(
+                                    model.updateCourse(
                                       categoryIndex: categoryIndex,
                                       courseIndex: index,
                                       course: course,

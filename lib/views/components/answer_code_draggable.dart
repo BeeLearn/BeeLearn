@@ -1,61 +1,64 @@
-import 'package:beelearn/views/components/answer_code_drag_target.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../views/app_theme.dart';
+import 'answer_code_drag_target.dart';
 import 'buttons.dart';
 import 'custom_draggable.dart';
 
-class AnswerCodeDraggable extends StatefulWidget {
-  final String data;
-  final bool canResize;
+class AnswerCodeDraggable extends StatelessWidget {
+  final DragData data;
+  final ValidationState validationState;
+  final void Function(DragData data, DragData previousData) onChange;
 
   const AnswerCodeDraggable({
     super.key,
     required this.data,
-    this.canResize = true,
+    required this.onChange,
+    this.validationState = ValidationState.none,
   });
 
-  @override
-  State<AnswerCodeDraggable> createState() => _AnswerCodeDraggableState();
-}
+  bool get isValidated {
+    switch (validationState) {
+      case ValidationState.error:
+      case ValidationState.success:
+        return true;
+      default:
+        return false;
+    }
+  }
 
-class _AnswerCodeDraggableState extends State<AnswerCodeDraggable> {
   @override
   Widget build(BuildContext context) {
     return CustomDraggable(
-      data: widget.data,
+      data: data,
+      // Ignore this for now
+      onChange: (details, currentData) {},
       feedback: CustomOutlinedButton(
-        onTap: () {},
         backgroundColor: Theme.of(context).brightness == Brightness.light ? Colors.white : null,
+        // Flutter reset style when dragging, set text-style
         child: DefaultTextStyle(
           style: GoogleFonts.albertSans(),
           child: Text(
-            widget.data,
+            data.value!,
             style: TextStyle(
               color: Theme.of(context).colorScheme.inverseSurface,
             ),
           ),
         ),
       ),
-      childWhenDragging: CustomOutlinedButton(
-        onTap: () {},
-        backgroundColor: Colors.grey[400],
-        child: Visibility(
-          visible: false,
-          maintainSize: true,
-          maintainState: true,
-          maintainAnimation: true,
-          child: Text(widget.data),
-        ),
-      ),
+      childWhenDragging: AnswerCodeDragTarget.variableDropZone(data: data.value),
       childWhenCompleted: AnswerCodeDragTarget(
-        data: widget.canResize ? widget.data : null,
+        onChange: onChange,
+        acceptData: data,
+        validationState: validationState,
       ),
-      getChild: ({required Object data, required DragState state}) {
+      getChild: (dragData, dragState) {
         return CustomOutlinedButton(
-          onTap: () {},
+          selected: isValidated,
+          selectedBackgroundColor: AppTheme.getValidationColor(validationState),
           backgroundColor: Theme.of(context).brightness == Brightness.light ? Colors.white : null,
-          child: Text(data as String),
+          child: Text(dragData.value!),
         );
       },
     );

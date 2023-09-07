@@ -1,10 +1,12 @@
-import 'package:beelearn/serializers/question.dart';
-import 'package:beelearn/views/app_theme.dart';
-import 'package:beelearn/views/components/question_single_choice.dart';
-import 'package:beelearn/views/components/question_text_option.dart';
 import 'package:flutter/material.dart';
 
+import '../serializers/question.dart';
 import '../services/code_question_parser.dart';
+import '../views/app_theme.dart';
+import '../views/components/question_drag_drop.dart';
+import '../views/components/question_multiple_choice.dart';
+import '../views/components/question_single_choice.dart';
+import '../views/components/question_text_option.dart';
 
 class QuestionView extends StatefulWidget {
   final Question question;
@@ -20,6 +22,8 @@ class QuestionView extends StatefulWidget {
 
 class _QuestionViewState extends State<QuestionView> {
   void Function()? onAnswer;
+  void Function()? validate;
+
   late CodeQuestionParser codeQuestionParser = CodeQuestionParser();
 
   @override
@@ -30,14 +34,15 @@ class _QuestionViewState extends State<QuestionView> {
   Widget getView() {
     switch (widget.question.type) {
       case QuestionType.singleChoice:
-        SingleChoiceQuestion question = widget.question as SingleChoiceQuestion;
+        final question = widget.question as SingleChoiceQuestion;
 
         return QuestionSingleChoice<Choice>(
-          items: question.choices,
+          choices: question.choices,
+          onInit: (answer) => onAnswer = answer,
           getText: (choice) => choice.name,
           onSelected: (value, onSubmit) {
             setState(() {
-              onAnswer = () {
+              validate = () {
                 /// If correct and has Answer before
                 /// Next Page
                 onSubmit();
@@ -45,18 +50,58 @@ class _QuestionViewState extends State<QuestionView> {
             });
           },
         );
-      case QuestionType.textOption:
-        TextOptionQuestion question = widget.question as TextOptionQuestion;
-
-        return QuestionTextOption(
-          question: question.question,
-          onChanged: (formKey) {
+      case QuestionType.multipleChoice:
+        final question = widget.question as MultiChoiceQuestion;
+        return QuestionMultipleChoice(
+          choices: question.choices,
+          onInit: (answer) => onAnswer = answer,
+          getText: (choice) => choice.name,
+          onReset: () => setState(() => validate = null),
+          onSelected: (value, onSubmit) {
             setState(() {
-              onAnswer = () {
-                formKey.currentState?.validate();
+              validate = () {
+                onSubmit();
               };
             });
           },
+        );
+      case QuestionType.textOption:
+        final question = widget.question as TextOptionQuestion;
+
+        return QuestionTextOption(
+          question: question.question,
+          onInit: (fragmentKeys) {
+            onAnswer = () {
+              for (final key in fragmentKeys) {
+                key.currentState?.inputPlaceholder();
+              }
+            };
+          },
+          onChanged: (formKey, fragments) {
+            setState(() {
+              validate = () {
+                if (formKey.currentState!.validate()) {
+                  for (final fragment in fragments) {
+                    fragment.currentState?.validateField();
+                  }
+
+                  /// Todo show success message
+                  /// Todo set validate to nexPage function
+                }
+              };
+
+              if (fragments.every(
+                (element) => element.currentState!.inputController.text.isEmpty,
+              )) {
+                validate = null;
+              }
+            });
+          },
+        );
+      case QuestionType.dragDrop:
+        final question = widget.question as DragDropQuestion;
+        return QuestionDragDrop(
+          question: question,
         );
       default:
         return const Placeholder();
@@ -84,7 +129,9 @@ class _QuestionViewState extends State<QuestionView> {
               alignment: WrapAlignment.center,
               children: [
                 OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    if (onAnswer != null) onAnswer!();
+                  },
                   style: FilledButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -99,12 +146,12 @@ class _QuestionViewState extends State<QuestionView> {
                   child: Theme(
                     data: AppTheme.light,
                     child: FilledButton(
-                      onPressed: onAnswer,
+                      onPressed: validate,
                       style: FilledButton.styleFrom(
-                        disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).colorScheme.primary.withAlpha(200) : Theme.of(context).colorScheme.primaryContainer,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4.0),
                         ),
+                        disabledBackgroundColor: Theme.of(context).primaryColorLight,
                       ),
                       child: const Text("Continue"),
                     ),

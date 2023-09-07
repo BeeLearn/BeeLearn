@@ -125,6 +125,7 @@ class SettingsView extends StatelessWidget {
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () {
                           showDialog(
+                            useSafeArea: false,
                             context: context,
                             builder: (context) => const SettingsNotificationView(),
                           );

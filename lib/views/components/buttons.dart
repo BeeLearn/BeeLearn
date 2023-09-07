@@ -61,17 +61,24 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
   }
 
   _updateButtonAppearance(bool update) {
+    clickTimer?.cancel();
+
     if (update) {
       setState(() {
         insetBottomBorderSize = 4.0;
         backgroundColor = Theme.of(context).colorScheme.primaryContainer.withAlpha(128);
       });
     } else {
-      setState(() {
-        insetBorderSize = 3.0;
-        insetBottomBorderSize = 6.0;
-        backgroundColor = widget.backgroundColor;
-      });
+      // In-case of when many render makes ui jank
+      // Make animation visible by setting a timer
+      clickTimer = Timer(
+        const Duration(milliseconds: 200),
+        () => setState(() {
+          insetBorderSize = 3.0;
+          insetBottomBorderSize = 6.0;
+          backgroundColor = widget.backgroundColor;
+        }),
+      );
     }
   }
 
@@ -80,9 +87,7 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
         ? child
         : GestureDetector(
             onTap: () {
-              if (!widget.selected) {
-                widget.onTap!();
-              }
+              if (widget.onTap != null) widget.onTap!();
             },
             onTapUp: (details) {
               _updateButtonAppearance(false);
@@ -129,23 +134,7 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
             ),
           ),
         ),
-        child: GestureDetector(
-          onTap: () {
-            if (!widget.selected) {
-              widget.onTap!();
-            }
-          },
-          onTapUp: (details) {
-            _updateButtonAppearance(false);
-          },
-          onTapDown: (details) {
-            _updateButtonAppearance(true);
-          },
-          onTapCancel: () {
-            _updateButtonAppearance(false);
-          },
-          child: widget.child,
-        ),
+        child: widget.child,
       ),
     );
   }

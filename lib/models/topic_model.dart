@@ -35,10 +35,15 @@ class TopicModel extends BaseModel<Topic> {
         HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
       },
     ).then((response) {
-      return Paginate.fromJson(
-        jsonDecode(response.body),
-        Topic.fromJson,
-      );
+      switch (response.statusCode) {
+        case HttpStatus.ok:
+          return Paginate.fromJson(
+            jsonDecode(response.body),
+            Topic.fromJson,
+          );
+        default:
+          return Future.error(response);
+      }
     });
   }
 
@@ -58,8 +63,7 @@ class TopicModel extends BaseModel<Topic> {
         case HttpStatus.ok:
           return Topic.fromJson(jsonDecode(response.body));
         default:
-          print(response.body);
-          throw Error();
+          return Future.error(response);
       }
     });
   }

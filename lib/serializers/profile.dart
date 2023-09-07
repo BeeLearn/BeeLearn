@@ -16,6 +16,9 @@ class Profile {
   @JsonKey(required: true)
   final int bits;
 
+  @JsonKey(required: true)
+  final int streaks;
+
   @JsonKey(required: true, name: "daily_streak_minutes")
   int dailyStreakMinutes;
 
@@ -26,6 +29,7 @@ class Profile {
     required this.lives,
     required this.xp,
     required this.bits,
+    required this.streaks,
     required this.dailyStreakMinutes,
   });
 

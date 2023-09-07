@@ -8,7 +8,9 @@ import '../main_application.dart';
 import '../models/course_model.dart';
 import '../models/reward_model.dart';
 import '../models/streak_model.dart';
+import '../models/user_model.dart';
 import '../serializers/course.dart';
+import '../serializers/profile.dart';
 import '../serializers/reward.dart';
 import '../serializers/streak.dart';
 import '../socket_client.dart';
@@ -128,7 +130,23 @@ class ApiMiddleware {
         },
       );
 
+      final unsubscribeProfileListener = await client?.subscribe(
+        namespace: "profiles",
+        onError: (response) {},
+        onSuccess: (response) {
+          final userModel = Provider.of<UserModel>(
+            context,
+            listen: false,
+          );
+          final user = userModel.user;
+          user.profile = Profile.fromJson(response.data);
+
+          userModel.setUser(user);
+        },
+      );
+
       client?.socket.onDisconnect((data) {
+        unsubscribeProfileListener!();
         unsubscribeCourseListener!();
         unsubscribeFavouriteListener!();
         unsubscribeRewardListener!();

@@ -1,19 +1,28 @@
-import 'package:beelearn/views/components/answer_code_draggable.dart';
 import 'package:flutter/material.dart';
 
+import '../../views/components/answer_code_draggable.dart';
+import '../../views/components/custom_draggable.dart';
 import 'buttons.dart';
 import 'custom_drag_target.dart';
 
+enum ValidationState {
+  none,
+  error,
+  success,
+}
+
 // Todo make answer drag target not able to resize
 // Todo Don't leave hint to users
-class AnswerCodeDragTarget extends StatefulWidget {
-  final String? data;
-  final bool canResize;
+class AnswerCodeDragTarget extends StatelessWidget {
+  final DragData acceptData;
+  final ValidationState validationState;
+  final void Function(DragData currentData, DragData previousData) onChange;
 
   const AnswerCodeDragTarget({
     super.key,
-    this.data,
-    this.canResize = true,
+    required this.acceptData,
+    required this.onChange,
+    this.validationState = ValidationState.none,
   });
 
   static variableDropZone({
@@ -45,20 +54,22 @@ class AnswerCodeDragTarget extends StatefulWidget {
   }
 
   @override
-  State<AnswerCodeDragTarget> createState() => _AnswerCodeDragTargetState();
-}
-
-class _AnswerCodeDragTargetState extends State<AnswerCodeDragTarget> {
-  @override
   Widget build(BuildContext context) {
-    return CustomDragTarget<String>(
-      getEmptyWidget: (data) => AnswerCodeDragTarget.variableDropZone(
-        data: data.isNotEmpty ? data[0] : null,
-      ),
-      getWidget: (data) => AnswerCodeDraggable(
-        data: data,
-        canResize: widget.canResize,
-      ),
+    return CustomDragTarget(
+      onChange: onChange,
+      acceptData: acceptData,
+      getEmptyWidget: (data) => AnswerCodeDragTarget.variableDropZone(),
+      getWidget: (currentData) {
+        return AnswerCodeDraggable(
+          validationState: validationState,
+          data: DragData(
+            value: currentData.value,
+            isReverse: acceptData.isReverse,
+            placeholder: acceptData.placeholder ?? currentData.placeholder,
+          ),
+          onChange: onChange,
+        );
+      },
     );
   }
 }

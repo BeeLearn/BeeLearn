@@ -26,7 +26,7 @@ Map<String, dynamic> _$QuestionToJson(Question instance) => <String, dynamic>{
 
 const _$QuestionTypeEnumMap = {
   QuestionType.textOption: 'TEXT_OPTION',
-  QuestionType.dragDrop: 'DRAG_DROP_OPTION',
+  QuestionType.dragDrop: 'DRAG_DROP',
   QuestionType.sortChoice: 'SORT_CHOICE',
   QuestionType.multipleChoice: 'MULTIPLE_CHOICE',
   QuestionType.singleChoice: 'SINGLE_CHOICE',
@@ -101,12 +101,14 @@ Map<String, dynamic> _$SingleChoiceQuestionToJson(
 DragDropQuestion _$DragDropQuestionFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    requiredKeys: const ['id', 'title', 'type'],
+    requiredKeys: const ['id', 'title', 'type', 'choices', 'question'],
   );
   return DragDropQuestion(
     id: json['id'] as int,
     title: json['title'] as String,
     type: $enumDecode(_$QuestionTypeEnumMap, json['type']),
+    question: json['question'] as String,
+    choicesValue: json['choices'] as String,
   );
 }
 
@@ -115,6 +117,8 @@ Map<String, dynamic> _$DragDropQuestionToJson(DragDropQuestion instance) =>
       'id': instance.id,
       'title': instance.title,
       'type': _$QuestionTypeEnumMap[instance.type]!,
+      'choices': instance.choicesValue,
+      'question': instance.question,
     };
 
 TextOptionQuestion _$TextOptionQuestionFromJson(Map<String, dynamic> json) {

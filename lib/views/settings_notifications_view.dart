@@ -13,11 +13,8 @@ class SettingsNotificationView extends StatelessWidget {
         children: [
           SwitchListTile(
             title: const Text("News Letter"),
-            subtitle: Text(
+            subtitle: const Text(
               "Receive promotional emails, new letters and social media post updates",
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[400],
-                  ),
             ),
             onChanged: (data) {},
             value: true,
@@ -25,11 +22,8 @@ class SettingsNotificationView extends StatelessWidget {
           const Divider(),
           SwitchListTile(
             title: const Text("Push Notifications"),
-            subtitle: Text(
+            subtitle: const Text(
               "Receive new content alert and recommendations, following and mentions updates and more",
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey[400],
-                  ),
             ),
             onChanged: (data) {},
             value: true,

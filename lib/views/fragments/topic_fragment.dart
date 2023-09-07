@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:beelearn/models/topic_comment_model.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +59,11 @@ class _TopicFragmentState extends State<TopicFragment> {
         topicModel.setAll(topics.results);
         topicModel.loading = false;
       },
-    );
+    ).catchError((error, stackTrace) => log(
+          "Fucked up",
+          error: error,
+          stackTrace: stackTrace,
+        ));
     adLoader.setRewardedAdListener(
       onAdLoadFailedCallback: (adUnit, error) {
         context.loaderOverlay.hide();

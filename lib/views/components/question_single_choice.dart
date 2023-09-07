@@ -4,17 +4,19 @@ import 'package:flutter/material.dart';
 import 'buttons.dart';
 
 class QuestionSingleChoice<T extends Choice> extends StatefulWidget {
-  final List<T> items;
+  final List<T> choices;
   final String Function(T value) getText;
   final void Function(
     T value,
     void Function() onSubmit,
   ) onSelected;
+  final void Function(void Function() answer) onInit;
 
   const QuestionSingleChoice({
     super.key,
-    required this.items,
+    required this.choices,
     required this.getText,
+    required this.onInit,
     required this.onSelected,
   });
 
@@ -27,13 +29,39 @@ class _QuestionSingleChoiceState<T extends Choice> extends State<QuestionSingleC
   bool isSubmitted = false;
 
   @override
+  void initState() {
+    super.initState();
+
+    widget.onInit(_selectAnswers);
+  }
+
+  _selectAnswers() {
+    setState(() {
+      selectedIndex = widget.choices.indexWhere((choice) => choice.isAnswer);
+    });
+
+    _updateView();
+  }
+
+  _updateView() {
+    if (selectedIndex != null) {
+      widget.onSelected(
+        widget.choices[selectedIndex!],
+        () => setState(
+          () => isSubmitted = true,
+        ),
+      );
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: widget.items.length,
+      itemCount: widget.choices.length,
       shrinkWrap: false,
       physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, index) {
-        final Choice choice = widget.items[index];
+        final Choice choice = widget.choices[index];
         final isSelected = selectedIndex == index;
 
         return CustomOutlinedButton(
@@ -43,12 +71,7 @@ class _QuestionSingleChoiceState<T extends Choice> extends State<QuestionSingleC
               selectedIndex = index;
             });
 
-            widget.onSelected(
-              widget.items[index],
-              () => setState(
-                () => isSubmitted = true,
-              ),
-            );
+            _updateView();
           },
           selected: isSelected,
           selectedBackgroundColor: isSelected && isSubmitted

@@ -192,12 +192,14 @@ class _TopicCommentViewState extends State<TopicCommentView> {
   }
 
   Widget getReplyButton(TopicComment parent, TopicComment? child) {
+    final username = "@${(child ?? parent).user.username}";
+
     return TextButton(
       onPressed: () {
-        messageTextFieldController.text = "@lyonkvalid ";
+        messageTextFieldController.text = username;
         if (!messageTextFieldFocusNode.hasFocus) {
           messageTextFieldFocusNode.requestFocus();
-          messageTextFieldController.selection = const TextSelection.collapsed(offset: 8);
+          messageTextFieldController.selection = TextSelection.fromPosition(TextPosition(offset: username.length));
         }
 
         parentComment = parent;
