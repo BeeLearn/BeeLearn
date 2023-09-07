@@ -186,7 +186,16 @@ class _TopicFragmentState extends State<TopicFragment> {
   }
 
   Widget getQuestionView(Topic topic, int index) {
-    return QuestionView(question: topic.question!);
+    return QuestionView(
+      question: topic.question!,
+      nextPage: () {
+        log("Habbii");
+        controller.nextPage(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.bounceIn,
+        );
+      },
+    );
   }
 
   (List<_TopicFragmentViewType>, List<Topic>) getViewTypes(List<Topic> topics) {

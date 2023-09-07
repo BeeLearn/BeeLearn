@@ -30,7 +30,15 @@ class _CustomDragTargetState extends State<CustomDragTarget> {
     return hasData
         ? widget.getWidget(acceptedData)
         : DragTarget<DragData>(
-            onWillAccept: (data) => data.runtimeType == widget.acceptData.runtimeType,
+            onWillAccept: (data) {
+              // First condition check
+              final accept = widget.acceptData.isReverse && !data!.isReverse;
+              // Can accept reverse check
+              final reverseAccept = !widget.acceptData.isReverse && data!.isReverse;
+              // Can swap data
+              final swap = widget.acceptData.isReverse && data!.isReverse;
+              return data.runtimeType == widget.acceptData.runtimeType && (accept || reverseAccept || swap);
+            },
             onAccept: (data) {
               setState(() {
                 hasData = true;

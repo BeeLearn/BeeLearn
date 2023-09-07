@@ -1,6 +1,6 @@
-import 'package:beelearn/views/components/custom_draggable.dart';
 import 'package:flutter/material.dart';
 
+import '../../views/components/custom_draggable.dart';
 import '../components/answer_code_drag_target.dart';
 
 class AnswerDragDropFragment extends StatefulWidget {
@@ -19,6 +19,9 @@ class AnswerDragDropFragmentState extends State<AnswerDragDropFragment> {
   DragData? data;
   ValidationState validationState = ValidationState.none;
 
+  void Function()? _onChange;
+  set onChange(dynamic value) => setState(() => _onChange = value);
+
   void reset() => setState(() {
         data = null;
         validationState = ValidationState.none;
@@ -30,7 +33,8 @@ class AnswerDragDropFragmentState extends State<AnswerDragDropFragment> {
           () => validationState = ValidationState.error,
         );
 
-  bool get isCorrect => data == null ? false : data?.placeholder == "%${data!.value}%";
+  bool get hasData => data != null;
+  bool get isCorrect => hasData && data!.placeholder == "%${data!.value}%";
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +45,16 @@ class AnswerDragDropFragmentState extends State<AnswerDragDropFragment> {
         isReverse: true,
         placeholder: widget.token,
       ),
-      onChange: (currentData, previousData) => setState(
-        () {
-          data = currentData + previousData;
-          validationState = ValidationState.none;
-        },
-      ),
+      onChange: (currentData, previousData) {
+        setState(
+          () {
+            data = currentData + previousData;
+            validationState = ValidationState.none;
+          },
+        );
+
+        if (_onChange != null) _onChange!();
+      },
     );
   }
 }

@@ -10,10 +10,12 @@ import '../views/components/question_text_option.dart';
 
 class QuestionView extends StatefulWidget {
   final Question question;
+  final void Function() nextPage;
 
   const QuestionView({
     super.key,
     required this.question,
+    required this.nextPage,
   });
 
   @override
@@ -40,12 +42,16 @@ class _QuestionViewState extends State<QuestionView> {
           choices: question.choices,
           onInit: (answer) => onAnswer = answer,
           getText: (choice) => choice.name,
-          onSelected: (value, onSubmit) {
+          onSelected: (selectedChoice, onSubmit) {
             setState(() {
               validate = () {
-                /// If correct and has Answer before
-                /// Next Page
                 onSubmit();
+                final isCorrect = selectedChoice.isAnswer;
+                if (isCorrect) {
+                  setState(() => validate = widget.nextPage);
+                }
+
+                /// Todo show success dialog
               };
             });
           },
@@ -57,10 +63,13 @@ class _QuestionViewState extends State<QuestionView> {
           onInit: (answer) => onAnswer = answer,
           getText: (choice) => choice.name,
           onReset: () => setState(() => validate = null),
-          onSelected: (value, onSubmit) {
+          onSelected: (selectedChoices, onSubmit) {
             setState(() {
               validate = () {
                 onSubmit();
+                final isCorrect = selectedChoices.every((choice) => choice.isAnswer);
+                // Todo show success dialog
+                // Todo validate = nextPage
               };
             });
           },
@@ -77,21 +86,19 @@ class _QuestionViewState extends State<QuestionView> {
               }
             };
           },
-          onChanged: (formKey, fragments) {
+          onChanged: (formKey, fragmentKeys) {
             setState(() {
               validate = () {
                 if (formKey.currentState!.validate()) {
-                  for (final fragment in fragments) {
-                    fragment.currentState?.validateField();
-                  }
+                  bool isCorrect = fragmentKeys.every((key) => key.currentState!.validateField());
+                  if (isCorrect) validate = widget.nextPage;
 
                   /// Todo show success message
-                  /// Todo set validate to nexPage function
                 }
               };
 
-              if (fragments.every(
-                (element) => element.currentState!.inputController.text.isEmpty,
+              if (fragmentKeys.every(
+                (key) => key.currentState!.inputController.text.isEmpty,
               )) {
                 validate = null;
               }
@@ -102,6 +109,20 @@ class _QuestionViewState extends State<QuestionView> {
         final question = widget.question as DragDropQuestion;
         return QuestionDragDrop(
           question: question,
+          onChange: (targets, validateTargets) {
+            if (targets.every((target) => target.hasData)) {
+              setState(
+                () => validate = () {
+                  if (validateTargets()) {
+                    // On Continue click nextPage or if lesson complete quit
+                    setState(() => validate = widget.nextPage);
+                  }
+                },
+              );
+            } else {
+              setState(() => validate = null);
+            }
+          },
         );
       default:
         return const Placeholder();
@@ -151,7 +172,7 @@ class _QuestionViewState extends State<QuestionView> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4.0),
                         ),
-                        disabledBackgroundColor: Theme.of(context).primaryColorLight,
+                        disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorLight : null,
                       ),
                       child: const Text("Continue"),
                     ),

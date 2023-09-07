@@ -1,20 +1,23 @@
-import 'dart:developer';
-
-import 'package:beelearn/views/components/custom_draggable.dart';
-import 'package:beelearn/views/fragments/answer_drag_drop_fragment.dart';
 import 'package:flutter/material.dart';
 
 import '../../serializers/question.dart';
 import '../../services/code_parser.dart';
 import '../../services/code_question_parser.dart';
 import '../../views/components/answer_code_draggable.dart';
+import '../../views/components/custom_draggable.dart';
+import '../../views/fragments/answer_drag_drop_fragment.dart';
 
 class QuestionDragDrop extends StatefulWidget {
   final DragDropQuestion question;
+  final void Function(
+    Iterable<AnswerDragDropFragmentState> targets,
+    bool Function() validate,
+  ) onChange;
 
   const QuestionDragDrop({
     super.key,
     required this.question,
+    required this.onChange,
   });
 
   @override
@@ -23,7 +26,11 @@ class QuestionDragDrop extends StatefulWidget {
 
 class _QuestionDragDropState extends State<QuestionDragDrop> {
   late final Widget questionWidget;
-  late final List<GlobalKey<AnswerDragDropFragmentState>> targetKeys;
+  late final Iterable<GlobalKey<AnswerDragDropFragmentState>> targetKeys;
+
+  Iterable<AnswerDragDropFragmentState> get targets {
+    return targetKeys.map((key) => key.currentState!);
+  }
 
   @override
   void initState() {
@@ -32,17 +39,40 @@ class _QuestionDragDropState extends State<QuestionDragDrop> {
 
     questionWidget = result.$1;
     targetKeys = result.$2;
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      for (final target in targets) {
+        target.onChange = () => widget.onChange(targets, validate);
+      }
+    });
   }
 
+  /// Todo debug circular mismatch with more concise + operator
   void _onChange(DragData currentData, DragData previousData) {
     final data = previousData + currentData;
 
-    for (final key in targetKeys) {
-      final targetData = key.currentState?.data;
+    for (final target in targets) {
+      final targetData = target.data;
+
       if (targetData == null) continue;
 
-      if (data == targetData) key.currentState?.reset();
+      // Fix when data is not equal to targetData
+      // When two there is circular mismatch of data
+      if (data == targetData || data.placeholder == targetData.placeholder) target.reset();
     }
+
+    widget.onChange(targets, validate);
+  }
+
+  bool validate() {
+    bool isValid = true;
+
+    for (final target in targets) {
+      target.validate();
+      isValid = isValid && target.isCorrect;
+    }
+
+    return isValid;
   }
 
   @override
@@ -50,20 +80,6 @@ class _QuestionDragDropState extends State<QuestionDragDrop> {
     return Column(
       children: [
         questionWidget,
-        FilledButton(
-          onPressed: () {
-            log(targetKeys.length.toString());
-            for (final key in targetKeys) {
-              try {
-                log(key.currentState!.data.toString());
-                key.currentState?.validate();
-              } catch (error, stackTrace) {
-                log("Fucked", error: error, stackTrace: stackTrace);
-              }
-            }
-          },
-          child: const Text("Validate"),
-        ),
         Wrap(
           spacing: 16.0,
           alignment: WrapAlignment.center,

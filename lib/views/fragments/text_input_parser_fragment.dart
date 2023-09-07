@@ -19,8 +19,9 @@ class TextInputFragmentState extends State<TextInputFragment> {
   bool isCorrect = false;
   final inputController = TextEditingController();
 
-  void validateField() {
+  bool validateField() {
     if ("%${inputController.text}%" == widget.placeholder) setState(() => isCorrect = true);
+    return isCorrect;
   }
 
   void inputPlaceholder() {
