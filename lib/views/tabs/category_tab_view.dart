@@ -35,9 +35,11 @@ class CategoryTabView extends StatelessWidget {
                   snap: true,
                   title: GestureDetector(
                     onTap: () => context.go("/search"),
-                    child: const CupertinoSearchTextField(
-                      enabled: false,
-                      backgroundColor: Colors.red,
+                    child: const AbsorbPointer(
+                      child: CupertinoSearchTextField(
+                        enabled: false,
+                        backgroundColor: Colors.red,
+                      ),
                     ),
                   ),
                   bottom: TabBar(

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -59,11 +57,7 @@ class _TopicFragmentState extends State<TopicFragment> {
         topicModel.setAll(topics.results);
         topicModel.loading = false;
       },
-    ).catchError((error, stackTrace) => log(
-          "Fucked up",
-          error: error,
-          stackTrace: stackTrace,
-        ));
+    );
     adLoader.setRewardedAdListener(
       onAdLoadFailedCallback: (adUnit, error) {
         context.loaderOverlay.hide();
@@ -81,8 +75,8 @@ class _TopicFragmentState extends State<TopicFragment> {
   }
 
   Widget getTopicView(Topic topic, int index) {
-    // final isDark = Theme.of(context).brightness == Brightness.dark;
-    // final config = isDark ? MarkdownConfig.darkConfig : MarkdownConfig.defaultConfig;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final config = isDark ? MarkdownConfig.darkConfig : MarkdownConfig.defaultConfig;
     // codeWrapper(child, text) => CodeWrapperWidget(child: child, text: text);
 
     return Stack(
@@ -112,20 +106,7 @@ class _TopicFragmentState extends State<TopicFragment> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(top: 16.0),
                   child: MarkdownWidget(
                     data: topic.content,
-                    // config: config.copy(
-                    //   configs: [
-                    //     isDark ? PreConfig.darkConfig.copy(wrapper: codeWrapper) : const PreConfig().copy(wrapper: codeWrapper),
-                    //   ],
-                    // )
-
-                    //  styleSheet: MarkdownStyle(),
-                    //   highlightBuilder: (text, language, infoString) {
-                    //     final prism = Prism(
-                    //       mouseCursor: SystemMouseCursors.text,
-                    //       style: Theme.of(context).brightness == Brightness.dark ? const PrismStyle.dark() : const PrismStyle(),
-                    //     );
-                    //     return prism.render(text, language ?? 'plain');
-                    //   },
+                    config: config,
                   ),
                 ),
               ),
@@ -171,6 +152,8 @@ class _TopicFragmentState extends State<TopicFragment> {
                 IconButton(
                   onPressed: () async {
                     context.loaderOverlay.show();
+
+                    /// Todo Complete Lesson Share
                     Share.shareWithResult("Check out this course on BeeLearn", subject: "We are").whenComplete(
                       () => context.loaderOverlay.hide(),
                     );
@@ -193,7 +176,7 @@ class _TopicFragmentState extends State<TopicFragment> {
         unlockTopic(topics[currentPage + 1]).then((value) {
           controller.nextPage(
             duration: const Duration(milliseconds: 500),
-            curve: Curves.bounceIn,
+            curve: Curves.easeInOut,
           );
         }).whenComplete(() => context.loaderOverlay.hide());
       }

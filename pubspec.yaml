@@ -78,6 +78,7 @@ dependencies:
   rich_text_view: ^1.2.0
   loadmore: ^2.1.0
   flutter_social_textfield: ^0.1.2
+  wechat_assets_picker: ^8.6.3
 
 dev_dependencies:
   flutter_test:

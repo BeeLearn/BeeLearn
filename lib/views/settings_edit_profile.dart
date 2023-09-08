@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
+import '../middlewares/api_middleware.dart' show showSnackBar;
 import '../models/user_model.dart';
 
+/// Todo make ui more cool
 class SettingsEditProfile extends StatefulWidget {
   const SettingsEditProfile({super.key});
 
@@ -12,9 +16,8 @@ class SettingsEditProfile extends StatefulWidget {
 
 class _SettingsEditProfile extends State<SettingsEditProfile> {
   late UserModel userModel;
-  late TextEditingController usernameTextEditController;
-  late TextEditingController emailTextEditController;
-  late TextEditingController fullNameTextEditController;
+  late TextEditingController usernameTextEditController, emailTextEditController;
+  late TextEditingController lastNameTextEditController, firstNameTextEditController;
 
   @override
   void initState() {
@@ -25,71 +28,106 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
       listen: false,
     );
 
-    fullNameTextEditController = TextEditingController(text: "Hey Boy");
     emailTextEditController = TextEditingController(text: userModel.user.email);
+    lastNameTextEditController = TextEditingController(text: userModel.user.lastName);
+    firstNameTextEditController = TextEditingController(text: userModel.user.firstName);
     usernameTextEditController = TextEditingController(text: userModel.user.username);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Edit Profile"),
-        centerTitle: true,
-        actions: [
-          TextButton(
-            onPressed: () {},
-            child: const Text("Save"),
-          ),
-        ],
-      ),
-      body: GestureDetector(
-        onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: SingleChildScrollView(
-            child: Consumer<UserModel>(
-              builder: (context, model, child) {
-                return Column(
-                  children: [
-                    Column(
-                      children: [
-                        const CircleAvatar(
-                          maxRadius: 64,
-                        ),
-                        TextButton(
-                          onPressed: () {},
-                          child: const Text("Change profile picture"),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 32),
-                    TextFormField(
-                      controller: emailTextEditController,
-                      decoration: const InputDecoration(
-                        labelText: "Email",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: fullNameTextEditController,
-                      decoration: const InputDecoration(
-                        labelText: "Full Name",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: usernameTextEditController,
-                      decoration: const InputDecoration(
-                        labelText: "Username",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ],
+    return LoaderOverlay(
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("Edit Profile"),
+          centerTitle: true,
+          actions: [
+            TextButton(
+              onPressed: () async {
+                context.loaderOverlay.show();
+
+                final data = {
+                  "email": emailTextEditController.text,
+                  "last_name": lastNameTextEditController.text,
+                  "first_name": firstNameTextEditController.text,
+                  "username": usernameTextEditController.text,
+                };
+
+                await UserModel.updateOne(
+                  userModel.user.id,
+                  data,
+                ).then((user) => userModel.setUser(user)).onError((error, stackTrace) {
+                  showSnackBar(
+                    leading: const Icon(Icons.error),
+                    title: "An error occur while updating your profile",
+                  );
+                }).whenComplete(
+                  () => context.loaderOverlay.hide(),
                 );
               },
+              child: const Text("Save"),
+            ),
+          ],
+        ),
+        body: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Column(
+                    children: [
+                      const CircleAvatar(
+                        maxRadius: 64,
+                      ),
+                      TextButton(
+                        onPressed: () async {
+                          final List<AssetEntity>? result = await AssetPicker.pickAssets(
+                            context,
+                            pickerConfig: const AssetPickerConfig(
+                              maxAssets: 1,
+                            ),
+                          );
+                        },
+                        child: const Text("Change profile picture"),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  TextFormField(
+                    controller: emailTextEditController,
+                    decoration: const InputDecoration(
+                      labelText: "Email",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: firstNameTextEditController,
+                    decoration: const InputDecoration(
+                      labelText: "First Name",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: lastNameTextEditController,
+                    decoration: const InputDecoration(
+                      labelText: "Last Name",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: usernameTextEditController,
+                    decoration: const InputDecoration(
+                      labelText: "Username",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

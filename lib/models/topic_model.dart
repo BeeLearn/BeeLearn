@@ -1,15 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:beelearn/models/base_model.dart';
 import 'package:http/http.dart' show get, patch, post;
 
 import '../../main_application.dart';
 import '../serializers/enhancement.dart';
 import '../serializers/paginate.dart';
 import '../serializers/topic.dart';
+import 'base_model.dart';
 
-// Todo Fix Bug When Extending BaseModel
 class TopicModel extends BaseModel<Topic> {
   static const String apiURL = "${MainApplication.baseURL}/api/catalogue/topics/";
 

@@ -25,8 +25,8 @@ class QuestionView extends StatefulWidget {
 }
 
 class _QuestionViewState extends State<QuestionView> {
-  void Function()? onAnswer;
-  void Function()? validate;
+  final onAnswerListener = ValueNotifier<void Function()?>(null);
+  final onValidateListener = ValueNotifier<void Function()?>(null);
 
   late CodeQuestionParser codeQuestionParser = CodeQuestionParser();
 
@@ -42,38 +42,32 @@ class _QuestionViewState extends State<QuestionView> {
 
         return QuestionSingleChoice<Choice>(
           choices: question.choices,
-          onInit: (answer) => onAnswer = answer,
+          onInit: (answer) => onAnswerListener.value = answer,
           getText: (choice) => choice.name,
           onSelected: (selectedChoice, onSubmit) {
-            setState(() {
-              validate = () {
-                onSubmit();
-                final isCorrect = selectedChoice.isAnswer;
-                if (isCorrect) {
-                  setState(() => validate = widget.nextPage);
-                }
+            onValidateListener.value = () {
+              onSubmit();
+              final isCorrect = selectedChoice.isAnswer;
+              if (isCorrect) onValidateListener.value = widget.nextPage;
 
-                /// Todo show success dialog
-              };
-            });
+              /// Todo show success dialog
+            };
           },
         );
       case QuestionType.multipleChoice:
         final question = widget.question as MultiChoiceQuestion;
         return QuestionMultipleChoice(
           choices: question.choices,
-          onInit: (answer) => onAnswer = answer,
+          onInit: (answer) => onAnswerListener.value = answer,
           getText: (choice) => choice.name,
-          onReset: () => setState(() => validate = null),
+          onReset: () => onValidateListener.value = null,
           onSelected: (selectedChoices, onSubmit) {
-            setState(() {
-              validate = () {
-                onSubmit();
-                final isCorrect = selectedChoices.every((choice) => choice.isAnswer);
-                // Todo show success dialog
-                // Todo validate = nextPage
-              };
-            });
+            onValidateListener.value = () {
+              onSubmit();
+              final isCorrect = selectedChoices.every((choice) => choice.isAnswer);
+              // Todo show success dialog
+              // Todo validate = nextPage
+            };
           },
         );
       case QuestionType.textOption:
@@ -82,30 +76,28 @@ class _QuestionViewState extends State<QuestionView> {
         return QuestionTextOption(
           question: question.question,
           onInit: (fragmentKeys) {
-            onAnswer = () {
+            onAnswerListener.value = () {
               for (final key in fragmentKeys) {
                 key.currentState?.inputPlaceholder();
               }
             };
           },
           onChanged: (formKey, fragmentKeys) {
-            setState(() {
-              validate = () {
-                if (formKey.currentState!.validate()) {
-                  bool isCorrect = fragmentKeys.every((key) => key.currentState!.validateField());
-                  log(isCorrect.toString());
-                  if (isCorrect) setState(() => validate = widget.nextPage);
+            onValidateListener.value = () {
+              if (formKey.currentState!.validate()) {
+                bool isCorrect = fragmentKeys.every((key) => key.currentState!.validateField());
+                log(isCorrect.toString());
+                if (isCorrect) onValidateListener.value = widget.nextPage;
 
-                  /// Todo show success message
-                }
-              };
-
-              if (fragmentKeys.every(
-                (key) => key.currentState!.inputController.text.isEmpty,
-              )) {
-                validate = null;
+                /// Todo show success message
               }
-            });
+            };
+
+            if (fragmentKeys.every(
+              (key) => key.currentState!.inputController.text.isEmpty,
+            )) {
+              onValidateListener.value = null;
+            }
           },
         );
       case QuestionType.dragDrop:
@@ -114,16 +106,20 @@ class _QuestionViewState extends State<QuestionView> {
           question: question,
           onChange: (targets, validateTargets) {
             if (targets.every((target) => target.hasData)) {
-              setState(
-                () => validate = () {
-                  if (validateTargets()) {
-                    // On Continue click nextPage or if lesson complete quit
-                    setState(() => validate = widget.nextPage);
-                  }
-                },
-              );
+              onValidateListener.value = () {
+                log("This is called not expected");
+                if (validateTargets()) {
+                  // On Continue click nextPage or if lesson complete quit
+                  onValidateListener.value = () {
+                    log("AHHHHH Validate scam");
+
+                    widget.nextPage();
+                    // onValidateListener.value = null;
+                  };
+                }
+              };
             } else {
-              setState(() => validate = null);
+              onValidateListener.value = null;
             }
           },
         );
@@ -154,7 +150,7 @@ class _QuestionViewState extends State<QuestionView> {
               children: [
                 OutlinedButton.icon(
                   onPressed: () {
-                    if (onAnswer != null) onAnswer!();
+                    if (onAnswerListener.value != null) onAnswerListener.value!();
                   },
                   style: FilledButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -169,15 +165,20 @@ class _QuestionViewState extends State<QuestionView> {
                   margin: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Theme(
                     data: AppTheme.light,
-                    child: FilledButton(
-                      onPressed: validate,
-                      style: FilledButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                        disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorLight : null,
-                      ),
-                      child: const Text("Continue"),
+                    child: ValueListenableBuilder(
+                      valueListenable: onValidateListener,
+                      builder: (valueContext, value, child) {
+                        return FilledButton(
+                          onPressed: value,
+                          style: FilledButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorLight.withAlpha(164) : null,
+                          ),
+                          child: const Text("Continue"),
+                        );
+                      },
                     ),
                   ),
                 )

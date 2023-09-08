@@ -2,8 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:provider/provider.dart';
 
-import '../models/streak_model.dart';
-import '../models/user_model.dart';
+import '../models/models.dart';
 import 'profile.dart';
 
 part 'user.g.dart';
@@ -25,12 +24,23 @@ class User {
   @JsonKey(includeIfNull: true, required: true)
   final String? avatar;
 
+  @JsonKey(required: true, name: "first_name")
+  final String firstName;
+
+  @JsonKey(required: true, name: "last_name")
+  final String lastName;
+
+  @JsonKey(includeToJson: false, includeFromJson: false)
+  String get fullName => "$firstName $lastName";
+
   User({
     required this.id,
     required this.username,
     required this.email,
     required this.avatar,
     required this.profile,
+    required this.firstName,
+    required this.lastName,
   });
 
   /// Update current daily streak spent seconds

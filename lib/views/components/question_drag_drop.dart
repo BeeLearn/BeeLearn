@@ -24,7 +24,10 @@ class QuestionDragDrop extends StatefulWidget {
   State<QuestionDragDrop> createState() => _QuestionDragDropState();
 }
 
-class _QuestionDragDropState extends State<QuestionDragDrop> {
+class _QuestionDragDropState extends State<QuestionDragDrop> with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   late final Widget questionWidget;
   late final Iterable<GlobalKey<AnswerDragDropFragmentState>> targetKeys;
 
