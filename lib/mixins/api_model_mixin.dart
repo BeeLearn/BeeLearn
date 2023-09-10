@@ -84,13 +84,13 @@ mixin ApiModelMixin {
 
   /// Update
   Future<T> update<T>({
-    required int id,
+    required dynamic path,
     Map<String, dynamic>? query,
     required Map<String, dynamic>? body,
     required T Function(Map<String, dynamic> json) fromJson,
   }) async {
     final response = await patch(
-      Uri.parse(getDetailedPath(id)).replace(queryParameters: query),
+      Uri.parse(getDetailedPath(path)).replace(queryParameters: query),
       body: jsonEncode(body),
       headers: headers,
     );

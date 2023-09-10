@@ -56,7 +56,7 @@ class CourseCard extends StatelessWidget {
           children: [
             Image.network(
               course.image,
-              fit: BoxFit.cover,
+              fit: BoxFit.fill,
             ),
             if (course.isNew)
               Positioned(

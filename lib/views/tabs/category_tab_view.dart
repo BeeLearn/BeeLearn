@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import '../../models/course_model.dart';
 import '../../models/user_model.dart';
@@ -10,8 +11,17 @@ import '../components/pill_chip.dart';
 import 'category_single_tab.dart';
 import 'category_tab.dart';
 
-class CategoryTabView extends StatelessWidget {
-  const CategoryTabView({super.key}) : super();
+class CategoryTabView extends StatefulWidget {
+  const CategoryTabView({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _CategoryTabView();
+}
+
+class _CategoryTabView extends State<CategoryTabView> {
+  final GlobalKey _one = GlobalKey();
+  final GlobalKey _two = GlobalKey();
+  final GlobalKey _three = GlobalKey();
 
   List<Tab> get _tabs => [
         const Tab(child: Text("For you")),
@@ -19,6 +29,15 @@ class CategoryTabView extends StatelessWidget {
         const Tab(child: Text("In progress")),
         const Tab(child: Text("Completed")),
       ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      ShowCaseWidget.of(context).startShowCase([_one, _two, _three]);
+    });
+  }
 
   @override
   Widget build(context) {
@@ -47,43 +66,47 @@ class CategoryTabView extends StatelessWidget {
                     tabs: _tabs,
                   ),
                   actions: [
-                    PillChip(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Theme.of(context).splashColor),
-                        borderRadius: BorderRadius.circular(100.0),
+                    Showcase(
+                      key: _one,
+                      title: "Take on your next challenge",
+                      description: "Use your hearts to keep learning!",
+                      child: PillChip(
+                        children: [
+                          const Icon(
+                            Icons.favorite,
+                            color: Colors.redAccent,
+                          ),
+                          const SizedBox(width: 8.0),
+                          Text(model.value.profile.lives.toString())
+                        ],
                       ),
-                      children: [
-                        const Icon(
-                          Icons.favorite,
-                          color: Colors.redAccent,
-                        ),
-                        const SizedBox(width: 8.0),
-                        Text(model.value.profile.lives.toString())
-                      ],
                     ),
                     const SizedBox(width: 8.0),
-                    PillChip(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Theme.of(context).splashColor),
-                        borderRadius: BorderRadius.circular(100.0),
-                      ),
-                      children: [
-                        const Icon(
-                          CupertinoIcons.flame_fill,
-                          color: Colors.greenAccent,
-                        ),
-                        const SizedBox(width: 8.0),
-                        Text(model.value.profile.streaks.toString()),
-                      ],
-                    ),
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.notifications_none,
-                        color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).indicatorColor : Colors.black,
+                    Showcase(
+                      key: _two,
+                      title: "Let that streak be consistent",
+                      description: "View your streaks, and share",
+                      child: PillChip(
+                        children: [
+                          const Icon(
+                            CupertinoIcons.flame_fill,
+                            color: Colors.greenAccent,
+                          ),
+                          const SizedBox(width: 8.0),
+                          Text(model.value.profile.streaks.toString()),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    Showcase(
+                      key: _three,
+                      title: "Notifications",
+                      description: "View all your notifications and alerts here",
+                      child: IconButton(
+                        onPressed: () {},
+                        icon: const Icon(Icons.notifications_none),
+                      ),
+                    ),
+                    const SizedBox(width: 8.0),
                   ],
                 );
               },

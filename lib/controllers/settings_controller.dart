@@ -1,7 +1,7 @@
 import '../mixins/api_model_mixin.dart';
 import '../serializers/settings.dart';
 
-class SettingsModel with ApiModelMixin {
+class _SettingsController with ApiModelMixin {
   @override
   String get basePath => "api/account/settings";
 
@@ -11,7 +11,7 @@ class SettingsModel with ApiModelMixin {
     required Map<String, dynamic>? body,
   }) {
     return update(
-      id: id,
+      path: id,
       body: body,
       query: query,
       fromJson: Settings.fromJson,

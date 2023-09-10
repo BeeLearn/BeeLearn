@@ -43,7 +43,7 @@ class PurchaseModel extends BaseModel<Product> with ApiModelMixin {
     required Map<String, dynamic>? body,
   }) {
     return super.update(
-      id: id,
+      path: id,
       query: query,
       body: body,
       fromJson: Purchase.fromJson,

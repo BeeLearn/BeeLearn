@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'components/buttons.dart';
+import 'components/premium_subscription.dart';
 
 class SettingsPremiumView extends StatelessWidget {
   const SettingsPremiumView({super.key});
@@ -70,7 +71,25 @@ class SettingsPremiumView extends StatelessWidget {
                     children: [
                       Expanded(
                         child: CustomOutlinedButton(
-                          onTap: () {},
+                          onTap: () {
+                            showModalBottomSheet(
+                              context: context,
+                              useSafeArea: true,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (innerContext) => Container(
+                                height: MediaQuery.of(context).size.height * 0.7,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.secondaryContainer,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(25.0),
+                                    topRight: Radius.circular(25.0),
+                                  ),
+                                ),
+                                child: const PremiumSubscription(),
+                              ),
+                            );
+                          },
                           backgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).highlightColor : Theme.of(context).colorScheme.inversePrimary,
                           child: const Center(
                             child: Text("Subscribe"),

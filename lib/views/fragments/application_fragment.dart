@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:beelearn/controllers/user_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -11,13 +12,13 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
+import '../../controllers/notification_controller.dart';
 import '../../globals.dart';
 import '../../main_application.dart';
 import '../../middlewares/api_middleware.dart';
 import '../../middlewares/widget_middleware.dart';
 import '../../mixins/initialization_state_mixin.dart';
 import '../../models/product_model.dart';
-import '../../models/settings_model.dart';
 import '../../models/user_model.dart';
 import '../app_theme.dart';
 
@@ -32,15 +33,16 @@ class ApplicationFragment extends StatefulWidget {
 
 class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with InitializationStateMixin<T> {
   late final UserModel _userModel;
-  late final SettingsModel _settingsModel;
   late final ProductModel _productModel;
-  late final StreamSubscription<String> _firebaseTokenRefreshListener;
   late final StreamSubscription<User?> _idTokenListener, _authStateChangeListener;
 
   late final StreamSubscription<List<PurchaseDetails>> _purchaseUpdateListener;
 
   // authStateChanges must be called before app can initialize
   InitializationState appInitializationState = InitializationState.pending;
+
+  final _awesomeNotifications = AwesomeNotifications();
+  final _awesomeNotificationsFcm = AwesomeNotificationsFcm();
 
   @override
   void initState() {
@@ -56,8 +58,6 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
       context,
       listen: false,
     );
-
-    _settingsModel = SettingsModel();
 
     _productModel = Provider.of<ProductModel>(
       context,
@@ -104,6 +104,15 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
       },
       onDone: () => _purchaseUpdateListener.cancel(),
     );
+
+    // _firebaseMessageListener = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    //   print('Got a message whilst in the foreground!');
+    //   print('Message data: ${message.data}');
+    //
+    //   if (message.notification != null) {
+    //     print('Message also contained a notification: ${message.notification}');
+    //   }
+    // });
   }
 
   @override
@@ -112,6 +121,8 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
 
     _idTokenListener.cancel();
     _authStateChangeListener.cancel();
+    _purchaseUpdateListener.cancel();
+    // _firebaseMessageListener.cancel();
   }
 
   @override
@@ -133,17 +144,43 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
               _userModel.value = user;
               _productModel.setAll(paginatedProducts.results);
 
-              _firebaseTokenRefreshListener = FirebaseMessaging.instance.onTokenRefresh.listen(
-                (fcmToken) async {
-                  final user = _userModel.value;
-                  final settings = await _settingsModel.updateSettings(
-                    id: user.id,
-                    body: {"fcm_token": fcmToken},
-                  );
-                  user.settings = settings;
-                  _userModel.value = user;
-                },
+              await _awesomeNotificationsFcm.initialize(
+                licenseKeys: null,
+                debug: MainApplication.isDevelopment,
+                onFcmTokenHandle: NotificationController.fcmTokenHandle,
+                onFcmSilentDataHandle: NotificationController.silentDataHandle,
+                onNativeTokenHandle: NotificationController.nativeTokenHandle,
               );
+
+              _awesomeNotificationsFcm.requestFirebaseAppToken();
+
+              _awesomeNotifications.setListeners(
+                onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+                onNotificationCreatedMethod: NotificationController.onNotificationCreatedMethod,
+                onNotificationDisplayedMethod: NotificationController.onNotificationDisplayedMethod,
+                onDismissActionReceivedMethod: NotificationController.onDismissActionReceivedMethod,
+              );
+
+              _awesomeNotifications.isNotificationAllowed().then((isAllowed) {
+                if (!isAllowed) {
+                  // This is just a basic example. For real apps, you must show some
+                  // friendly dialog box before call the request method.
+                  // This is very important to not harm the user experience
+                  AwesomeNotifications().requestPermissionToSendNotifications();
+                }
+              });
+
+              // _firebaseTokenRefreshListener = FirebaseMessaging.instance.onTokenRefresh.listen(
+              //   (fcmToken) async {
+              //     final user = _userModel.value;
+              //     final settings = await _settingsModel.updateSettings(
+              //       id: user.id,
+              //       body: {"fcm_token": fcmToken},
+              //     );
+              //     user.settings = settings;
+              //     _userModel.value = user;
+              //   },
+              // );
             }
 
             stateNotifier.addListener(
@@ -158,7 +195,7 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
               },
             );
           },
-          onDispose: (stateNotifier) => _firebaseTokenRefreshListener.cancel(),
+          //onDispose: (stateNotifier) => _firebaseTokenRefreshListener.cancel(),
           builder: (state) => ResponsiveBreakpoints.builder(
             breakpoints: defaultBreakpoints,
             child: MaterialApp.router(

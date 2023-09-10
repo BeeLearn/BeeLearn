@@ -29,7 +29,7 @@ class NotificationModel extends BaseModel<Notification> with ApiModelMixin {
     required Map<String, dynamic>? body,
   }) {
     return super.update(
-      id: id,
+      path: id,
       query: query,
       body: body,
       fromJson: Notification.fromJson,

@@ -2,6 +2,7 @@ import 'package:beelearn/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 import 'tabs/category_tab_view.dart';
 import 'tabs/favorite_tab_view.dart';
@@ -95,9 +96,13 @@ class _MainViewState extends State<MainView> {
                       ),
                     ),
                     Expanded(
-                      child: IndexedStack(
-                        index: _currentIndex,
-                        children: _tabs,
+                      child: ShowCaseWidget(
+                        builder: Builder(
+                          builder: (context) => IndexedStack(
+                            index: _currentIndex,
+                            children: _tabs,
+                          ),
+                        ),
                       ),
                     ),
                   ],

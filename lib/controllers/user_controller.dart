@@ -14,13 +14,21 @@ class _UserController with ApiModelMixin {
     );
   }
 
+  Future<User> updateCurrentUser({required Map<String, dynamic> body}) {
+    return update(
+      body: body,
+      fromJson: User.fromJson,
+      path: currentUserApiPath,
+    );
+  }
+
   Future<User> updateUser({
     required int id,
     Map<String, dynamic>? query,
     required Map<String, dynamic>? body,
   }) {
     return super.update(
-      id: id,
+      path: id,
       query: query,
       body: body,
       fromJson: User.fromJson,
