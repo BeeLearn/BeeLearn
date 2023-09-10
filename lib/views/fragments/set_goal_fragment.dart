@@ -13,19 +13,24 @@ class SetGoalFragment extends StatefulWidget {
 
 class _SetGoalFragmentState extends State<SetGoalFragment> {
   bool isLoading = false;
-  late UserModel userModel;
-  late StreakModel streakModel;
-  late int dailyStreakMinutesGoal;
+
+  late int _dailyStreakMinutesGoal;
+  late final UserModel _userModel;
+  late final StreakModel _streakModel;
 
   @override
   void initState() {
     super.initState();
-    userModel = Provider.of<UserModel>(context, listen: false);
-    streakModel = Provider.of<StreakModel>(context, listen: false);
-
-    setState(
-      () => dailyStreakMinutesGoal = userModel.user.profile.dailyStreakMinutes,
+    _userModel = Provider.of<UserModel>(
+      context,
+      listen: false,
     );
+    _streakModel = Provider.of<StreakModel>(
+      context,
+      listen: false,
+    );
+
+    _dailyStreakMinutesGoal = _userModel.value.profile.dailyStreakMinutes;
   }
 
   @override
@@ -44,12 +49,12 @@ class _SetGoalFragmentState extends State<SetGoalFragment> {
                   isLoading = true;
                 });
 
-                final user = userModel.user;
+                final user = _userModel.value;
 
-                return user.setDailyStreakMinutes(dailyStreakMinutesGoal).then(
+                return user.setDailyStreakMinutes(_dailyStreakMinutesGoal).then(
                   (user) {
-                    userModel.setUser(user);
-                    streakModel.todayStreak.currentStreakSeconds = 0;
+                    _userModel.value = user;
+                    _streakModel.todayStreak.currentStreakSeconds = 0;
                     Navigator.of(context).pop();
                   },
                 ).whenComplete(() {
@@ -73,7 +78,7 @@ class _SetGoalFragmentState extends State<SetGoalFragment> {
           child: SleekCircularSlider(
             min: 1,
             max: 240,
-            initialValue: dailyStreakMinutesGoal.toDouble(),
+            initialValue: _dailyStreakMinutesGoal.toDouble(),
             appearance: CircularSliderAppearance(
               size: 256,
               animationEnabled: false,
@@ -94,9 +99,9 @@ class _SetGoalFragmentState extends State<SetGoalFragment> {
               ),
             ),
             onChangeEnd: (double value) async {
-              setState(() {
-                dailyStreakMinutesGoal = value.toInt();
-              });
+              setState(
+                () => _dailyStreakMinutesGoal = value.toInt(),
+              );
             },
           ),
         ),

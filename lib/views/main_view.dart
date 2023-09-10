@@ -59,7 +59,7 @@ class _MainViewState extends State<MainView> {
       ),
       body: Consumer<UserModel>(
         builder: (context, model, child) {
-          return model.nullableUser == null
+          return model.nullableValue == null
               ? const Center(
                   child: CircularProgressIndicator(),
                 )

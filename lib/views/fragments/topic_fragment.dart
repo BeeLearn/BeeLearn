@@ -136,7 +136,7 @@ class _TopicFragmentState extends State<TopicFragment> {
                 ),
                 IconButton(
                   onPressed: () async {
-                    await topic.setIsLiked(userModel.user, !topic.isLiked).then(
+                    await topic.setIsLiked(userModel.value, !topic.isLiked).then(
                       (topic) {
                         topicModel.updateOne(topic);
                       },
@@ -230,7 +230,7 @@ class _TopicFragmentState extends State<TopicFragment> {
   /// complete topic
   Future<void> completeTopic(Topic topic) async {
     if (!topic.isCompleted) {
-      final newTopic = await topic.setIsComplete(userModel.user);
+      final newTopic = await topic.setIsComplete(userModel.value);
       topicModel.updateOne(newTopic);
     }
   }
@@ -238,7 +238,7 @@ class _TopicFragmentState extends State<TopicFragment> {
   /// unlock topic
   Future<void> unlockTopic(Topic topic) async {
     if (!topic.isUnlocked) {
-      final newTopic = await topic.setIsUnlocked(userModel.user);
+      final newTopic = await topic.setIsUnlocked(userModel.value);
       topicModel.updateOne(newTopic);
     }
   }

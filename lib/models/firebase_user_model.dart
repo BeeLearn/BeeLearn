@@ -3,11 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:provider/provider.dart';
 
 import '../main_application.dart';
-import '../middlewares/api_middleware.dart';
-import 'user_model.dart';
 
 class FirebaseUserModel {
   static Future<void>? setup(BuildContext context, User? user, {bool? reconnect}) {
@@ -17,14 +14,14 @@ class FirebaseUserModel {
 
         // This is called when app if first initialized
         if (reconnect ?? false) {
-          UserModel.getCurrentUser().then((user) {
-            Provider.of<UserModel>(
-              context,
-              listen: false,
-            ).setUser(user);
-
-            ApiMiddleware.run(context);
-          });
+          // UserModel.getCurrentUser().then((user) {
+          //   Provider.of<UserModel>(
+          //     context,
+          //     listen: false,
+          //   ).user = user;
+          //
+          //   ApiMiddleware.run(context);
+          // });
         }
 
         // Remove splash screen

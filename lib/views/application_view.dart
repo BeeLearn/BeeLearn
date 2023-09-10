@@ -1,9 +1,11 @@
+import 'package:beelearn/models/purchase_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../main_application.dart';
 import '../models/category_model.dart';
 import '../models/course_model.dart';
+import '../models/product_model.dart';
 import '../models/reward_model.dart';
 import '../models/streak_model.dart';
 import '../models/user_model.dart';
@@ -25,6 +27,8 @@ class ApplicationView extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => StreakModel()),
         ChangeNotifierProvider(create: (context) => UserModel()),
         ChangeNotifierProvider(create: (context) => FavouriteCourseModel()),
+        ChangeNotifierProvider(create: (context) => PurchaseModel()),
+        ChangeNotifierProvider(create: (context) => ProductModel()),
       ],
       child: MaterialApp(
         theme: AppTheme.dark,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:djira_client/djira_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -90,17 +92,22 @@ class ApiMiddleware {
         namespace: "rewards",
         onError: (response) {},
         onSuccess: (response) {
-          final reward = Reward.fromJson(response.data);
+          log("OnSuccess", error: response.data);
+          try {
+            final reward = Reward.fromJson(response.data);
 
-          Provider.of<RewardModel>(
-            context,
-            listen: false,
-          ).updateOrAddOne(reward);
-          showSnackBar(
-            leading: CircleAvatar(foregroundImage: NetworkImage(reward.icon)),
-            title: reward.title,
-            subtitle: reward.description,
-          );
+            Provider.of<RewardModel>(
+              context,
+              listen: false,
+            ).updateOrAddOne(reward);
+            showSnackBar(
+              leading: CircleAvatar(foregroundImage: NetworkImage(reward.icon)),
+              title: reward.title,
+              subtitle: reward.description,
+            );
+          } catch (error, stackTrace) {
+            log("Subscription error", error: error, stackTrace: stackTrace);
+          }
         },
       );
 
@@ -138,10 +145,10 @@ class ApiMiddleware {
             context,
             listen: false,
           );
-          final user = userModel.user;
+          final user = userModel.value;
           user.profile = Profile.fromJson(response.data);
 
-          userModel.setUser(user);
+          userModel.value = user;
         },
       );
 

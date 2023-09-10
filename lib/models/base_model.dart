@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 
-class BaseModel<T> extends ChangeNotifier {
+abstract class BaseModel<T> extends ChangeNotifier {
   bool _loading = true;
 
   bool get loading => _loading;
@@ -20,13 +20,9 @@ class BaseModel<T> extends ChangeNotifier {
     return UnmodifiableListView(values);
   }
 
-  dynamic getEntityId(T item) {
-    throw UnimplementedError("getEntityId is not implemented");
-  }
+  dynamic getEntityId(T item);
 
-  int orderBy(T first, T second) {
-    throw UnimplementedError("orderBy is not implemented");
-  }
+  int orderBy(T first, T second);
 
   T? getEntityById(dynamic id) => _entities[id];
 

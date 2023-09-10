@@ -59,7 +59,7 @@ dependencies:
   google_sign_in: ^6.1.4
   flutter_facebook_auth: ^6.0.1
   flutter_svg: ^2.0.7
-  in_app_purchase: ^3.1.8
+  in_app_purchase: ^3.1.10
   # google_mobile_ads: ^3.0.0
   # flutter_markdown: ^0.6.17+1
   horizontal_blocked_scroll_physics: ^4.0.1
@@ -79,6 +79,7 @@ dependencies:
   loadmore: ^2.1.0
   flutter_social_textfield: ^0.1.2
   wechat_assets_picker: ^8.6.3
+  firebase_messaging: ^14.6.7
 
 dev_dependencies:
   flutter_test:

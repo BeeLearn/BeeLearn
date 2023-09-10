@@ -37,7 +37,7 @@ class CourseCard extends StatelessWidget {
 
           CourseModel.updateCourse(id: course.id, data: {
             "course_enrolled_users": {
-              "add": [userModel.user.id]
+              "add": [userModel.value.id]
             },
           }).then((course) {
             if (onUpdate != null) {

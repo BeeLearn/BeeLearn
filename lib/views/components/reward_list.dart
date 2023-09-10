@@ -30,14 +30,15 @@ class _RewardListState extends State<RewardList> {
   Widget build(context) {
     return Consumer<RewardModel>(
       builder: (context, model, child) {
+        final rewards = model.items;
         return SizedBox(
           height: 172,
           child: PageView.builder(
-            itemCount: model.rewards.length,
+            itemCount: rewards.length,
             padEnds: false,
             controller: PageController(viewportFraction: 1 / 3),
             itemBuilder: (context, index) {
-              final reward = model.rewards[index];
+              final reward = rewards[index];
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.center,

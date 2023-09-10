@@ -32,7 +32,7 @@ class _FavoriteTabState extends State<FavoriteTab> {
   }
 
   Future<void> fetchFavourites() async {
-    final user = _userModel.user;
+    final user = _userModel.value;
 
     CourseModel.getCourses(
       query: {"module__lesson__topic__likes": "${user.id}"},
@@ -116,7 +116,7 @@ class _FavoriteTabState extends State<FavoriteTab> {
                             return CourseCard(
                               course: course,
                               onTap: () => context.go(
-                                "/topics/?lesson__module__course=${course.id}&likes=${_userModel.user.id}",
+                                "/topics/?lesson__module__course=${course.id}&likes=${_userModel.value.id}",
                               ),
                             );
                           },

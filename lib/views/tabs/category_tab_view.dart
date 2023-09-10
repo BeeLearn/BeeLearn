@@ -58,7 +58,7 @@ class CategoryTabView extends StatelessWidget {
                           color: Colors.redAccent,
                         ),
                         const SizedBox(width: 8.0),
-                        Text(model.user.profile.lives.toString())
+                        Text(model.value.profile.lives.toString())
                       ],
                     ),
                     const SizedBox(width: 8.0),
@@ -73,7 +73,7 @@ class CategoryTabView extends StatelessWidget {
                           color: Colors.greenAccent,
                         ),
                         const SizedBox(width: 8.0),
-                        Text(model.user.profile.streaks.toString()),
+                        Text(model.value.profile.streaks.toString()),
                       ],
                     ),
                     IconButton(
@@ -92,7 +92,7 @@ class CategoryTabView extends StatelessWidget {
         },
         body: Consumer<UserModel>(
           builder: (context, model, child) {
-            final user = model.user;
+            final user = model.value;
 
             return TabBarView(
               children: [

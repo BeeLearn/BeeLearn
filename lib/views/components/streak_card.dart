@@ -6,7 +6,6 @@ import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 import "../../models/streak_model.dart";
 import "../../models/user_model.dart";
-import "../../serializers/user.dart";
 import "streak_calender.dart";
 
 class StreakCard extends StatefulWidget {
@@ -17,29 +16,20 @@ class StreakCard extends StatefulWidget {
 }
 
 class _StreakCardState extends State<StreakCard> {
-  late User user;
+  late final StreakModel _streakModel;
 
   @override
   void initState() {
     super.initState();
 
-    StreakModel.getStreak(
-      query: {
-        "start_date": DateTime.now().toIso8601String(),
-      },
-    ).then(
-      (response) {
-        Provider.of<StreakModel>(
-          context,
-          listen: false,
-        ).setAll(response.results);
-      },
-    );
-
-    user = Provider.of<UserModel>(
+    _streakModel = Provider.of<StreakModel>(
       context,
       listen: false,
-    ).user;
+    );
+
+    StreakModel.getStreak(
+      query: {"start_date": DateTime.now().toIso8601String()},
+    ).then((response) => _streakModel.setAll(response.results));
   }
 
   @override
@@ -72,7 +62,7 @@ class _StreakCardState extends State<StreakCard> {
                 const SizedBox(height: 16.0),
                 Consumer2<UserModel, StreakModel>(
                   builder: (context, userModel, streakModel, child) {
-                    final user = userModel.user;
+                    final user = userModel.value;
                     final isStreakComplete = streakModel.streaks.isEmpty ? false : streakModel.todayStreak.isComplete;
                     final dailyStreakSeconds = streakModel.streaks.isEmpty ? 0 : streakModel.todayStreak.currentStreakSeconds;
                     final dailyStreakMinutes = streakModel.streaks.isEmpty ? 0 : streakModel.todayStreak.currentStreakMinutes;

@@ -1,3 +1,4 @@
+import 'package:beelearn/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
@@ -28,10 +29,10 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
       listen: false,
     );
 
-    emailTextEditController = TextEditingController(text: userModel.user.email);
-    lastNameTextEditController = TextEditingController(text: userModel.user.lastName);
-    firstNameTextEditController = TextEditingController(text: userModel.user.firstName);
-    usernameTextEditController = TextEditingController(text: userModel.user.username);
+    emailTextEditController = TextEditingController(text: userModel.value.email);
+    lastNameTextEditController = TextEditingController(text: userModel.value.lastName);
+    firstNameTextEditController = TextEditingController(text: userModel.value.firstName);
+    usernameTextEditController = TextEditingController(text: userModel.value.username);
   }
 
   @override
@@ -53,10 +54,14 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
                   "username": usernameTextEditController.text,
                 };
 
-                await UserModel.updateOne(
-                  userModel.user.id,
-                  data,
-                ).then((user) => userModel.setUser(user)).onError((error, stackTrace) {
+                await userController
+                    .updateUser(
+                  id: userModel.value.id,
+                  body: data,
+                )
+                    .then((user) {
+                  userModel.value = user;
+                }).onError((error, stackTrace) {
                   showSnackBar(
                     leading: const Icon(Icons.error),
                     title: "An error occur while updating your profile",
@@ -83,6 +88,7 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
                       ),
                       TextButton(
                         onPressed: () async {
+                          /// Todo upload image
                           final List<AssetEntity>? result = await AssetPicker.pickAssets(
                             context,
                             pickerConfig: const AssetPickerConfig(

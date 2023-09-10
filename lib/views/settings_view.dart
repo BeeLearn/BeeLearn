@@ -1,8 +1,12 @@
-import 'package:beelearn/views/settings_edit_profile.dart';
+import 'package:beelearn/models/models.dart';
 import 'package:beelearn/views/settings_notifications_view.dart';
 import 'package:beelearn/views/settings_premium_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import 'settings_edit_profile.dart';
+
+/// Settings Page
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
 
@@ -21,32 +25,36 @@ class SettingsView extends StatelessWidget {
               Flex(
                 direction: Axis.vertical,
                 children: [
-                  ListTile(
-                    leading: const CircleAvatar(),
-                    onTap: () {
-                      showDialog(
-                        useSafeArea: false,
-                        context: context,
-                        builder: (context) => const SettingsEditProfile(),
+                  Consumer<UserModel>(
+                    builder: (context, model, child) {
+                      return ListTile(
+                        leading: const CircleAvatar(),
+                        onTap: () {
+                          showDialog(
+                            useSafeArea: false,
+                            context: context,
+                            builder: (context) => const SettingsEditProfile(),
+                          );
+                        },
+                        title: Text(
+                          model.value.fullName,
+                          style: Theme.of(context).textTheme.bodyLarge,
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(model.value.userType.name.toUpperCase()),
+                            Text(
+                              model.firebaseUser!.email!.toString(),
+                              style: TextStyle(
+                                color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).hintColor : null,
+                              ),
+                            ),
+                          ],
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
                       );
                     },
-                    title: Text(
-                      "LyonKvalid",
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("Student"),
-                        Text(
-                          "Logged in with Google",
-                          style: TextStyle(
-                            color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).hintColor : null,
-                          ),
-                        ),
-                      ],
-                    ),
-                    trailing: const Icon(Icons.chevron_right),
                   ),
                   const SizedBox(height: 16.0),
                   GestureDetector(

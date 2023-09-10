@@ -1,15 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:beelearn/main_application.dart';
 import 'package:http/http.dart';
 
 /// BeeLearn API abstract implementation for high level abstraction
-mixin ApiModel {
+mixin ApiModelMixin {
   /// API Headers abstract getter
-  Map<String, String>? get headers;
+  Map<String, String>? get headers => {
+        HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
+      };
 
   /// Base API Url
-  String get baseUrl;
+  String get baseUrl => MainApplication.baseURL;
 
   /// Base pathname
   String? get basePath;
@@ -18,13 +22,13 @@ mixin ApiModel {
   String get apiUrl => "$baseUrl/$basePath/";
 
   /// detailed path builder
-  String getDetailedPath(int id) => "$apiUrl/$id/";
+  String getDetailedPath(dynamic path) => "$apiUrl$path/";
 
   /// List
   Future<T> list<T>({
     String? url,
     Map<String, dynamic>? query,
-    required T Function(Map<String, dynamic>) fromJson,
+    required T Function(Map<String, dynamic> json) fromJson,
   }) async {
     final response = await get(
       Uri.parse(url ?? apiUrl).replace(queryParameters: query),
@@ -43,7 +47,7 @@ mixin ApiModel {
   Future<T> retrieve<T>({
     required int id,
     Map<String, dynamic>? query,
-    required T Function(Map<String, dynamic>) fromJson,
+    required T Function(Map<String, dynamic> json) fromJson,
   }) async {
     final response = await get(
       Uri.parse(getDetailedPath(id)).replace(queryParameters: query),
@@ -62,13 +66,8 @@ mixin ApiModel {
   Future<T> create<T>({
     Map<String, dynamic>? query,
     required Map<String, dynamic> body,
-    required T Function(Map<String, dynamic>) fromJson,
+    required T Function(Map<String, dynamic> json) fromJson,
   }) async {
-    headers?.putIfAbsent(
-      HttpHeaders.contentTypeHeader,
-      () => ContentType.json.mimeType,
-    );
-
     final response = await post(
       Uri.parse(apiUrl).replace(queryParameters: query),
       headers: headers,
@@ -88,13 +87,8 @@ mixin ApiModel {
     required int id,
     Map<String, dynamic>? query,
     required Map<String, dynamic>? body,
-    required T Function(Map<String, dynamic>) fromJson,
+    required T Function(Map<String, dynamic> json) fromJson,
   }) async {
-    headers?.putIfAbsent(
-      HttpHeaders.contentTypeHeader,
-      () => ContentType.json.mimeType,
-    );
-
     final response = await patch(
       Uri.parse(getDetailedPath(id)).replace(queryParameters: query),
       body: jsonEncode(body),
@@ -113,7 +107,7 @@ mixin ApiModel {
   Future<T> remove<T>({
     required int id,
     Map<String, dynamic>? query,
-    required T Function(Map<String, dynamic>) fromJson,
+    required T Function(Map<String, dynamic> json) fromJson,
   }) async {
     final response = await delete(
       Uri.parse(getDetailedPath(id)).replace(queryParameters: query),
