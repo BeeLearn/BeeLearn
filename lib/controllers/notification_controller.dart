@@ -1,8 +1,12 @@
 import 'dart:developer';
+import 'dart:math' show Random;
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
-import 'package:beelearn/controllers/user_controller.dart';
+import 'package:beelearn/constants/constants.dart';
+
+import '../controllers/topic_comment_controller.dart';
+import '../controllers/user_controller.dart';
 
 class NotificationController {
   @pragma("vm:entry-point")
@@ -55,12 +59,28 @@ class NotificationController {
   /// Use this method to detect when the user taps on a notification or action button
   @pragma("vm:entry-point")
   static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
-    // Your code goes here
+    if (receivedAction.channelKey == NotificationConstant.comment.channelKey) {
+      final payload = receivedAction.payload!;
+      final message = "@${payload["sender_username"]} ${receivedAction.buttonKeyInput}";
 
-    log("Action", error: receivedAction.actionType);
-    // Navigate into pages, avoiding to open the notification details page over another details page already opened
-    // MyApp.navigatorKey.currentState?.pushNamedAndRemoveUntil('/notification-page',
-    //         (route) => (route.settings.name != '/notification-page') || route.isFirst,
-    //     arguments: receivedAction);
+      await topicCommentController.updateTopicComment(
+        id: int.parse(payload["thread_id"]!),
+        body: {
+          "content": message,
+          "topic": int.parse(payload["topic_id"]!),
+        },
+      );
+
+      await AwesomeNotifications().createNotification(
+        content: NotificationContent(
+          body: message,
+          payload: payload,
+          id: Random().nextInt(receivedAction.id!) + 256,
+          channelKey: NotificationConstant.comment.channelKey,
+          groupKey: NotificationConstant.comment.channelGroupKey,
+          title: "You replied ${payload['sender_full_name']}",
+        ),
+      );
+    }
   }
 }

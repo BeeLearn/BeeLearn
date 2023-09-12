@@ -23,10 +23,10 @@ class AppTheme {
   }
 
   static final ThemeData light = ThemeData.light(useMaterial3: true).copyWith(
-    textTheme: GoogleFonts.latoTextTheme(),
+    textTheme: GoogleFonts.albertSansTextTheme(),
   );
   static final ThemeData dark = ThemeData.dark(useMaterial3: true).copyWith(
-    textTheme: GoogleFonts.latoTextTheme(
+    textTheme: GoogleFonts.albertSansTextTheme(
       ThemeData.dark(useMaterial3: true).textTheme,
     ),
   );

@@ -25,7 +25,7 @@ class TopicCommentView extends StatefulWidget {
 
 class _TopicCommentViewState extends State<TopicCommentView> {
   // Socket unsubscribe
-  dynamic? unsubscribe;
+  dynamic unsubscribe;
 
   String? nextUrl;
   late final TopicCommentModel topicCommentModel;
@@ -41,7 +41,7 @@ class _TopicCommentViewState extends State<TopicCommentView> {
       DetectedType.mention,
       TextStyle(
         fontSize: 17.0,
-        color: Colors.deepPurple[500],
+        color: Colors.deepPurple[400],
         backgroundColor: Colors.deepPurple.withAlpha(50),
       ),
     );
@@ -54,6 +54,7 @@ class _TopicCommentViewState extends State<TopicCommentView> {
       context,
       listen: false,
     );
+
     topicCommentModel.getTopicComments(
       query: {
         "topic": widget.topicId.toString(),
@@ -113,96 +114,120 @@ class _TopicCommentViewState extends State<TopicCommentView> {
 
   Widget getCommentFragment({
     required TopicComment topicComment,
-    Widget? child,
-    Widget? button,
+    required List<Widget> children,
+    EdgeInsets? contentPadding,
   }) {
-    return ListTile(
-      contentPadding: child == null
-          ? EdgeInsets.zero
-          : const EdgeInsets.symmetric(
-              horizontal: 16.0,
-            ),
-      isThreeLine: true,
-      leading: CircleAvatar(
-        maxRadius: child == null ? 16.0 : null,
-        child: topicComment.user.avatar == null
-            ? Text(
-                topicComment.user.email.substring(0, 1),
-              )
-            : Image.network(topicComment.user.avatar!),
-      ),
-      title: Row(
-        children: [
-          Flexible(
-            child: Text(
-              topicComment.user.username,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Text(
-            timeago.format(topicComment.createdAt),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.inverseSurface.withOpacity(0.8),
-                ),
-          ),
-        ],
-      ),
-      subtitle: Column(
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.only(left: 16.0),
+      child: Flex(
+        direction: Axis.horizontal,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 4.0),
-            child: RichTextView(
-              maxLines: 3,
-              viewLessText: "hide",
-              text: topicComment.content,
-              supportedTypes: [
-                EmailParser(
-                  onTap: (value) {},
-                ),
-                PhoneParser(
-                  onTap: (value) {},
-                ),
-                UrlParser(
-                  onTap: (value) {},
-                ),
-                HashTagParser(
-                  onTap: (value) {},
-                ),
-                MentionParser(
-                  onTap: (value) {},
-                ),
-                BoldParser(),
-              ],
-              truncate: true,
-              linkStyle: TextStyle(
-                color: Theme.of(context).colorScheme.primary,
-                decoration: TextDecoration.underline,
-              ),
-            ),
+          CircleAvatar(
+            maxRadius: 16.0,
+            child: topicComment.user.avatar == null
+                ? Text(
+                    topicComment.user.email.substring(0, 1),
+                  )
+                : Image.network(topicComment.user.avatar!),
           ),
-          // reply parent comment
-          if (child != null && button != null) button,
-          if (child != null) child,
-          // reply child comment
-          if (child == null && button != null) button,
+          const SizedBox(width: 8.0),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Flex(
+                  direction: Axis.horizontal,
+                  children: [
+                    Flexible(
+                      child: Row(
+                        children: [
+                          Text(
+                            topicComment.user.username,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(width: 8.0),
+                          Text(
+                            timeago.format(topicComment.createdAt),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Theme.of(context).colorScheme.inverseSurface.withOpacity(0.8),
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    PopupMenuButton<int>(
+                      icon: Icon(
+                        Icons.more_vert_outlined,
+                        color: Theme.of(context).dividerColor,
+                      ),
+                      padding: EdgeInsets.zero,
+                      itemBuilder: (context) {
+                        return [
+                          const PopupMenuItem(
+                            child: Text("Edit"),
+                          ),
+                          const PopupMenuItem(
+                            child: Text("Delete"),
+                          ),
+                          const PopupMenuItem(
+                            child: Text("Report"),
+                          ),
+                        ];
+                      },
+                    ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 4.0),
+                  child: RichTextView(
+                    maxLines: 3,
+                    viewLessText: "hide",
+                    text: topicComment.content,
+                    supportedTypes: [
+                      EmailParser(
+                        onTap: (value) {},
+                      ),
+                      PhoneParser(
+                        onTap: (value) {},
+                      ),
+                      UrlParser(
+                        onTap: (value) {},
+                      ),
+                      HashTagParser(
+                        onTap: (value) {},
+                      ),
+                      MentionParser(
+                        onTap: (value) {},
+                      ),
+                      BoldParser(),
+                    ],
+                    truncate: true,
+                    linkStyle: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ),
+                ...children,
+              ],
+            ),
+          )
         ],
       ),
     );
   }
 
   Widget getReplyButton(TopicComment parent, TopicComment? child) {
-    final username = "@${(child ?? parent).user.username}";
-
     return TextButton(
       onPressed: () {
+        final username = "@${(child ?? parent).user.username} ";
+
         messageTextFieldController.text = username;
-        if (!messageTextFieldFocusNode.hasFocus) {
-          messageTextFieldFocusNode.requestFocus();
-          messageTextFieldController.selection = TextSelection.fromPosition(TextPosition(offset: username.length));
-        }
+        if (!messageTextFieldFocusNode.hasFocus) messageTextFieldFocusNode.requestFocus();
 
         parentComment = parent;
+        messageTextFieldController.selection = TextSelection.fromPosition(TextPosition(offset: username.length));
       },
       child: const Text("Reply"),
     );
@@ -241,19 +266,54 @@ class _TopicCommentViewState extends State<TopicCommentView> {
 
                                 return getCommentFragment(
                                   topicComment: topicComment,
-                                  button: getReplyButton(topicComment, null),
-                                  child: ListView.builder(
-                                    itemCount: subTopicComments?.length,
-                                    shrinkWrap: true,
-                                    physics: const ClampingScrollPhysics(),
-                                    itemBuilder: (context, index) {
-                                      final subTopicComment = subTopicComments![index];
-                                      return getCommentFragment(
-                                        topicComment: subTopicComment,
-                                        button: getReplyButton(topicComment, subTopicComment),
-                                      );
-                                    },
-                                  ),
+                                  contentPadding: const EdgeInsets.only(left: 16.0),
+                                  children: [
+                                    getReplyButton(topicComment, null),
+                                    ListView.builder(
+                                      itemCount: subTopicComments?.length,
+                                      shrinkWrap: true,
+                                      physics: const ClampingScrollPhysics(),
+                                      itemBuilder: (context, index) {
+                                        final subTopicComment = subTopicComments![index];
+                                        return getCommentFragment(
+                                          topicComment: subTopicComment,
+                                          contentPadding: EdgeInsets.zero,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                InkWell(
+                                                  onTap: () {},
+                                                  child: Container(
+                                                    height: 24.0,
+                                                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                                    decoration: BoxDecoration(
+                                                      // onSelected color: Theme.of(context).dividerColor.withAlpha(147),
+                                                      border: Border.all(color: Theme.of(context).dividerColor),
+                                                      borderRadius: BorderRadius.circular(4.0),
+                                                    ),
+                                                    child: const Center(
+                                                      child: Row(
+                                                        children: [
+                                                          Text("1k"),
+                                                          SizedBox(width: 4.0),
+                                                          Icon(
+                                                            Icons.favorite,
+                                                            size: 18.0,
+                                                            color: Colors.red,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                getReplyButton(topicComment, subTopicComment),
+                                              ],
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  ],
                                 );
                               },
                             ),
@@ -275,20 +335,23 @@ class _TopicCommentViewState extends State<TopicCommentView> {
                   return topicCommentModel.createTopicComment(data: newComment).then(
                     (response) {
                       topicCommentModel.setOne(response);
+                      setState(() => parentComment = null);
                     },
-                  ).whenComplete(() => setState(() => parentComment = null));
+                  );
                 } else {
-                  return topicCommentModel
-                      .updateTopicComment(
-                        id: parentComment!.id,
-                        data: {
-                          "sub_topic_comments": {
-                            "create": [data]
-                          },
-                        },
-                      )
-                      .then((response) => topicCommentModel.updateOne(response))
-                      .whenComplete(() => setState(() => parentComment = null));
+                  return topicCommentModel.updateTopicComment(
+                    id: parentComment!.id,
+                    data: {
+                      "sub_topic_comments": {
+                        "create": [data]
+                      },
+                    },
+                  ).then(
+                    (response) {
+                      topicCommentModel.updateOne(response);
+                      setState(() => parentComment = null);
+                    },
+                  );
                 }
               },
             ),

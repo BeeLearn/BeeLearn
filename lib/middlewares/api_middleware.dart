@@ -152,13 +152,13 @@ class ApiMiddleware {
         },
       );
 
-      client?.socket.onDisconnect((data) {
-        unsubscribeProfileListener!();
-        unsubscribeCourseListener!();
-        unsubscribeFavouriteListener!();
-        unsubscribeRewardListener!();
-        unsubscribeStreakListener!();
-      });
+      // client?.socket.onDisconnect((data) {
+      //   unsubscribeProfileListener!();
+      //   unsubscribeCourseListener!();
+      //   unsubscribeFavouriteListener!();
+      //   unsubscribeRewardListener!();
+      //   unsubscribeStreakListener!();
+      // });
     });
   }
 }

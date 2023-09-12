@@ -101,6 +101,8 @@ class CourseCard extends StatelessWidget {
                     Flexible(
                       child: Text(
                         course.name,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16.0,
