@@ -71,7 +71,7 @@ class _StreakCardState extends State<StreakCard> {
                       width: 156,
                       height: 156,
                       padding: 0,
-                      totalSteps: user.profile.dailyStreakSeconds,
+                      totalSteps: user.profile!.dailyStreakSeconds,
                       currentStep: dailyStreakSeconds,
                       selectedColor: Colors.green,
                       child: Center(
@@ -91,7 +91,7 @@ class _StreakCardState extends State<StreakCard> {
                                         fontWeight: FontWeight.w900,
                                       ),
                                     ),
-                                    TextSpan(text: "Of ${user.profile.dailyStreakMinutes} min goal"),
+                                    TextSpan(text: "Of ${user.profile!.dailyStreakMinutes} min goal"),
                                   ],
                                 ),
                                 textAlign: TextAlign.center,

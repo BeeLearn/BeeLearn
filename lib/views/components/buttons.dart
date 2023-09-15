@@ -45,6 +45,22 @@ class CustomOutlinedButton extends StatefulWidget {
 
   @override
   State<CustomOutlinedButton> createState() => _CustomOutlinedButtonState();
+
+  factory CustomOutlinedButton.icon({
+    required void Function() onPressed,
+    required Widget icon,
+    required String label,
+  }) =>
+      CustomOutlinedButton(
+        onTap: onPressed,
+        child: Row(
+          children: [
+            icon,
+            const SizedBox(width: 8.0),
+            Expanded(child: Text(label)),
+          ],
+        ),
+      );
 }
 
 class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
@@ -85,7 +101,7 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
   _getWidget(Widget child) {
     return widget.preventGesture
         ? child
-        : GestureDetector(
+        : InkWell(
             onTap: () {
               if (widget.onTap != null) widget.onTap!();
             },

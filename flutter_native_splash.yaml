@@ -1,5 +1,8 @@
 flutter_native_splash:
-  color: "#FFFFFF"
-  branding: assets/branding_icon.png
-  image: assets/splash_icon.png
-  fullscree: true
+  branding: assets/branding_light_icon.png
+  branding_dark: assets/branding_dark_icon.png
+  color: "#FBEAFF"
+  image: assets/app_icon_light.png
+  color_dark: "#673AB7"
+  image_dark: assets/app_icon_dark.png
+  fullscreen: true

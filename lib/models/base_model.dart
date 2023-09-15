@@ -26,19 +26,19 @@ abstract class BaseModel<T> extends ChangeNotifier {
 
   T? getEntityById(dynamic id) => _entities[id];
 
-  setOne(T value) {
+  void setOne(T value) {
     final id = getEntityId(value);
     _entities[id] = value;
     notifyListeners();
   }
 
-  setAll(List<T> items) {
+  void setAll(List<T> items) {
     _entities = {};
 
     addAll(items);
   }
 
-  addAll(List<T> items) {
+  void addAll(List<T> items) {
     for (final item in items) {
       final id = getEntityId(item);
       _entities[id] = item;
@@ -68,13 +68,13 @@ abstract class BaseModel<T> extends ChangeNotifier {
     notifyListeners();
   }
 
-  removeAll(T item) {
+  void removeAll(T item) {
     _entities = {};
 
     notifyListeners();
   }
 
-  removeOne(T item) {
+  void removeOne(T item) {
     final id = getEntityId(item);
 
     _entities.remove(id);

@@ -45,9 +45,7 @@ class _MessageTextFieldState extends State<MessageTextField> {
                 counterText: "",
               ),
               onChanged: (value) {
-                setState(() {
-                  counter = value.length;
-                });
+                setState(() => counter = value.length);
               },
             ),
           ),
@@ -77,24 +75,27 @@ class _MessageTextFieldState extends State<MessageTextField> {
               height: 32,
               child: Center(
                 child: IconButton.filled(
-                  onPressed: () async {
-                    if (isSending) return;
-                    isSending = true;
+                  onPressed: isSending
+                      ? null
+                      : () {
+                          setState(() => isSending = false);
 
-                    await widget.onSend(widget.controller.text).then(
-                      (value) {
-                        setState(() {
-                          counter = 0;
-                          widget.controller.text = "";
-                        });
-                      },
-                    ).whenComplete(() => setState(() => isSending = false));
-                  },
+                          widget.onSend(widget.controller.text).then(
+                            (value) {
+                              setState(() {
+                                counter = 0;
+                                widget.controller.text = "";
+                              });
+                            },
+                          ).whenComplete(() => setState(() => isSending = false));
+                        },
                   padding: EdgeInsets.zero,
-                  icon: const Icon(
-                    Icons.arrow_upward,
-                    size: 18,
-                  ),
+                  icon: isSending
+                      ? const CircularProgressIndicator()
+                      : const Icon(
+                          Icons.arrow_upward,
+                          size: 18,
+                        ),
                 ),
               ),
             ),

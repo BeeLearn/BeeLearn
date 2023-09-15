@@ -9,7 +9,13 @@ part of 'topic.dart';
 Topic _$TopicFromJson(Map<String, dynamic> json) {
   $checkKeys(
     json,
-    requiredKeys: const ['id', 'is_liked', 'title', 'content'],
+    requiredKeys: const [
+      'id',
+      'is_liked',
+      'title',
+      'content',
+      'thread_reference'
+    ],
   );
   return Topic(
     id: json['id'] as int,
@@ -22,6 +28,7 @@ Topic _$TopicFromJson(Map<String, dynamic> json) {
     isUnlocked: json['is_unlocked'] as bool,
     isCompleted: json['is_completed'] as bool,
     hasAssessment: json['has_assessment'] as bool? ?? false,
+    threadReference: json['thread_reference'] as String,
     createdAt: DateTime.parse(json['created_at'] as String),
     updatedAt: DateTime.parse(json['updated_at'] as String),
   )..enhancement = json['enhancement'] == null
@@ -38,6 +45,7 @@ Map<String, dynamic> _$TopicToJson(Topic instance) => <String, dynamic>{
       'is_unlocked': instance.isUnlocked,
       'is_completed': instance.isCompleted,
       'has_assessment': instance.hasAssessment,
+      'thread_reference': instance.threadReference,
       'created_at': instance.createdAt.toIso8601String(),
       'updated_at': instance.updatedAt.toIso8601String(),
     };

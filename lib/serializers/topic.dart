@@ -40,6 +40,9 @@ class Topic {
   @JsonKey(includeToJson: false)
   Enhancement? enhancement;
 
+  @JsonKey(required: true, name: "thread_reference")
+  final String threadReference;
+
   @JsonKey(required: false, name: "created_at")
   DateTime createdAt;
 
@@ -55,6 +58,7 @@ class Topic {
     required this.isUnlocked,
     required this.isCompleted,
     required this.hasAssessment,
+    required this.threadReference,
     required this.createdAt,
     required this.updatedAt,
   });

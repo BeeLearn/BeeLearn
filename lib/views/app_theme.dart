@@ -30,4 +30,23 @@ class AppTheme {
       ThemeData.dark(useMaterial3: true).textTheme,
     ),
   );
+
+  static ThemeData getAppTheme(ThemeData themeData) {
+    return themeData.copyWith(
+      useMaterial3: true,
+      textTheme: GoogleFonts.latoTextTheme(themeData.textTheme).copyWith(
+        bodyLarge: themeData.textTheme.bodyLarge?.copyWith(
+          fontSize: 18,
+        ),
+        displayLarge: themeData.textTheme.displayLarge?.copyWith(
+          fontSize: 32.0,
+          fontWeight: FontWeight.w900,
+        ),
+        displayMedium: themeData.textTheme.displayLarge?.copyWith(
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
 }

@@ -1,9 +1,8 @@
-import 'package:beelearn/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'components/buttons.dart';
+import '../globals.dart';
 import 'components/premium_subscription.dart';
 
 class SettingsPremiumView extends StatelessWidget {
@@ -70,8 +69,8 @@ class SettingsPremiumView extends StatelessWidget {
                   child: Row(
                     children: [
                       Expanded(
-                        child: CustomOutlinedButton(
-                          onTap: () {
+                        child: FilledButton(
+                          onPressed: () {
                             showModalBottomSheet(
                               context: context,
                               useSafeArea: true,
@@ -90,7 +89,12 @@ class SettingsPremiumView extends StatelessWidget {
                               ),
                             );
                           },
-                          backgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).highlightColor : Theme.of(context).colorScheme.inversePrimary,
+                          style: FilledButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                          ),
+                          //backgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).highlightColor : Theme.of(context).colorScheme.inversePrimary,
                           child: const Center(
                             child: Text("Subscribe"),
                           ),

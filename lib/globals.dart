@@ -1,3 +1,4 @@
+import 'package:beelearn/views/onboarding_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,10 +9,8 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'views/enhancement_view.dart';
 import 'views/main_view.dart';
 import 'views/module_view.dart';
-import 'views/passwordless_signin_view.dart';
 import 'views/search_view.dart';
 import 'views/settings_view.dart';
-import 'views/signin_view.dart';
 import 'views/topic_view.dart';
 
 /// Todo enhance
@@ -34,13 +33,17 @@ GoRouter router = GoRouter(
         ),
       ),
       routes: [
+        // GoRoute(
+        //   path: "/sign-in",
+        //   builder: (context, state) => const SignInView(),
+        // ),
+        // GoRoute(
+        //   path: "/passwordless-sign-in",
+        //   builder: (context, state) => const PasswordLessSignInView(),
+        // ),
         GoRoute(
-          path: "/sign-in",
-          builder: (context, state) => const SignInView(),
-        ),
-        GoRoute(
-          path: "/passwordless-sign-in",
-          builder: (context, state) => const PasswordLessSignInView(),
+          path: "/onboarding",
+          builder: (context, state) => OnBoardingView(),
         ),
         GoRoute(
           path: '/',
@@ -80,9 +83,9 @@ GoRouter router = GoRouter(
           ],
           redirect: (context, state) async {
             if (FirebaseAuth.instance.currentUser == null) {
-              if (state.location.contains("sign-in")) return null;
+              if (state.location.contains("onboarding")) return null;
 
-              return "/passwordless-sign-in";
+              return "/onboarding";
             }
 
             return null;

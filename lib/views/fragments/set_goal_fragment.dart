@@ -1,8 +1,9 @@
-import 'package:beelearn/models/streak_model.dart';
-import 'package:beelearn/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
+
+import '../../models/streak_model.dart';
+import '../../models/user_model.dart';
 
 class SetGoalFragment extends StatefulWidget {
   const SetGoalFragment({super.key});
@@ -30,7 +31,7 @@ class _SetGoalFragmentState extends State<SetGoalFragment> {
       listen: false,
     );
 
-    _dailyStreakMinutesGoal = _userModel.value.profile.dailyStreakMinutes;
+    _dailyStreakMinutesGoal = _userModel.value.profile!.dailyStreakMinutes;
   }
 
   @override

@@ -14,8 +14,6 @@ User _$UserFromJson(Map<String, dynamic> json) {
       'user_type',
       'username',
       'email',
-      'profile',
-      'settings',
       'avatar',
       'first_name',
       'last_name',
@@ -23,13 +21,17 @@ User _$UserFromJson(Map<String, dynamic> json) {
     ],
   );
   return User(
+    avatar: json['avatar'] as String?,
+    profile: json['profile'] == null
+        ? null
+        : Profile.fromJson(json['profile'] as Map<String, dynamic>),
     id: json['id'] as int,
     userType: $enumDecode(_$UserTypeEnumMap, json['user_type']),
     username: json['username'] as String,
     email: json['email'] as String,
-    avatar: json['avatar'] as String?,
-    profile: Profile.fromJson(json['profile'] as Map<String, dynamic>),
-    settings: Settings.fromJson(json['settings'] as Map<String, dynamic>),
+    settings: json['settings'] == null
+        ? null
+        : Settings.fromJson(json['settings'] as Map<String, dynamic>),
     firstName: json['first_name'] as String,
     lastName: json['last_name'] as String,
     isPremium: json['is_premium'] as bool,

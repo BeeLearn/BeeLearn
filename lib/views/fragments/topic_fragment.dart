@@ -7,12 +7,12 @@ import 'package:markdown_widget/markdown_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../models/topic_comment_model.dart';
+import '../../models/thread_model.dart';
 import '../../models/topic_model.dart';
 import '../../models/user_model.dart';
 import '../../serializers/topic.dart';
 import '../../services/ad_loader.dart';
-import '../../views/topic_comment_view.dart';
+import '../../views/thread_view.dart';
 import '../components/page_view_indicators.dart';
 import '../question_view.dart';
 
@@ -127,8 +127,8 @@ class _TopicFragmentState extends State<TopicFragment> {
                       useSafeArea: false,
                       context: context,
                       builder: (context) => ChangeNotifierProvider(
-                        create: (context) => TopicCommentModel(),
-                        child: TopicCommentView(topicId: topic.id),
+                        create: (context) => ThreadModel(),
+                        child: ThreadView(reference: topic.threadReference),
                       ),
                     );
                   },

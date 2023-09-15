@@ -37,7 +37,7 @@ class SettingsNotificationView extends StatelessWidget {
 
                   model.value = newUser;
                 },
-                value: user.settings.isPromotionalEmailEnabled,
+                value: user.settings!.isPromotionalEmailEnabled,
               ),
               const Divider(),
               SwitchListTile(
@@ -57,7 +57,7 @@ class SettingsNotificationView extends StatelessWidget {
 
                   model.value = newUser;
                 },
-                value: user.settings.isPushNotificationsEnabled,
+                value: user.settings!.isPushNotificationsEnabled,
               ),
             ],
           );

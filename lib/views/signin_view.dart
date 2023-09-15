@@ -48,7 +48,7 @@ class _SignInViewState extends State<SignInView> {
                         const Image(
                           height: 88,
                           width: 88,
-                          image: AssetImage("assets/splash_icon.png"),
+                          image: AssetImage("assets/app_icon_dark.png"),
                         ),
                         Expanded(
                           child: Form(

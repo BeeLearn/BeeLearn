@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:beelearn/models/streak_model.dart';
-import 'package:beelearn/models/user_model.dart';
-import 'package:beelearn/views/fragments/topic_fragment.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import "package:provider/provider.dart";
 
+import '../models/streak_model.dart';
 import '../models/topic_model.dart';
+import '../models/user_model.dart';
+import 'fragments/topic_fragment.dart';
 
 /// [query] used to filter topics from api
 class TopicView extends StatefulWidget {
@@ -47,7 +47,7 @@ class _TopicViewState extends State<TopicView> {
           int currentStreakSeconds = await userModel.value.increaseDailyStreakSeconds(context);
 
           /// cancel timer when streak minute reached
-          if (currentStreakSeconds >= userModel.value.profile.dailyStreakSeconds) {
+          if (currentStreakSeconds >= userModel.value.profile!.dailyStreakSeconds) {
             timer.cancel();
           }
         },

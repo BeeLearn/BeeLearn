@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:beelearn/main_application.dart';
 import 'package:http/http.dart';
+
+import '../main_application.dart';
 
 /// BeeLearn API abstract implementation for high level abstraction
 mixin ApiModelMixin {

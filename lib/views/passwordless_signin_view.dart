@@ -214,7 +214,7 @@ class _PasswordLessSignInViewState extends State<PasswordLessSignInView> {
                       Image(
                         width: 80,
                         height: 80,
-                        image: AssetImage("assets/splash_icon.png"),
+                        image: AssetImage("assets/app_icon_dark.png"),
                       ),
                       Text.rich(
                         TextSpan(

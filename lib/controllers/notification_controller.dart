@@ -1,11 +1,11 @@
 import 'dart:developer';
-import 'dart:math' show Random;
+import 'dart:math' hide log;
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
-import 'package:beelearn/constants/constants.dart';
 
-import '../controllers/topic_comment_controller.dart';
+import '../constants/notification_constant.dart';
+import '../controllers/reply_controller.dart';
 import '../controllers/user_controller.dart';
 
 class NotificationController {
@@ -61,13 +61,12 @@ class NotificationController {
   static Future<void> onActionReceivedMethod(ReceivedAction receivedAction) async {
     if (receivedAction.channelKey == NotificationConstant.comment.channelKey) {
       final payload = receivedAction.payload!;
-      final message = "@${payload["sender_username"]} ${receivedAction.buttonKeyInput}";
-
-      await topicCommentController.updateTopicComment(
-        id: int.parse(payload["thread_id"]!),
+      final message = "@${payload["reply.user.username"]} ${receivedAction.buttonKeyInput}";
+      await replyController.createReply(
         body: {
-          "content": message,
-          "topic": int.parse(payload["topic_id"]!),
+          "user": payload["reply.user.id"],
+          "parent": payload["thread.id"],
+          "comment": {"content": message}
         },
       );
 
@@ -78,7 +77,7 @@ class NotificationController {
           id: Random().nextInt(receivedAction.id!) + 256,
           channelKey: NotificationConstant.comment.channelKey,
           groupKey: NotificationConstant.comment.channelGroupKey,
-          title: "You replied ${payload['sender_full_name']}",
+          title: "You replied ${payload['reply.user.fullname']}",
         ),
       );
     }

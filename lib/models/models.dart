@@ -5,6 +5,5 @@ export 'firebase_user_model.dart';
 export 'module_model.dart';
 export 'reward_model.dart';
 export 'streak_model.dart';
-export 'topic_comment_model.dart';
 export 'topic_model.dart';
 export 'user_model.dart';

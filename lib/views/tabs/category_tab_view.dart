@@ -77,7 +77,7 @@ class _CategoryTabView extends State<CategoryTabView> {
                             color: Colors.redAccent,
                           ),
                           const SizedBox(width: 8.0),
-                          Text(model.value.profile.lives.toString())
+                          Text(model.value.profile!.lives.toString())
                         ],
                       ),
                     ),
@@ -93,7 +93,7 @@ class _CategoryTabView extends State<CategoryTabView> {
                             color: Colors.greenAccent,
                           ),
                           const SizedBox(width: 8.0),
-                          Text(model.value.profile.streaks.toString()),
+                          Text(model.value.profile!.streaks.toString()),
                         ],
                       ),
                     ),

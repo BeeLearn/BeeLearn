@@ -32,13 +32,13 @@ class User {
   @JsonKey(required: true)
   final String email;
 
-  @JsonKey(required: true)
-  Profile profile;
+  @JsonKey(required: false, includeIfNull: true)
+  Profile? profile;
 
-  @JsonKey(required: true)
-  Settings settings;
+  @JsonKey(required: false, includeIfNull: true)
+  Settings? settings;
 
-  @JsonKey(includeIfNull: true, required: true)
+  @JsonKey(required: true, includeIfNull: true)
   final String? avatar;
 
   @JsonKey(required: true, name: "first_name")
@@ -51,15 +51,18 @@ class User {
   final bool isPremium;
 
   @JsonKey(includeToJson: false, includeFromJson: false)
+  String get tagUsername => "@$username";
+
+  @JsonKey(includeToJson: false, includeFromJson: false)
   String get fullName => "$firstName $lastName";
 
   User({
+    this.avatar,
+    this.profile,
     required this.id,
     required this.userType,
     required this.username,
     required this.email,
-    required this.avatar,
-    required this.profile,
     required this.settings,
     required this.firstName,
     required this.lastName,
@@ -77,7 +80,7 @@ class User {
 
     todayStreak.currentStreakSeconds = currentStreakSeconds + 1;
 
-    if (todayStreak.currentStreakSeconds >= profile.dailyStreakSeconds) {
+    if (todayStreak.currentStreakSeconds >= profile!.dailyStreakSeconds) {
       return StreakModel.updateStreak(
         todayStreak.id,
         data: {
@@ -98,7 +101,7 @@ class User {
   }
 
   Future<User> setDailyStreakMinutes(int value) {
-    profile.dailyStreakMinutes = value;
+    profile!.dailyStreakMinutes = value;
 
     return userController.updateUser(
       id: id,
