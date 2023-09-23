@@ -6,7 +6,7 @@ class MainApplication {
   static const baseURL = isDevelopment ? "http://127.0.0.1:8000" : "https://beelearn.onrender.com";
 
   static SharedPreferences? sharedPreferences;
-  static String? accessToken;
+  static String? firebaseIdToken, accessToken;
 
   static final GlobalKey<ScaffoldMessengerState> scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 

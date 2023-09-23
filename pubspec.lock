@@ -268,10 +268,11 @@ packages:
   djira_client:
     dependency: "direct main"
     description:
-      path: "../../../code/workspace/dart/djira_client"
-      relative: true
-    source: path
-    version: "1.0.7"
+      name: djira_client
+      sha256: bf6271361f4cc613a42d4483988ccfdfd8a2d80db68f795c4ee9483f36d15beb
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.8"
   extended_image:
     dependency: transitive
     description:
@@ -664,7 +665,7 @@ packages:
     source: hosted
     version: "3.2.1"
   http_parser:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http_parser
       sha256: "2aa08ce0341cc9b354a498388e30986515406668dbcc4f7c950c3e715496693b"

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../globals.dart';
-import 'components/premium_subscription.dart';
 
 class SettingsPremiumView extends StatelessWidget {
   const SettingsPremiumView({super.key});
@@ -43,7 +42,7 @@ class SettingsPremiumView extends StatelessWidget {
           ),
           const SizedBox(height: 32.0),
           Text(
-            "What's included",
+            "What's included?",
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 32.0),
@@ -63,40 +62,62 @@ class SettingsPremiumView extends StatelessWidget {
                     );
                   },
                 ),
-                const SizedBox(height: 32.0),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Wrap(
+                    runSpacing: 8.0,
                     children: [
-                      Expanded(
-                        child: FilledButton(
-                          onPressed: () {
-                            showModalBottomSheet(
-                              context: context,
-                              useSafeArea: true,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              builder: (innerContext) => Container(
-                                height: MediaQuery.of(context).size.height * 0.7,
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.secondaryContainer,
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(25.0),
-                                    topRight: Radius.circular(25.0),
-                                  ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: FilledButton(
+                              onPressed: () {
+                                // showModalBottomSheet(
+                                //   context: context,
+                                //   useSafeArea: true,
+                                //   isScrollControlled: true,
+                                //   backgroundColor: Colors.transparent,
+                                //   builder: (innerContext) => Container(
+                                //     height: MediaQuery.of(context).size.height * 0.7,
+                                //     decoration: BoxDecoration(
+                                //       color: Theme.of(context).colorScheme.secondaryContainer,
+                                //       borderRadius: const BorderRadius.only(
+                                //         topLeft: Radius.circular(25.0),
+                                //         topRight: Radius.circular(25.0),
+                                //       ),
+                                //     ),
+                                //     child: const PremiumSubscription(),
+                                //   ),
+                                // );
+                              },
+                              style: FilledButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(4.0),
                                 ),
-                                child: const PremiumSubscription(),
                               ),
-                            );
-                          },
-                          style: FilledButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4.0),
+                              child: const Center(
+                                child: Text("Subscribe"),
+                              ),
                             ),
                           ),
-                          //backgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).highlightColor : Theme.of(context).colorScheme.inversePrimary,
-                          child: const Center(
-                            child: Text("Subscribe"),
+                        ],
+                      ),
+                      Opacity(
+                        opacity: 0.8,
+                        child: Text.rich(
+                          const TextSpan(
+                            children: [
+                              TextSpan(text: "Auto-renews for "),
+                              TextSpan(
+                                text: "₦1,578.78/months ",
+                              ),
+                              TextSpan(text: "until canceled"),
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.notoSans(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w300,
                           ),
                         ),
                       ),
@@ -106,9 +127,14 @@ class SettingsPremiumView extends StatelessWidget {
               ],
             ),
           ),
-          const Padding(
-            padding: EdgeInsets.only(bottom: kToolbarHeight),
-            child: Text("Terms & Privacy policy"),
+          Padding(
+            padding: const EdgeInsets.only(bottom: kToolbarHeight),
+            child: Text(
+              "Terms & Privacy policy",
+              style: TextStyle(
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white60 : null,
+              ),
+            ),
           ),
         ],
       ),

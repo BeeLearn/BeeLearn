@@ -176,13 +176,13 @@ class _ThreadViewState extends State<ThreadView> {
           Container(
             /// Todo, use a better fix than using margin
             margin: const EdgeInsets.only(top: 16.0), // make avatar align with text,
-            child: CircleAvatar(
-              maxRadius: 16.0,
-              child: comment.user.avatar == null
-                  ? Text(
-                      comment.user.username.substring(0, 1).toUpperCase(),
-                    )
-                  : Image.network(comment.user.avatar!),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(100),
+              child: Image.network(
+                comment.user.avatar,
+                width: 32.0,
+                height: 32.0,
+              ),
             ),
           ),
           const SizedBox(width: 8.0),

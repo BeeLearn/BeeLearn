@@ -29,8 +29,11 @@ void main() async {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      await AppLovinMAX.initialize(EnvConstant.appLovinSdkKey);
 
+      /// Lazy load ads
+      AppLovinMAX.initialize(EnvConstant.appLovinSdkKey);
+
+      /// Lazy load notifications
       await AwesomeNotifications().initialize(
         NotificationConstant.appIcon,
         debug: MainApplication.isDevelopment,

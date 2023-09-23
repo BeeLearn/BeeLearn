@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
-import 'package:beelearn/controllers/user_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -34,7 +33,7 @@ class ApplicationFragment extends StatefulWidget {
 class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with InitializationStateMixin<T> {
   late final UserModel _userModel;
   late final ProductModel _productModel;
-  late final StreamSubscription<User?> _idTokenListener, _authStateChangeListener;
+  late final StreamSubscription<User?> _authStateChangeListener;
 
   late final StreamSubscription<List<PurchaseDetails>> _purchaseUpdateListener;
 
@@ -66,18 +65,13 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
 
     _authStateChangeListener = FirebaseAuth.instance.authStateChanges().listen(
       (user) async {
-        await _userModel.setFirebaseUser(user);
+        _userModel.setFirebaseUser(user);
+
         setState(
           () {
             appInitializationState = InitializationState.success;
           },
         );
-      },
-    );
-
-    _idTokenListener = FirebaseAuth.instance.idTokenChanges().listen(
-      (user) async {
-        _userModel.firebaseUser = user;
       },
     );
 
@@ -104,25 +98,15 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
       },
       onDone: () => _purchaseUpdateListener.cancel(),
     );
-
-    // _firebaseMessageListener = FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    //   print('Got a message whilst in the foreground!');
-    //   print('Message data: ${message.data}');
-    //
-    //   if (message.notification != null) {
-    //     print('Message also contained a notification: ${message.notification}');
-    //   }
-    // });
   }
 
   @override
   void dispose() {
     super.dispose();
 
-    _idTokenListener.cancel();
+    //_idTokenListener.cancel();
     _authStateChangeListener.cancel();
     _purchaseUpdateListener.cancel();
-    // _firebaseMessageListener.cancel();
   }
 
   @override
@@ -133,7 +117,6 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
           onInit: (stateNotifier) async {
             if (MainApplication.accessToken != null) {
               ApiMiddleware.run(context);
-              final user = await userController.getCurrentUser();
               Map<String, dynamic> subscriptionQuery = {};
               if (Platform.isIOS && Platform.isAndroid) subscriptionQuery["skid__isnull"] = false;
 
@@ -141,7 +124,6 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
                 query: subscriptionQuery,
               );
 
-              _userModel.value = user;
               _productModel.setAll(paginatedProducts.results);
 
               await _awesomeNotificationsFcm.initialize(
@@ -169,18 +151,6 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
                   AwesomeNotifications().requestPermissionToSendNotifications();
                 }
               });
-
-              // _firebaseTokenRefreshListener = FirebaseMessaging.instance.onTokenRefresh.listen(
-              //   (fcmToken) async {
-              //     final user = _userModel.value;
-              //     final settings = await _settingsModel.updateSettings(
-              //       id: user.id,
-              //       body: {"fcm_token": fcmToken},
-              //     );
-              //     user.settings = settings;
-              //     _userModel.value = user;
-              //   },
-              // );
             }
 
             stateNotifier.addListener(

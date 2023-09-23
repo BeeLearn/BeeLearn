@@ -49,7 +49,7 @@ class CustomOutlinedButton extends StatefulWidget {
   factory CustomOutlinedButton.icon({
     required void Function() onPressed,
     required Widget icon,
-    required String label,
+    required Widget label,
   }) =>
       CustomOutlinedButton(
         onTap: onPressed,
@@ -57,7 +57,7 @@ class CustomOutlinedButton extends StatefulWidget {
           children: [
             icon,
             const SizedBox(width: 8.0),
-            Expanded(child: Text(label)),
+            Expanded(child: label),
           ],
         ),
       );

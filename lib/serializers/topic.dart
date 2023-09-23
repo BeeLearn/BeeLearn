@@ -1,9 +1,9 @@
 import 'package:beelearn/serializers/enhancement.dart';
-import 'package:beelearn/serializers/question.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 import '../models/topic_model.dart';
 import "../serializers/user.dart";
+import 'topic_question.dart';
 
 part 'topic.g.dart';
 
@@ -21,21 +21,14 @@ class Topic {
   @JsonKey(required: true)
   final String content;
 
-  @JsonKey(required: false)
-  final Question? question;
+  @JsonKey(required: true, name: "topic_questions")
+  final List<TopicQuestion> topicQuestions;
 
   @JsonKey(required: false, name: "is_unlocked")
   final bool isUnlocked;
 
   @JsonKey(required: false, name: "is_completed")
   final bool isCompleted;
-
-  @JsonKey(
-    required: false,
-    name: "has_assessment",
-    defaultValue: false,
-  )
-  final bool hasAssessment;
 
   @JsonKey(includeToJson: false)
   Enhancement? enhancement;
@@ -54,10 +47,9 @@ class Topic {
     required this.title,
     required this.content,
     required this.isLiked,
-    required this.question,
+    required this.topicQuestions,
     required this.isUnlocked,
     required this.isCompleted,
-    required this.hasAssessment,
     required this.threadReference,
     required this.createdAt,
     required this.updatedAt,

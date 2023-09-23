@@ -30,15 +30,6 @@ class TextInputFragmentState extends State<TextInputFragment> {
 
   @override
   Widget build(BuildContext context) {
-    final border = isCorrect
-        ? const OutlineInputBorder(
-            borderSide: BorderSide(
-              width: 2.0,
-              color: Colors.green,
-            ),
-          )
-        : null;
-
     return TextFormField(
       textAlign: TextAlign.center,
       controller: inputController,

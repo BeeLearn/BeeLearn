@@ -1,10 +1,10 @@
 import 'package:beelearn/controllers/user_controller.dart';
+import 'package:beelearn/serializers/serializers.dart';
 import 'package:flutter/widgets.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:provider/provider.dart';
 
 import '../models/models.dart';
-import 'profile.dart';
 import 'settings.dart';
 
 part 'user.g.dart';
@@ -38,8 +38,11 @@ class User {
   @JsonKey(required: false, includeIfNull: true)
   Settings? settings;
 
-  @JsonKey(required: true, includeIfNull: true)
-  final String? avatar;
+  @JsonKey(required: false, includeIfNull: true)
+  Token? token;
+
+  @JsonKey(required: true)
+  final String avatar;
 
   @JsonKey(required: true, name: "first_name")
   final String firstName;
@@ -57,13 +60,14 @@ class User {
   String get fullName => "$firstName $lastName";
 
   User({
-    this.avatar,
+    this.token,
     this.profile,
+    this.settings,
     required this.id,
     required this.userType,
     required this.username,
     required this.email,
-    required this.settings,
+    required this.avatar,
     required this.firstName,
     required this.lastName,
     required this.isPremium,

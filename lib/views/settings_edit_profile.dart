@@ -1,10 +1,15 @@
-import 'package:beelearn/controllers/user_controller.dart';
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
+import 'package:http/http.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
+import '../controllers/user_controller.dart';
 import '../middlewares/api_middleware.dart' show showSnackBar;
 import '../models/user_model.dart';
 
@@ -41,116 +46,151 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
   @override
   Widget build(BuildContext context) {
     return LoaderOverlay(
-      child: Form(
-        key: _formKey,
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text("Edit Profile"),
-            centerTitle: true,
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  if (!_formKey.currentState!.validate()) return;
+      child: Consumer<UserModel>(
+        builder: (context, model, child) {
+          return Form(
+            key: _formKey,
+            child: Scaffold(
+              appBar: AppBar(
+                title: const Text("Edit Profile"),
+                centerTitle: true,
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      if (!_formKey.currentState!.validate()) return;
 
-                  context.loaderOverlay.show();
+                      context.loaderOverlay.show();
 
-                  final data = {
-                    "email": emailTextEditController.text,
-                    "last_name": lastNameTextEditController.text,
-                    "first_name": firstNameTextEditController.text,
-                    "username": usernameTextEditController.text,
-                  };
+                      final data = {
+                        "email": emailTextEditController.text,
+                        "last_name": lastNameTextEditController.text,
+                        "first_name": firstNameTextEditController.text,
+                        "username": usernameTextEditController.text,
+                      };
 
-                  await userController.updateUser(id: userModel.value.id, body: data).then(
-                    (user) {
-                      userModel.value = user;
+                      userModel.value = await userController.updateUser(id: userModel.value.id, body: data).onError(
+                        (error, stackTrace) {
+                          showSnackBar(
+                            leading: const Icon(Icons.error),
+                            title: "An error occur while updating your profile",
+                          );
+
+                          return Future.error(error!);
+                        },
+                      ).whenComplete(
+                        () => context.loaderOverlay.hide(),
+                      );
                     },
-                  ).onError((error, stackTrace) {
-                    showSnackBar(
-                      leading: const Icon(Icons.error),
-                      title: "An error occur while updating your profile",
-                    );
-                  }).whenComplete(
-                    () => context.loaderOverlay.hide(),
-                  );
-                },
-                child: const Text("Save"),
+                    child: const Text("Save"),
+                  ),
+                ],
               ),
-            ],
-          ),
-          body: GestureDetector(
-            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Column(
+              body: GestureDetector(
+                onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: SingleChildScrollView(
+                    child: Column(
                       children: [
-                        const CircleAvatar(
-                          maxRadius: 64,
-                        ),
-                        TextButton(
-                          onPressed: () async {
-                            /// Todo upload image
-                            final List<AssetEntity>? result = await AssetPicker.pickAssets(
-                              context,
-                              pickerConfig: const AssetPickerConfig(
-                                maxAssets: 1,
+                        Column(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: Image.network(
+                                userModel.value.avatar,
+                                width: 80.0,
+                                height: 80.0,
+                                fit: BoxFit.cover,
                               ),
-                            );
-                          },
-                          child: const Text("Change profile picture"),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                context.loaderOverlay.show();
+                                final List<AssetEntity>? result = await AssetPicker.pickAssets(
+                                  context,
+                                  pickerConfig: const AssetPickerConfig(
+                                    maxAssets: 1,
+                                  ),
+                                );
+
+                                if (result != null && result.isNotEmpty) {
+                                  final File file = (await result[0].file)!;
+
+                                  userModel.value = await userController.updateMultipartUser(
+                                    id: userModel.value.id,
+                                    multipartFiles: [
+                                      await MultipartFile.fromPath(
+                                        "avatar",
+                                        file.path,
+                                        contentType: MediaType.parse(result[0].mimeType!),
+                                      ),
+                                    ],
+                                  ).onError(
+                                    (error, stackTrace) {
+                                      log(
+                                        "Upload error",
+                                        error: error,
+                                        stackTrace: stackTrace,
+                                      );
+
+                                      return Future.error(error!);
+                                    },
+                                  ).whenComplete(() => context.loaderOverlay.hide());
+                                }
+                              },
+                              child: const Text("Change profile picture"),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 32),
+                        TextFormField(
+                          controller: emailTextEditController,
+                          validator: ValidationBuilder().required().email().build(),
+                          decoration: const InputDecoration(
+                            labelText: "Email",
+                            prefixIcon: Icon(Icons.email),
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: firstNameTextEditController,
+                          maxLength: 16,
+                          validator: ValidationBuilder().required().minLength(3).maxLength(16).build(),
+                          decoration: const InputDecoration(
+                            labelText: "First Name",
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: lastNameTextEditController,
+                          maxLength: 16,
+                          validator: ValidationBuilder().required().minLength(3).maxLength(16).build(),
+                          decoration: const InputDecoration(
+                            labelText: "Last Name",
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          controller: usernameTextEditController,
+                          maxLength: 16,
+                          validator: ValidationBuilder().required().minLength(3).maxLength(16).build(),
+                          decoration: const InputDecoration(
+                            labelText: "Username",
+                            prefix: Text("@"),
+                            border: OutlineInputBorder(),
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 32),
-                    TextFormField(
-                      controller: emailTextEditController,
-                      validator: ValidationBuilder().required().email().build(),
-                      decoration: const InputDecoration(
-                        labelText: "Email",
-                        prefixIcon: Icon(Icons.email),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: firstNameTextEditController,
-                      maxLength: 16,
-                      validator: ValidationBuilder().required().minLength(3).maxLength(16).build(),
-                      decoration: const InputDecoration(
-                        labelText: "First Name",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: lastNameTextEditController,
-                      maxLength: 16,
-                      validator: ValidationBuilder().required().minLength(3).maxLength(16).build(),
-                      decoration: const InputDecoration(
-                        labelText: "Last Name",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: usernameTextEditController,
-                      maxLength: 16,
-                      validator: ValidationBuilder().required().minLength(3).maxLength(16).build(),
-                      decoration: const InputDecoration(
-                        labelText: "Username",
-                        prefix: Text("@"),
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }

@@ -31,20 +31,33 @@ class _MainViewState extends State<MainView> {
           _currentIndex = index;
         });
       },
-      items: const [
-        BottomNavigationBarItem(
+      items: [
+        const BottomNavigationBarItem(
           label: "Category",
           activeIcon: Icon(Icons.category),
           icon: Icon(Icons.category_outlined),
         ),
-        BottomNavigationBarItem(
+        const BottomNavigationBarItem(
           label: "Liked",
           activeIcon: Icon(Icons.favorite),
           icon: Icon(Icons.favorite_outline),
         ),
         BottomNavigationBarItem(
           label: "Profile",
-          icon: CircleAvatar(radius: 16),
+          icon: Consumer<UserModel>(
+            builder: (context, model, child) {
+              return model.nullableValue == null
+                  ? const CircleAvatar()
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: Image.network(
+                        model.value.avatar,
+                        width: 32.0,
+                        height: 32.0,
+                      ),
+                    );
+            },
+          ),
         ),
       ],
     );

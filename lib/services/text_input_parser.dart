@@ -10,7 +10,8 @@ class TextInputParser {
     final widget = Column(
       children: lines.map(
         (line) {
-          return SizedBox(
+          return Container(
+            margin: const EdgeInsets.only(bottom: 4.0),
             width: double.infinity,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -36,8 +37,8 @@ class TextInputParser {
                               constraints: const BoxConstraints(
                                 maxWidth: 98,
                                 minWidth: 32,
-                                minHeight: 32,
-                                maxHeight: 44,
+                                minHeight: 28,
+                                maxHeight: 38,
                               ),
                               child: fragment,
                             ),

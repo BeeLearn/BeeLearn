@@ -14,6 +14,7 @@ Topic _$TopicFromJson(Map<String, dynamic> json) {
       'is_liked',
       'title',
       'content',
+      'topic_questions',
       'thread_reference'
     ],
   );
@@ -22,12 +23,11 @@ Topic _$TopicFromJson(Map<String, dynamic> json) {
     title: json['title'] as String,
     content: json['content'] as String,
     isLiked: json['is_liked'] as bool,
-    question: json['question'] == null
-        ? null
-        : Question.fromJson(json['question'] as Map<String, dynamic>),
+    topicQuestions: (json['topic_questions'] as List<dynamic>)
+        .map((e) => TopicQuestion.fromJson(e as Map<String, dynamic>))
+        .toList(),
     isUnlocked: json['is_unlocked'] as bool,
     isCompleted: json['is_completed'] as bool,
-    hasAssessment: json['has_assessment'] as bool? ?? false,
     threadReference: json['thread_reference'] as String,
     createdAt: DateTime.parse(json['created_at'] as String),
     updatedAt: DateTime.parse(json['updated_at'] as String),
@@ -41,10 +41,9 @@ Map<String, dynamic> _$TopicToJson(Topic instance) => <String, dynamic>{
       'is_liked': instance.isLiked,
       'title': instance.title,
       'content': instance.content,
-      'question': instance.question,
+      'topic_questions': instance.topicQuestions,
       'is_unlocked': instance.isUnlocked,
       'is_completed': instance.isCompleted,
-      'has_assessment': instance.hasAssessment,
       'thread_reference': instance.threadReference,
       'created_at': instance.createdAt.toIso8601String(),
       'updated_at': instance.updatedAt.toIso8601String(),

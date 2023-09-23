@@ -28,7 +28,14 @@ class SettingsView extends StatelessWidget {
                   Consumer<UserModel>(
                     builder: (context, model, child) {
                       return ListTile(
-                        leading: const CircleAvatar(),
+                        leading: ClipRRect(
+                          borderRadius: BorderRadius.circular(100),
+                          child: Image.network(
+                            model.value.avatar,
+                            width: 48.0,
+                            height: 48.0,
+                          ),
+                        ),
                         onTap: () {
                           showDialog(
                             useSafeArea: false,

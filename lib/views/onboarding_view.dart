@@ -1,15 +1,49 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart' hide OutlinedButton;
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:provider/provider.dart';
 
 import '../controllers/firebase_auth_controller.dart';
+import '../models/user_model.dart';
 import 'components/buttons.dart';
 
 @immutable
-class OnBoardingView extends StatelessWidget {
+class OnBoardingView extends StatefulWidget {
+  const OnBoardingView({super.key});
+
+  @override
+  State<OnBoardingView> createState() => _OnBoardingView();
+}
+
+class _OnBoardingView extends State<OnBoardingView> {
   final isLoading = ValueNotifier(false);
 
-  OnBoardingView({super.key});
+  late final UserModel _userModel;
+
+  @override
+  initState() {
+    super.initState();
+
+    _userModel = Provider.of<UserModel>(
+      context,
+      listen: false,
+    );
+    _userModel.addListener(_userUpdateListener);
+  }
+
+  @override
+  dispose() {
+    super.dispose();
+
+    _userModel.removeListener(_userUpdateListener);
+  }
+
+  _userUpdateListener() {
+    if (_userModel.nullableValue != null) context.go("/");
+  }
 
   _signInWithGoogle(BuildContext context) {
     isLoading.value = true;
@@ -21,6 +55,8 @@ class OnBoardingView extends StatelessWidget {
       //     message: "An unexpected error occur, Try again!",
       //   ),
       // );
+
+      log("Firebase error", error: error, stackTrace: stackTrace);
 
       return Future.error(() => error);
     }).whenComplete(() => context.loaderOverlay.hide());
@@ -93,7 +129,9 @@ class OnBoardingView extends StatelessWidget {
                           "assets/icons/ic_google.png",
                           width: 24.0,
                         ),
-                        label: "Continue with Google",
+                        label: const Center(
+                          child: Text("Continue with Google"),
+                        ),
                       ),
                     ),
                   ],
@@ -107,7 +145,9 @@ class OnBoardingView extends StatelessWidget {
                           "assets/icons/ic_facebook.png",
                           width: 24.0,
                         ),
-                        label: "Continue with Facebook",
+                        label: const Center(
+                          child: Text("Continue with Facebook"),
+                        ),
                       ),
                     ),
                   ],

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,10 +9,11 @@ import 'package:markdown_widget/markdown_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../controllers/topic_question_controller.dart';
 import '../../models/thread_model.dart';
 import '../../models/topic_model.dart';
 import '../../models/user_model.dart';
-import '../../serializers/topic.dart';
+import '../../serializers/serializers.dart';
 import '../../services/ad_loader.dart';
 import '../../views/thread_view.dart';
 import '../components/page_view_indicators.dart';
@@ -30,6 +33,7 @@ class TopicFragment extends StatefulWidget {
   State createState() => _TopicFragmentState();
 }
 
+/// Todo move items to top level as variable
 class _TopicFragmentState extends State<TopicFragment> {
   late UserModel userModel;
   late TopicModel topicModel;
@@ -82,6 +86,7 @@ class _TopicFragmentState extends State<TopicFragment> {
     return Stack(
       children: [
         SafeArea(
+          bottom: false,
           child: Flex(
             direction: Axis.vertical,
             children: [
@@ -103,124 +108,141 @@ class _TopicFragmentState extends State<TopicFragment> {
               ),
               Flexible(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(top: 16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(
+                    top: 16.0,
+                  ),
                   child: MarkdownWidget(
                     data: topic.content,
                     config: config,
                   ),
                 ),
               ),
-            ],
-          ),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          child: BottomAppBar(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    showDialog(
-                      useSafeArea: false,
-                      context: context,
-                      builder: (context) => ChangeNotifierProvider(
-                        create: (context) => ThreadModel(),
-                        child: ThreadView(reference: topic.threadReference),
-                      ),
-                    );
-                  },
-                  icon: const Icon(CupertinoIcons.chat_bubble),
-                ),
-                IconButton(
-                  onPressed: () async {
-                    await topic.setIsLiked(userModel.value, !topic.isLiked).then(
-                      (topic) {
-                        topicModel.updateOne(topic);
+              BottomAppBar(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        showDialog(
+                          useSafeArea: false,
+                          context: context,
+                          builder: (context) => ChangeNotifierProvider(
+                            create: (context) => ThreadModel(),
+                            child: ThreadView(reference: topic.threadReference),
+                          ),
+                        );
                       },
-                    );
-                  },
-                  isSelected: topic.isLiked,
-                  selectedIcon: const Icon(
-                    CupertinoIcons.heart_fill,
-                    color: Colors.red,
-                  ),
-                  icon: const Icon(CupertinoIcons.heart),
-                ),
-                IconButton(
-                  onPressed: () async {
-                    context.loaderOverlay.show();
+                      icon: const Icon(CupertinoIcons.chat_bubble),
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        await topic.setIsLiked(userModel.value, !topic.isLiked).then(
+                          (topic) {
+                            topicModel.updateOne(topic);
+                          },
+                        );
+                      },
+                      isSelected: topic.isLiked,
+                      selectedIcon: const Icon(
+                        CupertinoIcons.heart_fill,
+                        color: Colors.red,
+                      ),
+                      icon: const Icon(CupertinoIcons.heart),
+                    ),
+                    IconButton(
+                      onPressed: () async {
+                        context.loaderOverlay.show();
 
-                    /// Todo Complete Lesson Share
-                    Share.shareWithResult("Check out this course on BeeLearn", subject: "We are").whenComplete(
-                      () => context.loaderOverlay.hide(),
-                    );
-                  },
-                  icon: const Icon(CupertinoIcons.share),
+                        /// Todo Complete Lesson Share
+                        Share.shareWithResult(
+                          "Check out this course on BeeLearn",
+                          subject: "We are",
+                        ).whenComplete(
+                          () => context.loaderOverlay.hide(),
+                        );
+                      },
+                      icon: const Icon(CupertinoIcons.share),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  Future<void> _nextPage(List<Topic> topics, List<_TopicFragmentViewType> viewTypes) async {
-    if (currentPage < topics.length - 1) {
+  /// nextPage manually, used when an assessment has been completed
+  Future<void> _nextPage(
+    List<dynamic> items,
+    List<_TopicFragmentViewType> viewTypes,
+  ) async {
+    if (currentPage < items.length - 1) {
       final nextViewType = viewTypes[currentPage + 1];
-      if (nextViewType == _TopicFragmentViewType.topicView) {
-        context.loaderOverlay.show();
-        unlockTopic(topics[currentPage + 1]).then((value) {
+      context.loaderOverlay.show();
+      try {
+        final topicQuestion = items[currentPage];
+        // Mark question as answered
+        await _markQuestionAsAnswered(topicQuestion);
+
+        if (nextViewType == _TopicFragmentViewType.topicView) {
+          // Unlock nextTopic
+          await unlockTopic(items[currentPage + 1]);
+
           controller.nextPage(
             duration: const Duration(milliseconds: 500),
             curve: Curves.easeInOut,
           );
-        }).whenComplete(() => context.loaderOverlay.hide());
+        }
+      } catch (error, stackTrace) {
+        log("HEY ERROR", error: error, stackTrace: stackTrace);
+      } finally {
+        context.loaderOverlay.hide();
       }
     }
   }
 
-  Widget getQuestionView(List<Topic> topics, List<_TopicFragmentViewType> viewTypes, int index) {
-    return QuestionView(
-      question: topics[index].question!,
-      nextPage: () => _nextPage(topics, viewTypes),
-    );
-  }
-
-  (List<_TopicFragmentViewType>, List<Topic>) getViewTypes(List<Topic> topics) {
+  (List<_TopicFragmentViewType>, List<dynamic>) _getViewTypes(List<Topic> topics) {
     final List<_TopicFragmentViewType> viewTypes = [];
-    final List<Topic> items = [];
+    final List<dynamic> items = [];
 
-    for (int index = 0; index < topics.length; index++) {
+    for (final topic in topics) {
       viewTypes.add(_TopicFragmentViewType.topicView);
-      items.add(topics[index]);
+      items.add(topic);
 
-      if (topics[index].question != null) {
-        items.add(topics[index]);
-        viewTypes.add(_TopicFragmentViewType.questionView);
+      if (topic.topicQuestions.isNotEmpty) {
+        items.addAll(topic.topicQuestions);
+        viewTypes.addAll(
+          List.filled(
+            topic.topicQuestions.length,
+            _TopicFragmentViewType.questionView,
+          ),
+        );
       }
     }
 
     return (viewTypes, items);
   }
 
-  /// Check if user can scroll left
+  /// Check if user can scroll right
+  /// Only when an assessment has been taken or viewType is topic can a view be scrolled left
   bool _canScrollNext(
-    List<Topic> topics,
+    List<dynamic> items,
     List<_TopicFragmentViewType> viewTypes,
   ) {
     final viewType = viewTypes[currentPage];
 
     switch (viewType) {
       case _TopicFragmentViewType.topicView:
+        // always true if current view is topicView
         return true;
       case _TopicFragmentViewType.questionView:
-        if (currentPage < topics.length - 1) {
-          final nextTopic = topics[currentPage + 1];
-          return nextTopic.isUnlocked;
+        if (currentPage < items.length - 1) {
+          final TopicQuestion topicQuestion = items[currentPage];
+          // This is mutated when  question is answered
+          // or is true when a question is previously answered
+          return topicQuestion.isAnswered;
         }
 
         return false;
@@ -243,15 +265,39 @@ class _TopicFragmentState extends State<TopicFragment> {
     }
   }
 
+  /// Mark question as answered by user
+  Future<void> _markQuestionAsAnswered(TopicQuestion topicQuestion) async {
+    if (!topicQuestion.isAnswered) {
+      final newTopicQuestion = await topicQuestionController.updateTopicQuestion(
+        id: topicQuestion.id,
+        body: {
+          "answered_users": {
+            "add": [userModel.value.id],
+          }
+        },
+      );
+
+      final topic = topicModel.getEntityById(newTopicQuestion.topic);
+      final index = topic?.topicQuestions.indexWhere(
+        (topicQuestion) => topicQuestion.id == newTopicQuestion.id,
+      );
+
+      if (index != null && index > -1) {
+        topic!.topicQuestions[index] = newTopicQuestion;
+        topicModel.updateOne(topic);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<TopicModel>(
       builder: (context, model, child) {
-        final (viewTypes, topics) = getViewTypes(model.items);
+        final (viewTypes, items) = _getViewTypes(model.items);
 
-        _TopicFragmentViewType? currentViewType;
+        //_TopicFragmentViewType? currentViewType;
 
-        if (viewTypes.isNotEmpty) currentViewType = viewTypes[currentPage];
+        //if (viewTypes.isNotEmpty) currentViewType = viewTypes[currentPage];
 
         return Scaffold(
           extendBody: true,
@@ -263,57 +309,57 @@ class _TopicFragmentState extends State<TopicFragment> {
               onPressed: () => Navigator.pop(context),
             ),
             title: LinearProgressPageIndicator(
-              itemCount: topics.length,
+              itemCount: items.length,
               pageController: controller,
             ),
-            actions: [
-              Visibility(
-                visible: topics.isNotEmpty && currentPage == topics.length - 1 && !(topics[currentPage].isUnlocked || topics[currentPage].isCompleted),
-                child: TextButton(
-                  onPressed: () async {
-                    final topic = topics[currentPage];
-
-                    // Ignore if error
-                    unlockTopic(topic);
-                    completeTopic(topic);
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        duration: const Duration(seconds: 2),
-                        padding: EdgeInsets.zero,
-                        content: ListTile(
-                          leading: const Icon(CupertinoIcons.sparkles),
-                          title: const Text("Hurray, Lesson completed"),
-                          trailing: Text(
-                            "+8xp",
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                          ),
-                        ),
-                        backgroundColor: Colors.black,
-                      ),
-                    );
-
-                    Navigator.pop(context);
-                  },
-                  child: const Text("Continue"),
-                ),
-              ),
-              Visibility(
-                visible: currentViewType != null && currentPage != topics.length - 1 && currentViewType == _TopicFragmentViewType.questionView,
-                child: TextButton(
-                  onPressed: () async {
-                    await unlockTopic(topics[currentPage + 1]);
-
-                    controller.nextPage(
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                  child: const Text("Skip"),
-                ),
-              ),
+            actions: const [
+              // Visibility(
+              //   visible: topics.isNotEmpty && currentPage == topics.length - 1 && !(topics[currentPage].isUnlocked || topics[currentPage].isCompleted),
+              //   child: TextButton(
+              //     onPressed: () async {
+              //       final topic = topics[currentPage];
+              //
+              //       // Ignore if error
+              //       unlockTopic(topic);
+              //       completeTopic(topic);
+              //
+              //       ScaffoldMessenger.of(context).showSnackBar(
+              //         SnackBar(
+              //           duration: const Duration(seconds: 2),
+              //           padding: EdgeInsets.zero,
+              //           content: ListTile(
+              //             leading: const Icon(CupertinoIcons.sparkles),
+              //             title: const Text("Hurray, Lesson completed"),
+              //             trailing: Text(
+              //               "+8xp",
+              //               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              //                     color: Theme.of(context).colorScheme.primary,
+              //                   ),
+              //             ),
+              //           ),
+              //           backgroundColor: Colors.black,
+              //         ),
+              //       );
+              //
+              //       Navigator.pop(context);
+              //     },
+              //     child: const Text("Continue"),
+              //   ),
+              // ),
+              // Visibility(
+              //   visible: currentViewType != null && currentPage != topics.length - 1 && currentViewType == _TopicFragmentViewType.questionView,
+              //   child: TextButton(
+              //     onPressed: () async {
+              //       await unlockTopic(topics[currentPage + 1]);
+              //
+              //       controller.nextPage(
+              //         duration: const Duration(milliseconds: 500),
+              //         curve: Curves.easeInOut,
+              //       );
+              //     },
+              //     child: const Text("Skip"),
+              //   ),
+              // ),
             ],
           ),
           body: model.loading
@@ -321,26 +367,30 @@ class _TopicFragmentState extends State<TopicFragment> {
                   child: CircularProgressIndicator(),
                 )
               : PageView.builder(
-                  itemCount: topics.length,
+                  itemCount: items.length,
                   controller: controller,
-                  physics: topics.isNotEmpty && _canScrollNext(topics, viewTypes) ? null : const LeftBlockedScrollPhysics(),
+                  physics: items.isNotEmpty && _canScrollNext(items, viewTypes) ? null : const LeftBlockedScrollPhysics(),
                   onPageChanged: (index) {
                     if (index > 0) {
                       final currentIndex = index - 1;
                       final viewType = viewTypes[currentIndex];
-                      if (viewType == _TopicFragmentViewType.topicView) completeTopic(topics[currentIndex]);
+                      if (viewType == _TopicFragmentViewType.topicView) completeTopic(items[currentIndex]);
                     }
+
                     setState(() => currentPage = index);
                   },
                   itemBuilder: (context, index) {
                     final viewType = viewTypes[index];
-                    final topic = topics[index];
+                    final item = items[index];
 
                     switch (viewType) {
                       case _TopicFragmentViewType.topicView:
-                        return getTopicView(topic, index);
+                        return getTopicView(item, index);
                       case _TopicFragmentViewType.questionView:
-                        return getQuestionView(topics, viewTypes, index);
+                        return QuestionView(
+                          topicQuestion: items[index],
+                          nextPage: () => _nextPage(items, viewTypes),
+                        );
                       default:
                         throw UnimplementedError("viewType not implemented");
                     }

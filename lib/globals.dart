@@ -26,10 +26,7 @@ GoRouter router = GoRouter(
         child: LoaderOverlay(
           overlayColor: Colors.black45,
           closeOnBackButton: true,
-          child: GestureDetector(
-            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-            child: child,
-          ),
+          child: child,
         ),
       ),
       routes: [
@@ -43,7 +40,7 @@ GoRouter router = GoRouter(
         // ),
         GoRoute(
           path: "/onboarding",
-          builder: (context, state) => OnBoardingView(),
+          builder: (context, state) => const OnBoardingView(),
         ),
         GoRoute(
           path: '/',

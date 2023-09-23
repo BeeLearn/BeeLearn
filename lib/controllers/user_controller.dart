@@ -1,3 +1,7 @@
+import 'dart:developer';
+
+import 'package:http/http.dart';
+
 import '../mixins/api_model_mixin.dart';
 import '../serializers/user.dart';
 
@@ -8,6 +12,7 @@ class _UserController with ApiModelMixin {
   String get currentUserApiPath => "current-user";
 
   Future<User> getCurrentUser() {
+    log("headers", error: headers);
     return list(
       url: getDetailedPath(currentUserApiPath),
       fromJson: User.fromJson,
@@ -31,6 +36,20 @@ class _UserController with ApiModelMixin {
       path: id,
       query: query,
       body: body,
+      fromJson: User.fromJson,
+    );
+  }
+
+  Future<User> updateMultipartUser({
+    List<MultipartFile>? multipartFiles,
+    required int id,
+    Map<String, String>? fields,
+  }) {
+    return super.multipartRequest(
+      id: id,
+      method: "PATCH",
+      fields: fields,
+      multipartFiles: multipartFiles,
       fromJson: User.fromJson,
     );
   }

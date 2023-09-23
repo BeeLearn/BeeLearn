@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
-import '../serializers/question.dart';
+import '../serializers/serializers.dart';
 import '../services/code_question_parser.dart';
 import '../views/app_theme.dart';
 import '../views/components/question_drag_drop.dart';
@@ -11,12 +11,12 @@ import '../views/components/question_single_choice.dart';
 import '../views/components/question_text_option.dart';
 
 class QuestionView extends StatefulWidget {
-  final Question question;
+  final TopicQuestion topicQuestion;
   final void Function() nextPage;
 
   const QuestionView({
     super.key,
-    required this.question,
+    required this.topicQuestion,
     required this.nextPage,
   });
 
@@ -36,9 +36,9 @@ class _QuestionViewState extends State<QuestionView> {
   }
 
   Widget getView() {
-    switch (widget.question.type) {
+    switch (widget.topicQuestion.question.type) {
       case QuestionType.singleChoice:
-        final question = widget.question as SingleChoiceQuestion;
+        final question = widget.topicQuestion.question as SingleChoiceQuestion;
 
         return QuestionSingleChoice<Choice>(
           choices: question.choices,
@@ -55,7 +55,7 @@ class _QuestionViewState extends State<QuestionView> {
           },
         );
       case QuestionType.multipleChoice:
-        final question = widget.question as MultiChoiceQuestion;
+        final question = widget.topicQuestion.question as MultiChoiceQuestion;
         return QuestionMultipleChoice(
           choices: question.choices,
           onInit: (answer) => onAnswerListener.value = answer,
@@ -71,7 +71,7 @@ class _QuestionViewState extends State<QuestionView> {
           },
         );
       case QuestionType.textOption:
-        final question = widget.question as TextOptionQuestion;
+        final question = widget.topicQuestion.question as TextOptionQuestion;
 
         return QuestionTextOption(
           question: question.question,
@@ -101,7 +101,7 @@ class _QuestionViewState extends State<QuestionView> {
           },
         );
       case QuestionType.dragDrop:
-        final question = widget.question as DragDropQuestion;
+        final question = widget.topicQuestion.question as DragDropQuestion;
         return QuestionDragDrop(
           question: question,
           onChange: (targets, validateTargets) {
@@ -137,7 +137,7 @@ class _QuestionViewState extends State<QuestionView> {
           direction: Axis.vertical,
           children: [
             Text(
-              widget.question.title,
+              widget.topicQuestion.question.title,
               style: TextStyle(color: Theme.of(context).colorScheme.secondary),
             ),
             const SizedBox(height: 16.0),

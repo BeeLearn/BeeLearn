@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -10,7 +11,7 @@ mixin ApiModelMixin {
   /// API Headers abstract getter
   Map<String, String>? get headers => {
         HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
-        HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
+        HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken ?? MainApplication.firebaseIdToken}",
       };
 
   /// Base API Url
@@ -118,6 +119,36 @@ mixin ApiModelMixin {
     switch (response.statusCode) {
       case HttpStatus.ok:
         return fromJson(jsonDecode(response.body));
+      default:
+        return Future.error(response);
+    }
+  }
+
+  Future<T> multipartRequest<T>({
+    Map<String, String>? fields,
+    List<MultipartFile>? multipartFiles,
+    required int id,
+    required String method,
+    required T Function(Map<String, dynamic> json) fromJson,
+  }) async {
+    final request = MultipartRequest(method, Uri.parse(getDetailedPath(id)));
+
+    if (headers != null) request.headers.addAll(headers!);
+    if (fields != null) request.fields.addAll(fields);
+    if (multipartFiles != null) request.files.addAll(multipartFiles);
+
+    final response = await request.send();
+
+    switch (response.statusCode) {
+      case HttpStatus.ok:
+        final completer = Completer<T>();
+        response.stream.transform(utf8.decoder).listen(
+          (response) {
+            completer.complete(fromJson(jsonDecode(response)));
+          },
+        );
+
+        return completer.future;
       default:
         return Future.error(response);
     }
