@@ -20,7 +20,7 @@ class PillChip extends StatelessWidget {
 
   @override
   Widget build(context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
       child: Container(
         padding: padding,

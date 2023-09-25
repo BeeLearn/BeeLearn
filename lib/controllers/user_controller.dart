@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:http/http.dart';
 
 import '../mixins/api_model_mixin.dart';
@@ -12,7 +10,6 @@ class _UserController with ApiModelMixin {
   String get currentUserApiPath => "current-user";
 
   Future<User> getCurrentUser() {
-    log("headers", error: headers);
     return list(
       url: getDetailedPath(currentUserApiPath),
       fromJson: User.fromJson,

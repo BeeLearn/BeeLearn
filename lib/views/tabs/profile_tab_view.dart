@@ -1,10 +1,10 @@
-import 'package:beelearn/views/components/reward_list.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
 
+import '../components/reward_list.dart';
 import '../components/streak_card.dart';
+import '../settings_view.dart';
 
 class ProfileTabView extends StatefulWidget {
   const ProfileTabView({Key? key}) : super(key: key);
@@ -42,7 +42,10 @@ class _ProfileTabViewState extends State<ProfileTabView> {
             ),
             actions: [
               IconButton(
-                onPressed: () => context.go("/settings"),
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => const SettingsView(),
+                ),
                 icon: const Icon(Icons.settings_outlined),
               ),
             ],

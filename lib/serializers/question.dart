@@ -7,8 +7,8 @@ enum QuestionType {
   textOption,
   @JsonValue("DRAG_DROP")
   dragDrop,
-  @JsonValue("SORT_CHOICE")
-  sortChoice,
+  @JsonValue("REORDER_CHOICE")
+  reorderChoice,
   @JsonValue("MULTIPLE_CHOICE")
   multipleChoice,
   @JsonValue("SINGLE_CHOICE")
@@ -44,6 +44,8 @@ class Question {
         return TextOptionQuestion.fromJson(json);
       case "DRAG_DROP":
         return DragDropQuestion.fromJson(json);
+      case "REORDER_CHOICE":
+        return ReorderChoiceQuestion.fromJson(json);
       default:
         throw UnimplementedError("question of $type is not implemented.");
     }
@@ -104,6 +106,47 @@ class SingleChoiceQuestion extends ChoiceQuestion {
   });
 
   factory SingleChoiceQuestion.fromJson(Map<String, dynamic> json) => _$SingleChoiceQuestionFromJson(json);
+}
+
+@JsonSerializable()
+class ReorderChoice {
+  @JsonKey(required: true)
+  final int id;
+
+  @JsonKey(required: true)
+  final String name;
+
+  @JsonKey(required: true)
+  final int position;
+
+  const ReorderChoice({
+    required this.id,
+    required this.name,
+    required this.position,
+  });
+
+  @override
+  int get hashCode => Object.hashAll([id, name, position]);
+
+  @override
+  bool operator ==(Object other) => other is ReorderChoice && id == other.id && name == other.name && position == other.position;
+
+  factory ReorderChoice.fromJson(Map<String, dynamic> json) => _$ReorderChoiceFromJson(json);
+}
+
+@JsonSerializable()
+class ReorderChoiceQuestion extends Question {
+  @JsonKey(required: true)
+  final List<ReorderChoice> choices;
+
+  const ReorderChoiceQuestion({
+    required super.id,
+    required super.title,
+    required super.type,
+    required this.choices,
+  });
+
+  factory ReorderChoiceQuestion.fromJson(Map<String, dynamic> json) => _$ReorderChoiceQuestionFromJson(json);
 }
 
 @JsonSerializable()

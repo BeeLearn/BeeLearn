@@ -1,18 +1,22 @@
-import 'package:beelearn/views/components/buttons.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-class QuestionDragSortChoice<T> extends StatefulWidget {
-  final List<T> items;
-  final String Function(dynamic value)? getKey;
-  final String Function(dynamic value) getText;
-  final void Function(int oldIndex, int newIndex) onReorder;
+import '../../serializers/question.dart';
+import '../../views/components/buttons.dart';
+
+class QuestionDragSortChoice extends StatefulWidget {
+  final List<ReorderChoice> choices;
+  final void Function(Function() orderChoices)? onInit;
+  final void Function(
+    List<ReorderChoice> choices,
+    bool Function() onSubmit,
+  ) onReorder;
 
   const QuestionDragSortChoice({
     super.key,
-    this.getKey,
-    required this.items,
+    this.onInit,
+    required this.choices,
     required this.onReorder,
-    required this.getText,
   });
 
   @override
@@ -20,7 +24,43 @@ class QuestionDragSortChoice<T> extends StatefulWidget {
 }
 
 class _QuestionDragSortChoiceState extends State<QuestionDragSortChoice> {
-  Widget proxyDecorator(Widget child, int index, Animation<double> animation) {
+  bool _isSummited = false;
+  late List<ReorderChoice> _choices = [...widget.choices];
+
+  @override
+  void initState() {
+    super.initState();
+    // randomize choices
+    _choices.shuffle();
+    _onReorder();
+    if (widget.onInit != null) {
+      widget.onInit!(
+        () => setState(
+          () => _choices = widget.choices,
+        ),
+      );
+    }
+  }
+
+  void _onReorder() {
+    widget.onReorder(
+      _choices,
+      () {
+        setState(() => _isSummited = true);
+        return _validateChoices();
+      },
+    );
+  }
+
+  bool _validateChoices() {
+    for (final [a, b] in IterableZip([widget.choices, _choices])) {
+      if (a.position != b.position) return false;
+    }
+
+    return true;
+  }
+
+  Widget _proxyDecorator(Widget child, int index, Animation<double> animation) {
     return AnimatedBuilder(
       animation: animation,
       builder: (BuildContext context, Widget? child) {
@@ -37,24 +77,36 @@ class _QuestionDragSortChoiceState extends State<QuestionDragSortChoice> {
   @override
   Widget build(BuildContext context) {
     return ReorderableList(
-      itemCount: widget.items.length,
-      proxyDecorator: proxyDecorator,
+      itemCount: _choices.length,
+      proxyDecorator: _proxyDecorator,
       physics: const NeverScrollableScrollPhysics(),
-      onReorder: widget.onReorder,
+      onReorder: (oldIndex, newIndex) {
+        setState(() {
+          if (oldIndex < newIndex) newIndex -= 1;
+          _choices.insert(newIndex, _choices.removeAt(oldIndex));
+          if (_isSummited) _isSummited = false;
+        });
+
+        _onReorder();
+      },
       itemBuilder: (context, index) {
-        final value = widget.items[index];
+        final choice = _choices[index];
+        final isCorrect = widget.choices[index].position == choice.position;
 
         return ReorderableDragStartListener(
           index: index,
-          key: Key(
-            widget.getKey != null ? widget.getKey!(value) : "$index",
-          ),
+          key: Key(choice.position.toString()),
           child: CustomOutlinedButton(
-            preventGesture: true,
             backgroundColor: Theme.of(context).colorScheme.surface,
+            selected: _isSummited,
+            selectedBackgroundColor: _isSummited
+                ? isCorrect
+                    ? Colors.greenAccent
+                    : Colors.redAccent
+                : null,
             child: Row(
               children: [
-                Expanded(child: Text(widget.getText(value))),
+                Expanded(child: Text(choice.name)),
                 const Icon(Icons.drag_handle_outlined),
               ],
             ),

@@ -1,12 +1,15 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:horizontal_blocked_scroll_physics/horizontal_blocked_scroll_physics.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:responsive_framework/responsive_framework.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../controllers/topic_question_controller.dart';
@@ -62,25 +65,63 @@ class _TopicFragmentState extends State<TopicFragment> {
         topicModel.loading = false;
       },
     );
-    adLoader.setRewardedAdListener(
-      onAdLoadFailedCallback: (adUnit, error) {
-        context.loaderOverlay.hide();
-      },
-      onAdReceivedRewardCallback: (ad, reward) {
-        context.loaderOverlay.hide();
-        controller.nextPage(
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      },
-    );
 
-    adLoader.loadAd(adUnitId);
+    if (!kIsWeb && Platform.isAndroid && Platform.isIOS) {
+      adLoader.setRewardedAdListener(
+        onAdLoadFailedCallback: (adUnit, error) {
+          context.loaderOverlay.hide();
+        },
+        onAdReceivedRewardCallback: (ad, reward) {
+          context.loaderOverlay.hide();
+          controller.nextPage(
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        },
+      );
+
+      adLoader.loadAd(adUnitId);
+    }
+  }
+
+  /// Markdown widget view
+  Widget _getMarkdownContent(Topic topic) {
+    return MarkdownWidget(
+      data: topic.content,
+      config: Theme.of(context).brightness == Brightness.dark
+          ? MarkdownConfig.darkConfig.copy(
+              configs: [
+                const PConfig(
+                  textStyle: TextStyle(fontSize: 14),
+                ),
+                PreConfig.darkConfig.copy(
+                  textStyle: GoogleFonts.notoSans(),
+                  styleNotMatched: GoogleFonts.notoSans(),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[800],
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                const BlockquoteConfig(
+                  textColor: Colors.white60,
+                ),
+              ],
+            )
+          : MarkdownConfig.defaultConfig.copy(
+              configs: [
+                const PConfig(
+                  textStyle: TextStyle(fontSize: 14),
+                ),
+                PreConfig(
+                  textStyle: GoogleFonts.notoSans(),
+                  styleNotMatched: GoogleFonts.notoSans(),
+                ),
+              ],
+            ),
+    );
   }
 
   Widget getTopicView(Topic topic, int index) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final config = isDark ? MarkdownConfig.darkConfig : MarkdownConfig.defaultConfig;
     // codeWrapper(child, text) => CodeWrapperWidget(child: child, text: text);
 
     return Stack(
@@ -108,13 +149,14 @@ class _TopicFragmentState extends State<TopicFragment> {
               ),
               Flexible(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(
-                    top: 16.0,
-                  ),
-                  child: MarkdownWidget(
-                    data: topic.content,
-                    config: config,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(top: 16.0),
+                  child: ResponsiveBreakpoints.of(context).largerThan(TABLET)
+                      ? SizedBox(
+                          width: ResponsiveBreakpoints.of(context).screenWidth * 0.5,
+                          height: double.infinity,
+                          child: _getMarkdownContent(topic),
+                        )
+                      : _getMarkdownContent(topic),
                 ),
               ),
               BottomAppBar(
@@ -182,10 +224,6 @@ class _TopicFragmentState extends State<TopicFragment> {
       final nextViewType = viewTypes[currentPage + 1];
       context.loaderOverlay.show();
       try {
-        final topicQuestion = items[currentPage];
-        // Mark question as answered
-        await _markQuestionAsAnswered(topicQuestion);
-
         if (nextViewType == _TopicFragmentViewType.topicView) {
           // Unlock nextTopic
           await unlockTopic(items[currentPage + 1]);
@@ -389,6 +427,13 @@ class _TopicFragmentState extends State<TopicFragment> {
                       case _TopicFragmentViewType.questionView:
                         return QuestionView(
                           topicQuestion: items[index],
+
+                          /// Todo rename callback as afterValidation
+                          markQuestionAsCompleted: () async {
+                            final topicQuestion = items[currentPage];
+                            // Mark question as answered
+                            await _markQuestionAsAnswered(topicQuestion);
+                          },
                           nextPage: () => _nextPage(items, viewTypes),
                         );
                       default:

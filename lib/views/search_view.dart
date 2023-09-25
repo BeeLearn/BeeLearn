@@ -100,11 +100,11 @@ class _SearchViewState extends State<SearchView> {
           },
         ),
       ),
-      body: (_isLoading
+      body: _isLoading
           ? loadingStateWidget
           : _courses.isEmpty
               ? emptyStateWidget
-              : searchListWidget),
+              : searchListWidget,
     );
   }
 }

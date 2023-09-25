@@ -1,3 +1,6 @@
+import 'package:beelearn/main_application.dart';
+import 'package:beelearn/views/streak_view.dart';
+import 'package:beelearn/views/user_lifeline_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -35,7 +38,9 @@ class _CategoryTabView extends State<CategoryTabView> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      ShowCaseWidget.of(context).startShowCase([_one, _two, _three]);
+      if (MainApplication.isNewUser) {
+        ShowCaseWidget.of(context).startShowCase([_one, _two, _three]);
+      }
     });
   }
 
@@ -71,6 +76,13 @@ class _CategoryTabView extends State<CategoryTabView> {
                       title: "Take on your next challenge",
                       description: "Use your hearts to keep learning!",
                       child: PillChip(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            showDragHandle: true,
+                            builder: (context) => const UserLifeLineView(),
+                          );
+                        },
                         children: [
                           const Icon(
                             Icons.favorite,
@@ -87,10 +99,17 @@ class _CategoryTabView extends State<CategoryTabView> {
                       title: "Let that streak be consistent",
                       description: "View your streaks, and share",
                       child: PillChip(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            showDragHandle: true,
+                            builder: (context) => const StreakView(),
+                          );
+                        },
                         children: [
-                          const Icon(
+                          Icon(
                             CupertinoIcons.flame_fill,
-                            color: Colors.greenAccent,
+                            color: Colors.greenAccent[700],
                           ),
                           const SizedBox(width: 8.0),
                           Text(model.value.profile!.streaks.toString()),

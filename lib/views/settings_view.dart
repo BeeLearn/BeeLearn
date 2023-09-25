@@ -1,17 +1,17 @@
 import 'package:beelearn/models/models.dart';
+import 'package:beelearn/views/fragments/dialog_fragment.dart';
 import 'package:beelearn/views/settings_notifications_view.dart';
-import 'package:beelearn/views/settings_premium_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'settings_edit_profile.dart';
+import 'settings_premium_view.dart';
 
 /// Settings Page
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _getBody(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Settings"),
@@ -64,12 +64,14 @@ class SettingsView extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 16.0),
-                  GestureDetector(
+                  InkWell(
                     onTap: () {
                       showDialog(
                         useSafeArea: false,
                         context: context,
-                        builder: (context) => const SettingsPremiumView(),
+                        builder: (buildContext) {
+                          return const SettingsPremiumView();
+                        },
                       );
                     },
                     child: Container(
@@ -117,9 +119,7 @@ class SettingsView extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 16.0,
-              ),
+              const SizedBox(height: 16.0),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -169,6 +169,15 @@ class SettingsView extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DialogFragment(
+      alignment: Alignment.topRight,
+      insetPadding: EdgeInsets.zero,
+      builder: _getBody,
     );
   }
 }

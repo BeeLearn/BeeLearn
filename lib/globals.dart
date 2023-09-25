@@ -10,7 +10,6 @@ import 'views/enhancement_view.dart';
 import 'views/main_view.dart';
 import 'views/module_view.dart';
 import 'views/search_view.dart';
-import 'views/settings_view.dart';
 import 'views/topic_view.dart';
 
 /// Todo enhance
@@ -30,14 +29,6 @@ GoRouter router = GoRouter(
         ),
       ),
       routes: [
-        // GoRoute(
-        //   path: "/sign-in",
-        //   builder: (context, state) => const SignInView(),
-        // ),
-        // GoRoute(
-        //   path: "/passwordless-sign-in",
-        //   builder: (context, state) => const PasswordLessSignInView(),
-        // ),
         GoRoute(
           path: "/onboarding",
           builder: (context, state) => const OnBoardingView(),
@@ -72,10 +63,6 @@ GoRouter router = GoRouter(
                   query: state.queryParameters,
                 );
               },
-            ),
-            GoRoute(
-              path: "settings",
-              builder: (context, state) => const SettingsView(),
             ),
           ],
           redirect: (context, state) async {

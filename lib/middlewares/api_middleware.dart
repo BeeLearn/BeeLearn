@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:djira_client/djira_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -28,12 +26,16 @@ void showSnackBar({
       padding: EdgeInsets.zero,
       content: ListTile(
         leading: leading,
-        title: Text(title),
+        title: Text(
+          title,
+          style: const TextStyle(color: Colors.white),
+        ),
         subtitle: subtitle == null
             ? null
             : Text(
                 subtitle,
                 overflow: TextOverflow.ellipsis,
+                style: const TextStyle(color: Colors.white70),
               ),
       ),
       action: action,
@@ -47,7 +49,7 @@ class ApiMiddleware {
     createClient(MainApplication.accessToken);
 
     client?.socket.onConnect((data) async {
-      final unsubscribeCourseListener = await client?.subscribe(
+      client?.subscribe(
         namespace: "courses",
         onError: (response) {},
         onSuccess: (response) {
@@ -70,7 +72,7 @@ class ApiMiddleware {
         },
       );
 
-      final unsubscribeFavouriteListener = await client?.subscribe(
+      client?.subscribe(
         namespace: "favourites",
         onError: (response) {},
         onSuccess: (response) {
@@ -88,30 +90,25 @@ class ApiMiddleware {
         },
       );
 
-      final unsubscribeRewardListener = await client?.subscribe(
+      client?.subscribe(
         namespace: "rewards",
         onError: (response) {},
         onSuccess: (response) {
-          log("OnSuccess", error: response.data);
-          try {
-            final reward = Reward.fromJson(response.data);
+          final reward = Reward.fromJson(response.data);
 
-            Provider.of<RewardModel>(
-              context,
-              listen: false,
-            ).updateOrAddOne(reward);
-            showSnackBar(
-              leading: CircleAvatar(foregroundImage: NetworkImage(reward.icon)),
-              title: reward.title,
-              subtitle: reward.description,
-            );
-          } catch (error, stackTrace) {
-            log("Subscription error", error: error, stackTrace: stackTrace);
-          }
+          Provider.of<RewardModel>(
+            context,
+            listen: false,
+          ).updateOrAddOne(reward);
+          showSnackBar(
+            leading: CircleAvatar(foregroundImage: NetworkImage(reward.icon)),
+            title: reward.title,
+            subtitle: reward.description,
+          );
         },
       );
 
-      final unsubscribeStreakListener = await client?.subscribe(
+      client?.subscribe(
         namespace: "streaks",
         onError: (response) {},
         onSuccess: (response) {
@@ -137,7 +134,7 @@ class ApiMiddleware {
         },
       );
 
-      final unsubscribeProfileListener = await client?.subscribe(
+      client?.subscribe(
         namespace: "profiles",
         onError: (response) {},
         onSuccess: (response) {
@@ -151,14 +148,6 @@ class ApiMiddleware {
           userModel.value = user;
         },
       );
-
-      // client?.socket.onDisconnect((data) {
-      //   unsubscribeProfileListener!();
-      //   unsubscribeCourseListener!();
-      //   unsubscribeFavouriteListener!();
-      //   unsubscribeRewardListener!();
-      //   unsubscribeStreakListener!();
-      // });
     });
   }
 }

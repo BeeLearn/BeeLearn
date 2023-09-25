@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -17,7 +18,6 @@ import '../../main_application.dart';
 import '../../middlewares/api_middleware.dart';
 import '../../middlewares/widget_middleware.dart';
 import '../../mixins/initialization_state_mixin.dart';
-import '../../models/product_model.dart';
 import '../../models/user_model.dart';
 import '../app_theme.dart';
 
@@ -32,10 +32,9 @@ class ApplicationFragment extends StatefulWidget {
 
 class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with InitializationStateMixin<T> {
   late final UserModel _userModel;
-  late final ProductModel _productModel;
   late final StreamSubscription<User?> _authStateChangeListener;
 
-  late final StreamSubscription<List<PurchaseDetails>> _purchaseUpdateListener;
+  StreamSubscription<List<PurchaseDetails>>? _purchaseUpdateListener;
 
   // authStateChanges must be called before app can initialize
   InitializationState appInitializationState = InitializationState.pending;
@@ -58,14 +57,9 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
       listen: false,
     );
 
-    _productModel = Provider.of<ProductModel>(
-      context,
-      listen: false,
-    );
-
     _authStateChangeListener = FirebaseAuth.instance.authStateChanges().listen(
       (user) async {
-        _userModel.setFirebaseUser(user);
+        await _userModel.setFirebaseUser(user);
 
         setState(
           () {
@@ -75,38 +69,39 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
       },
     );
 
-    _purchaseUpdateListener = InAppPurchase.instance.purchaseStream.listen(
-      (purchaseDetailsList) {
-        for (final purchaseDetails in purchaseDetailsList) {
-          switch (purchaseDetails.status) {
-            case PurchaseStatus.pending:
+    if (!kIsWeb && Platform.isAndroid && Platform.isIOS) {
+      _purchaseUpdateListener = InAppPurchase.instance.purchaseStream.listen(
+        (purchaseDetailsList) {
+          for (final purchaseDetails in purchaseDetailsList) {
+            switch (purchaseDetails.status) {
+              case PurchaseStatus.pending:
 
-              /// Todo update purchase status as pending
-              break;
-            case PurchaseStatus.purchased:
-            case PurchaseStatus.restored:
+                /// Todo update purchase status as pending
+                break;
+              case PurchaseStatus.purchased:
+              case PurchaseStatus.restored:
 
-              /// Todo add user as entitled when purchase is verified
-              break;
-            case PurchaseStatus.canceled:
-            case PurchaseStatus.error:
+                /// Todo add user as entitled when purchase is verified
+                break;
+              case PurchaseStatus.canceled:
+              case PurchaseStatus.error:
 
-              /// Todo remove user as entitled when purchase is cancelled or has an error
-              break;
+                /// Todo remove user as entitled when purchase is cancelled or has an error
+                break;
+            }
           }
-        }
-      },
-      onDone: () => _purchaseUpdateListener.cancel(),
-    );
+        },
+        onDone: () => _purchaseUpdateListener?.cancel(),
+      );
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
 
-    //_idTokenListener.cancel();
     _authStateChangeListener.cancel();
-    _purchaseUpdateListener.cancel();
+    _purchaseUpdateListener?.cancel();
   }
 
   @override
@@ -114,48 +109,13 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
     switch (appInitializationState) {
       case InitializationState.success:
         return WidgetMiddleware(
+          /// Call ui initialization blocking stuffs here
           onInit: (stateNotifier) async {
-            if (MainApplication.accessToken != null) {
-              ApiMiddleware.run(context);
-              Map<String, dynamic> subscriptionQuery = {};
-              if (Platform.isIOS && Platform.isAndroid) subscriptionQuery["skid__isnull"] = false;
-
-              final paginatedProducts = await _productModel.listProducts(
-                query: subscriptionQuery,
-              );
-
-              _productModel.setAll(paginatedProducts.results);
-
-              await _awesomeNotificationsFcm.initialize(
-                licenseKeys: null,
-                debug: MainApplication.isDevelopment,
-                onFcmTokenHandle: NotificationController.fcmTokenHandle,
-                onFcmSilentDataHandle: NotificationController.silentDataHandle,
-                onNativeTokenHandle: NotificationController.nativeTokenHandle,
-              );
-
-              _awesomeNotificationsFcm.requestFirebaseAppToken();
-
-              _awesomeNotifications.setListeners(
-                onActionReceivedMethod: NotificationController.onActionReceivedMethod,
-                onNotificationCreatedMethod: NotificationController.onNotificationCreatedMethod,
-                onNotificationDisplayedMethod: NotificationController.onNotificationDisplayedMethod,
-                onDismissActionReceivedMethod: NotificationController.onDismissActionReceivedMethod,
-              );
-
-              _awesomeNotifications.isNotificationAllowed().then((isAllowed) {
-                if (!isAllowed) {
-                  // This is just a basic example. For real apps, you must show some
-                  // friendly dialog box before call the request method.
-                  // This is very important to not harm the user experience
-                  AwesomeNotifications().requestPermissionToSendNotifications();
-                }
-              });
-            }
-
+            // addListener first to prevent error short circuit
             stateNotifier.addListener(
               () {
                 switch (stateNotifier.value) {
+                  /// Todo handle error state after splash removed
                   case InitializationState.success:
                   case InitializationState.error:
                     FlutterNativeSplash.remove();
@@ -164,9 +124,38 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
                 }
               },
             );
+
+            if (MainApplication.accessToken != null) {
+              ApiMiddleware.run(context);
+
+              if (!kIsWeb) {
+                await _awesomeNotificationsFcm.initialize(
+                  licenseKeys: null,
+                  debug: MainApplication.isDevelopment,
+                  onFcmTokenHandle: NotificationController.fcmTokenHandle,
+                  onFcmSilentDataHandle: NotificationController.silentDataHandle,
+                  onNativeTokenHandle: NotificationController.nativeTokenHandle,
+                );
+
+                _awesomeNotifications.setListeners(
+                  onActionReceivedMethod: NotificationController.onActionReceivedMethod,
+                  onNotificationCreatedMethod: NotificationController.onNotificationCreatedMethod,
+                  onNotificationDisplayedMethod: NotificationController.onNotificationDisplayedMethod,
+                  onDismissActionReceivedMethod: NotificationController.onDismissActionReceivedMethod,
+                );
+
+                _awesomeNotifications.isNotificationAllowed().then((isAllowed) {
+                  if (!isAllowed) {
+                    // This is just a basic example. For real apps, you must show some
+                    // friendly dialog box before call the request method.
+                    // This is very important to not harm the user experience
+                    AwesomeNotifications().requestPermissionToSendNotifications();
+                  }
+                });
+              }
+            }
           },
-          //onDispose: (stateNotifier) => _firebaseTokenRefreshListener.cancel(),
-          builder: (state) => ResponsiveBreakpoints.builder(
+          builder: (context, state) => ResponsiveBreakpoints.builder(
             breakpoints: defaultBreakpoints,
             child: MaterialApp.router(
               theme: AppTheme.light,

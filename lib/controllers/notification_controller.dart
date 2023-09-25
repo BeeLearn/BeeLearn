@@ -4,11 +4,12 @@ import 'dart:math' hide log;
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 
+import '../../mixins/api_model_mixin.dart';
 import '../constants/notification_constant.dart';
-import '../controllers/reply_controller.dart';
-import '../controllers/user_controller.dart';
+import '../serializers/serializers.dart';
+import 'controllers.dart';
 
-class NotificationController {
+class NotificationController with ApiModelMixin {
   @pragma("vm:entry-point")
   static Future<void> silentDataHandle(FcmSilentData silentData) async {
     log('"SilentData": ${silentData.toString()}');
@@ -82,4 +83,35 @@ class NotificationController {
       );
     }
   }
+
+  @override
+  String? get basePath => "api/account/notifications";
+
+  Future<Paginate<Notification>> listNotifications<T>({
+    String? url,
+    Map<String, dynamic>? query,
+  }) {
+    return list(
+      url: url,
+      fromJson: (Map<String, dynamic> json) => Paginate.fromJson(
+        json,
+        Notification.fromJson,
+      ),
+    );
+  }
+
+  Future<Notification> updateNotification({
+    required int id,
+    Map<String, dynamic>? query,
+    required Map<String, dynamic>? body,
+  }) {
+    return super.update(
+      path: id,
+      query: query,
+      body: body,
+      fromJson: Notification.fromJson,
+    );
+  }
 }
+
+final notificationController = NotificationController();

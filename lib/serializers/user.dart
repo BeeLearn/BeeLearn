@@ -1,11 +1,10 @@
-import 'package:beelearn/controllers/user_controller.dart';
-import 'package:beelearn/serializers/serializers.dart';
 import 'package:flutter/widgets.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:provider/provider.dart';
 
+import '../controllers/controllers.dart';
 import '../models/models.dart';
-import 'settings.dart';
+import 'serializers.dart';
 
 part 'user.g.dart';
 
@@ -85,9 +84,9 @@ class User {
     todayStreak.currentStreakSeconds = currentStreakSeconds + 1;
 
     if (todayStreak.currentStreakSeconds >= profile!.dailyStreakSeconds) {
-      return StreakModel.updateStreak(
-        todayStreak.id,
-        data: {
+      return streakController.updateStreak(
+        id: todayStreak.id,
+        body: {
           "streak_complete_users": {
             "add": [id],
           },

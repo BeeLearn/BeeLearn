@@ -101,7 +101,7 @@ class _ModuleFragmentState extends State<ModuleFragment> {
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: ExpandedList(
                     itemCount: modules.length,
-                    sharedPreferences: MainApplication.preferences,
+                    sharedPreferences: MainApplication.sharedPreferences,
                     generateKey: (index) => "module_${index}_expansion_state",
                     headerBuilder: (context, index, isExpanded) {
                       final module = modules[index];

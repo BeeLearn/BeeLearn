@@ -9,7 +9,7 @@ class Streak {
   final int id;
 
   @JsonKey(required: true)
-  final String date;
+  final DateTime date;
 
   @JsonKey(required: true, name: "is_today")
   final bool isToday;
@@ -17,17 +17,23 @@ class Streak {
   @JsonKey(required: true, name: "is_complete")
   final bool isComplete;
 
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  int get currentStreakSeconds => MainApplication.preferences.getInt(date) ?? 0;
+  /// Load streak currentStreakSeconds from sharedPreference
+  @JsonKey(
+    includeFromJson: false,
+    includeToJson: false,
+  )
+  int get currentStreakSeconds => MainApplication.sharedPreferences.getInt(date.toString()) ?? 0;
+
+  /// Save streak state to sharedPreference
+  set currentStreakSeconds(int seconds) {
+    MainApplication.sharedPreferences.setInt(
+      date.toString(),
+      seconds,
+    );
+  }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   int get currentStreakMinutes => (currentStreakSeconds / 60).round();
-
-  set currentStreakSeconds(int seconds) {
-    MainApplication.preferences.setInt(date, seconds);
-  }
-
-  DateTime get dateTime => DateTime.parse(date);
 
   Streak({
     required this.id,

@@ -18,6 +18,7 @@ class StreakCalender extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 2.0),
       child: ListView.builder(
         itemCount: streaks.length,
+        shrinkWrap: true,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
           final streak = streaks[index];
@@ -32,7 +33,7 @@ class StreakCalender extends StatelessWidget {
             ),
             child: Center(
               child: Text(
-                DateFormat.d().format(streak.dateTime),
+                DateFormat("dd").format(streak.date),
                 style: TextStyle(color: activeColor),
               ),
             ),

@@ -28,8 +28,7 @@ class UserModel extends ValueChangeNotifier<User> {
     firebaseIdToken = idToken;
     MainApplication.firebaseIdToken = idToken;
 
-    /// Todo Switch to use api idToken
-    if (MainApplication.accessToken == null) {
+    if (idToken != null && MainApplication.accessToken == null) {
       value = await userController.getCurrentUser();
 
       updateClient(MainApplication.accessToken);

@@ -1,15 +1,15 @@
-import 'package:beelearn/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../controllers/user_controller.dart';
+import '../models/models.dart';
+import 'fragments/dialog_fragment.dart';
 
 /// Notification Settings Dialog
 class SettingsNotificationView extends StatelessWidget {
   const SettingsNotificationView({super.key});
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _getBody(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Notifications"),
@@ -63,6 +63,15 @@ class SettingsNotificationView extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DialogFragment(
+      insetPadding: EdgeInsets.zero,
+      alignment: Alignment.topRight,
+      builder: _getBody,
     );
   }
 }

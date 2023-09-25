@@ -1,78 +1,26 @@
-import 'dart:collection';
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:beelearn/main_application.dart';
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' show get, patch;
-
-import '../serializers/paginate.dart';
+import '../models/base_model.dart';
 import '../serializers/streak.dart';
+import '../services/date_service.dart';
 
-class StreakModel extends ChangeNotifier {
-  List<Streak> _streaks = [];
-  static const apiURL = "${MainApplication.baseURL}/api/reward/streaks/";
+class StreakModel extends BaseModel<Streak> {
+  Streak get todayStreak => items.singleWhere((element) => element.isToday);
 
-  Streak get todayStreak => _streaks.singleWhere((element) => element.isToday);
+  List<Streak> get weekStreaks {
+    final (weekStart, weekEnd) = DateService.getWeekStartAndEnd();
 
-  UnmodifiableListView<Streak> get streaks => UnmodifiableListView(_streaks);
-
-  setAll(List<Streak> streaks) {
-    _streaks = streaks;
-    notifyListeners();
+    return items.where((streak) {
+      final date = streak.date;
+      return date.isAtSameMomentAs(weekStart) || date.isAtSameMomentAs(weekEnd) || (date.isAfter(weekStart) && date.isBefore(weekEnd));
+    }).toList();
   }
 
-  addAll(List<Streak> streaks) {
-    _streaks.addAll(streaks);
-    notifyListeners();
+  List<DateTime> get completedStreakDates {
+    return items.where((streak) => streak.isComplete).map((streak) => streak.date).toList();
   }
 
-  void updateOne(Streak streak) {
-    final index = _streaks.indexWhere((element) => element.id == streak.id);
+  @override
+  int getEntityId(Streak item) => item.id;
 
-    _streaks[index] = streak;
-
-    notifyListeners();
-  }
-
-  static Future<Paginate<Streak>> getStreak({String? nextURL, required Map<String, dynamic> query}) {
-    return get(
-      Uri.parse(nextURL ?? apiURL).replace(queryParameters: query),
-      headers: {
-        HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
-      },
-    ).then(
-      (response) {
-        switch (response.statusCode) {
-          case HttpStatus.ok:
-            return Paginate.fromJson(
-              jsonDecode(response.body),
-              Streak.fromJson,
-            );
-          default:
-            return Future.error(response);
-        }
-      },
-    );
-  }
-
-  static Future<Streak> updateStreak(int id, {required Map<String, dynamic> data}) {
-    return patch(
-      Uri.parse("$apiURL$id/"),
-      body: jsonEncode(data),
-      headers: {
-        HttpHeaders.contentTypeHeader: ContentType.json.mimeType,
-        HttpHeaders.authorizationHeader: "Token ${MainApplication.accessToken}",
-      },
-    ).then(
-      (response) {
-        switch (response.statusCode) {
-          case HttpStatus.ok:
-            return Streak.fromJson(jsonDecode(response.body));
-          default:
-            return Future.error(response);
-        }
-      },
-    );
-  }
+  @override
+  int orderBy(Streak first, Streak second) => first.date.compareTo(second.date);
 }

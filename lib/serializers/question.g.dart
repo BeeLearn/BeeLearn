@@ -27,7 +27,7 @@ Map<String, dynamic> _$QuestionToJson(Question instance) => <String, dynamic>{
 const _$QuestionTypeEnumMap = {
   QuestionType.textOption: 'TEXT_OPTION',
   QuestionType.dragDrop: 'DRAG_DROP',
-  QuestionType.sortChoice: 'SORT_CHOICE',
+  QuestionType.reorderChoice: 'REORDER_CHOICE',
   QuestionType.multipleChoice: 'MULTIPLE_CHOICE',
   QuestionType.singleChoice: 'SINGLE_CHOICE',
 };
@@ -91,6 +91,50 @@ SingleChoiceQuestion _$SingleChoiceQuestionFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$SingleChoiceQuestionToJson(
         SingleChoiceQuestion instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'type': _$QuestionTypeEnumMap[instance.type]!,
+      'choices': instance.choices,
+    };
+
+ReorderChoice _$ReorderChoiceFromJson(Map<String, dynamic> json) {
+  $checkKeys(
+    json,
+    requiredKeys: const ['id', 'name', 'position'],
+  );
+  return ReorderChoice(
+    id: json['id'] as int,
+    name: json['name'] as String,
+    position: json['position'] as int,
+  );
+}
+
+Map<String, dynamic> _$ReorderChoiceToJson(ReorderChoice instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'position': instance.position,
+    };
+
+ReorderChoiceQuestion _$ReorderChoiceQuestionFromJson(
+    Map<String, dynamic> json) {
+  $checkKeys(
+    json,
+    requiredKeys: const ['id', 'title', 'type', 'choices'],
+  );
+  return ReorderChoiceQuestion(
+    id: json['id'] as int,
+    title: json['title'] as String,
+    type: $enumDecode(_$QuestionTypeEnumMap, json['type']),
+    choices: (json['choices'] as List<dynamic>)
+        .map((e) => ReorderChoice.fromJson(e as Map<String, dynamic>))
+        .toList(),
+  );
+}
+
+Map<String, dynamic> _$ReorderChoiceQuestionToJson(
+        ReorderChoiceQuestion instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,

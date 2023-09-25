@@ -16,7 +16,7 @@ class _ThreadController with ApiModelMixin {
     return list(
       url: url,
       query: query,
-      fromJson: (json) => Paginate.fromJson(json, Thread.fromJson),
+      fromJson: (Map<String, dynamic> json) => Paginate.fromJson(json, Thread.fromJson),
     );
   }
 

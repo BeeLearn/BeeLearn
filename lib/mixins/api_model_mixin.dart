@@ -27,10 +27,10 @@ mixin ApiModelMixin {
   String getDetailedPath(dynamic path) => "$apiUrl$path/";
 
   /// List
-  Future<T> list<T>({
+  Future<T> list<T, TJson>({
     String? url,
     Map<String, dynamic>? query,
-    required T Function(Map<String, dynamic> json) fromJson,
+    required T Function(TJson) fromJson,
   }) async {
     final response = await get(
       Uri.parse(url ?? apiUrl).replace(queryParameters: query),

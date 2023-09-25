@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:beelearn/views/fragments/dialog_fragment.dart';
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:http/http.dart';
@@ -43,8 +44,7 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
     usernameTextEditController = TextEditingController(text: userModel.value.username);
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _getBody(BuildContext context) {
     return LoaderOverlay(
       child: Consumer<UserModel>(
         builder: (context, model, child) {
@@ -192,6 +192,15 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
           );
         },
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DialogFragment(
+      insetPadding: EdgeInsets.zero,
+      alignment: Alignment.topRight,
+      builder: _getBody,
     );
   }
 }

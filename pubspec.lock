@@ -169,6 +169,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
+  clean_calendar:
+    dependency: "direct main"
+    description:
+      path: "../../../code/workspace/dart/flutter_clean_calendar"
+      relative: true
+    source: path
+    version: "1.1.0"
   cli_util:
     dependency: transitive
     description:
@@ -194,7 +201,7 @@ packages:
     source: hosted
     version: "4.5.0"
   collection:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: collection
       sha256: "4a07be6cb69c84d677a6c3096fcf960cc3285a8330b4603e0d463d15d9bd934c"
@@ -268,11 +275,18 @@ packages:
   djira_client:
     dependency: "direct main"
     description:
-      name: djira_client
-      sha256: bf6271361f4cc613a42d4483988ccfdfd8a2d80db68f795c4ee9483f36d15beb
+      path: "../../../code/workspace/dart/djira_client"
+      relative: true
+    source: path
+    version: "1.0.8"
+  dots_indicator:
+    dependency: "direct main"
+    description:
+      name: dots_indicator
+      sha256: "58b6a365744aa62aa1b70c4ea29e5106fbe064f5edaf7e9652e9b856edbfd9bb"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.8"
+    version: "3.0.0"
   extended_image:
     dependency: transitive
     description:
@@ -415,7 +429,7 @@ packages:
     source: hosted
     version: "5.0.0"
   flutter_highlight:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_highlight
       sha256: "7b96333867aa07e122e245c033b8ad622e4e3a42a1a2372cbb098a2541d8782c"
@@ -752,6 +766,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.7.1"
+  just_the_tooltip:
+    dependency: "direct main"
+    description:
+      name: just_the_tooltip
+      sha256: "7a081133d57285bfb41b331f411006d57b433d7b35772e6155745f6a7a09cb82"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.12"
   lints:
     dependency: transitive
     description:

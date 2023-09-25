@@ -1,23 +1,27 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:responsive_framework/responsive_breakpoints.dart';
 
 import '../serializers/serializers.dart';
 import '../services/code_question_parser.dart';
 import '../views/app_theme.dart';
 import '../views/components/question_drag_drop.dart';
+import '../views/components/question_drag_sort.dart';
 import '../views/components/question_multiple_choice.dart';
 import '../views/components/question_single_choice.dart';
 import '../views/components/question_text_option.dart';
 
 class QuestionView extends StatefulWidget {
   final TopicQuestion topicQuestion;
-  final void Function() nextPage;
+  final Future<void> Function() nextPage;
+  final Future<void> Function() markQuestionAsCompleted;
 
   const QuestionView({
     super.key,
     required this.topicQuestion,
     required this.nextPage,
+    required this.markQuestionAsCompleted,
   });
 
   @override
@@ -45,12 +49,14 @@ class _QuestionViewState extends State<QuestionView> {
           onInit: (answer) => onAnswerListener.value = answer,
           getText: (choice) => choice.name,
           onSelected: (selectedChoice, onSubmit) {
-            onValidateListener.value = () {
+            onValidateListener.value = () async {
               onSubmit();
               final isCorrect = selectedChoice.isAnswer;
-              if (isCorrect) onValidateListener.value = widget.nextPage;
 
-              /// Todo show success dialog
+              if (isCorrect) {
+                await widget.markQuestionAsCompleted();
+                onValidateListener.value = widget.nextPage;
+              }
             };
           },
         );
@@ -65,8 +71,11 @@ class _QuestionViewState extends State<QuestionView> {
             onValidateListener.value = () {
               onSubmit();
               final isCorrect = selectedChoices.every((choice) => choice.isAnswer);
-              // Todo show success dialog
-              // Todo validate = nextPage
+
+              if (isCorrect) {
+                widget.markQuestionAsCompleted();
+                onValidateListener.value = widget.nextPage;
+              }
             };
           },
         );
@@ -83,13 +92,14 @@ class _QuestionViewState extends State<QuestionView> {
             };
           },
           onChanged: (formKey, fragmentKeys) {
-            onValidateListener.value = () {
+            onValidateListener.value = () async {
               if (formKey.currentState!.validate()) {
                 bool isCorrect = fragmentKeys.every((key) => key.currentState!.validateField());
                 log(isCorrect.toString());
-                if (isCorrect) onValidateListener.value = widget.nextPage;
-
-                /// Todo show success message
+                if (isCorrect) {
+                  await widget.markQuestionAsCompleted();
+                  onValidateListener.value = widget.nextPage;
+                }
               }
             };
 
@@ -106,16 +116,11 @@ class _QuestionViewState extends State<QuestionView> {
           question: question,
           onChange: (targets, validateTargets) {
             if (targets.every((target) => target.hasData)) {
-              onValidateListener.value = () {
+              onValidateListener.value = () async {
                 log("This is called not expected");
                 if (validateTargets()) {
-                  // On Continue click nextPage or if lesson complete quit
-                  onValidateListener.value = () {
-                    log("AHHHHH Validate scam");
-
-                    widget.nextPage();
-                    // onValidateListener.value = null;
-                  };
+                  await widget.markQuestionAsCompleted();
+                  onValidateListener.value = widget.nextPage;
                 }
               };
             } else {
@@ -123,9 +128,77 @@ class _QuestionViewState extends State<QuestionView> {
             }
           },
         );
+      case QuestionType.reorderChoice:
+        final question = widget.topicQuestion.question as ReorderChoiceQuestion;
+        return QuestionDragSortChoice(
+          choices: question.choices,
+          onInit: (orderChoices) {
+            onAnswerListener.value = orderChoices;
+          },
+          onReorder: (newChoices, onSubmit) {
+            onValidateListener.value = () async {
+              final isValid = onSubmit();
+              if (isValid) {
+                await widget.markQuestionAsCompleted();
+                onValidateListener.value = widget.nextPage;
+              } else {
+                onValidateListener.value = null;
+              }
+            };
+          },
+        );
       default:
         return const Placeholder();
     }
+  }
+
+  Widget get body {
+    return Flex(
+      direction: Axis.vertical,
+      children: [
+        Flexible(child: getView()),
+        Wrap(
+          runSpacing: 16.0,
+          alignment: WrapAlignment.center,
+          children: [
+            OutlinedButton.icon(
+              onPressed: () {
+                if (onAnswerListener.value != null) onAnswerListener.value!();
+              },
+              style: FilledButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+              icon: const Icon(Icons.lock_outline),
+              label: const Text("Answer"),
+            ),
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Theme(
+                data: AppTheme.light,
+                child: ValueListenableBuilder(
+                  valueListenable: onValidateListener,
+                  builder: (valueContext, value, child) {
+                    return FilledButton(
+                      onPressed: value,
+                      style: FilledButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(4.0),
+                        ),
+                        disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorLight.withAlpha(164) : null,
+                      ),
+                      child: const Text("Continue"),
+                    );
+                  },
+                ),
+              ),
+            )
+          ],
+        ),
+      ],
+    );
   }
 
   @override
@@ -142,48 +215,13 @@ class _QuestionViewState extends State<QuestionView> {
             ),
             const SizedBox(height: 16.0),
             Flexible(
-              child: getView(),
+              child: ResponsiveBreakpoints.of(context).largerThan(TABLET)
+                  ? SizedBox(
+                      width: ResponsiveBreakpoints.of(context).screenWidth * 0.5,
+                      child: body,
+                    )
+                  : body,
             ),
-            Wrap(
-              runSpacing: 16.0,
-              alignment: WrapAlignment.center,
-              children: [
-                OutlinedButton.icon(
-                  onPressed: () {
-                    if (onAnswerListener.value != null) onAnswerListener.value!();
-                  },
-                  style: FilledButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                  ),
-                  icon: const Icon(Icons.lock_outline),
-                  label: const Text("Answer"),
-                ),
-                Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Theme(
-                    data: AppTheme.light,
-                    child: ValueListenableBuilder(
-                      valueListenable: onValidateListener,
-                      builder: (valueContext, value, child) {
-                        return FilledButton(
-                          onPressed: value,
-                          style: FilledButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
-                            disabledBackgroundColor: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).primaryColorLight.withAlpha(164) : null,
-                          ),
-                          child: const Text("Continue"),
-                        );
-                      },
-                    ),
-                  ),
-                )
-              ],
-            )
           ],
         ),
       ),

@@ -1,35 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import '../main_application.dart';
-
 class FirebaseUserModel {
-  static Future<void>? setup(BuildContext context, User? user, {bool? reconnect}) {
-    return user?.getIdToken().then(
-      (value) {
-        MainApplication.accessToken = value;
-
-        // This is called when app if first initialized
-        if (reconnect ?? false) {
-          // UserModel.getCurrentUser().then((user) {
-          //   Provider.of<UserModel>(
-          //     context,
-          //     listen: false,
-          //   ).user = user;
-          //
-          //   ApiMiddleware.run(context);
-          // });
-        }
-
-        // Remove splash screen
-        FlutterNativeSplash.remove();
-      },
-    );
-  }
-
   static Future<UserCredential> signInWithGoogleWeb() async {
     GoogleAuthProvider googleProvider = GoogleAuthProvider();
 

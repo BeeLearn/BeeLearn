@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 /// StatefulWidget middleware wrapper
 class WidgetMiddleware extends StatefulWidget {
-  final Future<void> Function(ValueNotifier<InitializationState>)? onInit;
-  final void Function(ValueNotifier<InitializationState>)? onDispose;
+  final Future<void> Function(ValueNotifier<InitializationState> state)? onInit;
+  final void Function(ValueNotifier<InitializationState> state)? onDispose;
 
-  final Widget Function(InitializationState state) builder;
+  final Widget Function(BuildContext context, InitializationState state) builder;
 
   const WidgetMiddleware({
     super.key,
@@ -37,7 +37,10 @@ class _WidgetMiddlewareState extends State<WidgetMiddleware> with Initialization
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: initializationState,
-      builder: (context, state, child) => widget.builder(state),
+      builder: (context, state, child) => widget.builder(
+        context,
+        state,
+      ),
     );
   }
 }

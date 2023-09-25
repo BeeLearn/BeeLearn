@@ -5,25 +5,29 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-import '../../models/course_model.dart';
-import '../../models/user_model.dart';
+import '../../models/models.dart';
 import '../../views/components/course_card.dart';
 
-class FavoriteTab extends StatefulWidget {
-  const FavoriteTab({super.key}) : super();
+class FavoriteTabView extends StatefulWidget {
+  const FavoriteTabView({super.key}) : super();
 
   @override
-  State createState() => _FavoriteTabState();
+  State createState() => _FavoriteTabViewState();
 }
 
-class _FavoriteTabState extends State<FavoriteTab> {
+class _FavoriteTabViewState extends State<FavoriteTabView> {
   late UserModel _userModel;
+  late FavouriteCourseModel _favouriteCourseModel;
 
   @override
   void initState() {
     super.initState();
 
     _userModel = Provider.of<UserModel>(
+      context,
+      listen: false,
+    );
+    _favouriteCourseModel = Provider.of<FavouriteCourseModel>(
       context,
       listen: false,
     );
@@ -34,17 +38,14 @@ class _FavoriteTabState extends State<FavoriteTab> {
   Future<void> fetchFavourites() async {
     final user = _userModel.value;
 
-    CourseModel.getCourses(
-      query: {"module__lesson__topic__likes": "${user.id}"},
-    ).then((response) {
-      final favouriteCourseModel = Provider.of<FavouriteCourseModel>(
-        context,
-        listen: false,
-      );
+    final response = await CourseModel.getCourses(
+      query: {
+        "module__lesson__topic__likes": "${user.id}",
+      },
+    );
 
-      favouriteCourseModel.loading = false;
-      favouriteCourseModel.setAll(response.results);
-    });
+    _favouriteCourseModel.loading = false;
+    _favouriteCourseModel.setAll(response.results);
   }
 
   Widget get _emptyState => Center(

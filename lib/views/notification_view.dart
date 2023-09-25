@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/notification_model.dart';
+import '../../models/models.dart';
+import '../controllers/controllers.dart';
 
 class NotificationView extends StatelessWidget {
   const NotificationView({super.key});
@@ -25,7 +26,7 @@ class NotificationView extends StatelessWidget {
                   if (notification.intentTo != null) context.go(notification.intentTo!);
 
                   if (!notification.isRead) {
-                    final newNotification = await model.updateNotification(
+                    final newNotification = await notificationController.updateNotification(
                       id: notification.id,
                       body: {
                         "is_read": true,

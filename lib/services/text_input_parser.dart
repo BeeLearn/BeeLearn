@@ -16,7 +16,6 @@ class TextInputParser {
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: line.map(
                   (token) {
                     return Row(

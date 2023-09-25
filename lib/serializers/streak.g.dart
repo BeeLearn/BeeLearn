@@ -13,7 +13,7 @@ Streak _$StreakFromJson(Map<String, dynamic> json) {
   );
   return Streak(
     id: json['id'] as int,
-    date: json['date'] as String,
+    date: DateTime.parse(json['date'] as String),
     isToday: json['is_today'] as bool,
     isComplete: json['is_complete'] as bool,
   );
@@ -21,7 +21,7 @@ Streak _$StreakFromJson(Map<String, dynamic> json) {
 
 Map<String, dynamic> _$StreakToJson(Streak instance) => <String, dynamic>{
       'id': instance.id,
-      'date': instance.date,
+      'date': instance.date.toIso8601String(),
       'is_today': instance.isToday,
       'is_complete': instance.isComplete,
     };

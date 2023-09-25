@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:beelearn/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import "package:provider/provider.dart";
+import 'package:responsive_framework/responsive_breakpoints.dart';
 
 import '../models/streak_model.dart';
 import '../models/topic_model.dart';
@@ -76,7 +78,10 @@ class _TopicViewState extends State<TopicView> {
           ],
           child: SafeArea(
             bottom: false,
-            child: TopicFragment(query: widget.query),
+            child: ResponsiveBreakpoints(
+              breakpoints: defaultBreakpoints,
+              child: TopicFragment(query: widget.query),
+            ),
           ),
         ),
       ),

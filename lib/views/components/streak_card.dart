@@ -1,4 +1,3 @@
-import "package:beelearn/views/fragments/set_goal_fragment.dart";
 import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -6,6 +5,7 @@ import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 import "../../models/streak_model.dart";
 import "../../models/user_model.dart";
+import "../../views/fragments/set_goal_fragment.dart";
 import "streak_calender.dart";
 
 class StreakCard extends StatefulWidget {
@@ -16,20 +16,9 @@ class StreakCard extends StatefulWidget {
 }
 
 class _StreakCardState extends State<StreakCard> {
-  late final StreakModel _streakModel;
-
   @override
   void initState() {
     super.initState();
-
-    _streakModel = Provider.of<StreakModel>(
-      context,
-      listen: false,
-    );
-
-    StreakModel.getStreak(
-      query: {"start_date": DateTime.now().toIso8601String()},
-    ).then((response) => _streakModel.setAll(response.results));
   }
 
   @override
@@ -42,7 +31,8 @@ class _StreakCardState extends State<StreakCard> {
           child: SizedBox(
             height: 416,
             width: double.infinity,
-            child: Column(
+            child: Flex(
+              direction: Axis.vertical,
               children: [
                 const Column(
                   children: [
@@ -59,91 +49,107 @@ class _StreakCardState extends State<StreakCard> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16.0),
-                Consumer2<UserModel, StreakModel>(
-                  builder: (context, userModel, streakModel, child) {
-                    final user = userModel.value;
-                    final isStreakComplete = streakModel.streaks.isEmpty ? false : streakModel.todayStreak.isComplete;
-                    final dailyStreakSeconds = streakModel.streaks.isEmpty ? 0 : streakModel.todayStreak.currentStreakSeconds;
-                    final dailyStreakMinutes = streakModel.streaks.isEmpty ? 0 : streakModel.todayStreak.currentStreakMinutes;
+                Flexible(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Consumer2<UserModel, StreakModel>(
+                        builder: (context, userModel, streakModel, child) {
+                          final user = userModel.value;
 
-                    return CircularStepProgressIndicator(
-                      width: 156,
-                      height: 156,
-                      padding: 0,
-                      totalSteps: user.profile!.dailyStreakSeconds,
-                      currentStep: dailyStreakSeconds,
-                      selectedColor: Colors.green,
-                      child: Center(
-                        child: isStreakComplete
-                            ? const Icon(
-                                Icons.check,
-                                size: 72,
-                                color: Colors.green,
-                              )
-                            : Text.rich(
-                                TextSpan(
-                                  children: [
-                                    TextSpan(
-                                      text: "$dailyStreakMinutes\n",
-                                      style: const TextStyle(
-                                        fontSize: 32,
-                                        fontWeight: FontWeight.w900,
+                          /// Todo switch to a more explicit method
+                          final isStreakComplete = streakModel.items.isEmpty ? false : streakModel.todayStreak.isComplete;
+                          //final dailyStreakSeconds = streakModel.items.isEmpty ? 0 : streakModel.todayStreak.currentStreakSeconds;
+                          final dailyStreakMinutes = streakModel.items.isEmpty ? 0 : streakModel.todayStreak.currentStreakMinutes;
+
+                          return CircularStepProgressIndicator(
+                            width: 156,
+                            height: 156,
+                            padding: 0,
+                            totalSteps: user.profile!.dailyStreakMinutes,
+                            currentStep: dailyStreakMinutes,
+                            unselectedColor: Theme.of(context).brightness == Brightness.light ? Colors.grey[300] : Colors.grey,
+                            selectedColor: Theme.of(context).brightness == Brightness.dark ? Colors.green : Colors.greenAccent[400],
+                            child: Center(
+                              child: isStreakComplete
+                                  ? Icon(
+                                      Icons.check_rounded,
+                                      size: 72,
+                                      color: Theme.of(context).brightness == Brightness.dark ? Colors.green : Colors.greenAccent[400],
+                                    )
+                                  : Text.rich(
+                                      TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: "$dailyStreakMinutes\n",
+                                            style: const TextStyle(
+                                              fontSize: 32,
+                                              fontWeight: FontWeight.w900,
+                                            ),
+                                          ),
+                                          TextSpan(text: "Of ${user.profile!.dailyStreakMinutes} min goal"),
+                                        ],
                                       ),
+                                      textAlign: TextAlign.center,
                                     ),
-                                    TextSpan(text: "Of ${user.profile!.dailyStreakMinutes} min goal"),
-                                  ],
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                      const SizedBox(height: 16.0),
+                      Wrap(
+                        spacing: 8.0,
+                        children: [
+                          FilledButton.tonal(
+                            onPressed: () {
+                              showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return const SetGoalFragment();
+                                },
+                              );
+                            },
+                            child: const Text("Adjust goal"),
+                          ),
+                          FilledButton.tonal(
+                            onPressed: () {},
+                            child: const Text("Share"),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 16.0),
-                Wrap(
-                  spacing: 8.0,
+                Column(
                   children: [
-                    FilledButton.tonal(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          context: context,
-                          builder: (context) {
-                            return const SetGoalFragment();
-                          },
-                        );
+                    Consumer<StreakModel>(
+                      builder: (context, model, child) {
+                        return StreakCalender(streaks: model.weekStreaks);
                       },
-                      child: const Text("Adjust goal"),
                     ),
-                    FilledButton.tonal(
-                      onPressed: () {},
-                      child: const Text("Share"),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8.0),
-                Consumer<StreakModel>(
-                  builder: (context, model, child) {
-                    return StreakCalender(streaks: model.streaks);
-                  },
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        CupertinoIcons.gift_fill,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const Expanded(
-                      child: Text("My streak is 1 day"),
-                    ),
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        "All time record",
-                      ),
+                    Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            CupertinoIcons.gift_fill,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                        ),
+                        Expanded(
+                          child: Consumer<StreakModel>(
+                            builder: (context, model, child) {
+                              return Text("My streak is ${model.completedStreakDates.length} day");
+                            },
+                          ),
+                        ),
+                        // TextButton(
+                        //   onPressed: () {},
+                        //   child: const Text(
+                        //     "All time record",
+                        //   ),
+                        // ),
+                      ],
                     ),
                   ],
                 ),
