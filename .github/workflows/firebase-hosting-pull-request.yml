@@ -1,4 +1,4 @@
-name: CI
+name: Deploy to Firebase Hosting on PR
 on:
   pull_request:
     branches:
@@ -9,6 +9,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '3.10.6 '
+          channel: 'stable'
       - run: flutter build web
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:

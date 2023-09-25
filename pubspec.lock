@@ -172,9 +172,11 @@ packages:
   clean_calendar:
     dependency: "direct main"
     description:
-      path: "../../../code/workspace/dart/flutter_clean_calendar"
-      relative: true
-    source: path
+      path: "."
+      ref: "66f7434bea40581eefa670055f5c871b289b3042"
+      resolved-ref: "66f7434bea40581eefa670055f5c871b289b3042"
+      url: "https://github.com/oasisMystre/flutter_clean_calendar.git"
+    source: git
     version: "1.1.0"
   cli_util:
     dependency: transitive
@@ -275,10 +277,12 @@ packages:
   djira_client:
     dependency: "direct main"
     description:
-      path: "../../../code/workspace/dart/djira_client"
-      relative: true
-    source: path
-    version: "1.0.8"
+      path: "."
+      ref: "4ca1091947edb183bf8c4de38ebcad9dcb967e81"
+      resolved-ref: "4ca1091947edb183bf8c4de38ebcad9dcb967e81"
+      url: "https://github.com/oasisMystre/djira_client_dart.git"
+    source: git
+    version: "1.0.9"
   dots_indicator:
     dependency: "direct main"
     description:
