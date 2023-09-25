@@ -60,38 +60,32 @@ dependencies:
   flutter_facebook_auth: ^6.0.1
   flutter_svg: ^2.0.7
   in_app_purchase: ^3.1.10
-  # google_mobile_ads: ^3.0.0
-  # flutter_markdown: ^0.6.17+1
   horizontal_blocked_scroll_physics: ^4.0.1
   applovin_max: ^3.2.0
-  #djira_client: ^1.0.8
   djira_client:
-      path: ../../../code/workspace/dart/djira_client
+    git:
+      url: https://github.com/oasisMystre/djira_client_dart.git
+      ref: 4ca1091947edb183bf8c4de38ebcad9dcb967e81
   socket_io_client: ^2.0.3+1
   markdown_viewer: ^0.6.2
-  # flutter_prism: ^0.2.2
-  # like_button: ^2.0.5
   markdown_widget: ^2.2.0
   share_plus: ^7.1.0
-  # easy_rich_text: ^2.0.0
   rich_text_view: ^1.2.0
   loadmore: ^2.1.0
   flutter_social_textfield: ^0.1.2
   wechat_assets_picker: ^8.6.3
-  #firebase_messaging: ^14.6.7
   awesome_notifications_fcm: 0.7.4+1
   awesome_notifications: 0.7.4+1
   showcaseview: ^2.0.3
-  #flutter_flipperkit: ^0.0.29
   uuid: ^3.0.7
-  #mime: ^1.0.4
   http_parser: ^4.0.2
   flutter_highlight: ^0.7.0
   collection: ^1.17.1
   just_the_tooltip: ^0.0.12
-  # clean_calendar: ^1.1.0
   clean_calendar:
-    path: ../../../code/workspace/dart/flutter_clean_calendar
+    git:
+      url: https://github.com/oasisMystre/flutter_clean_calendar.git
+      ref: 66f7434bea40581eefa670055f5c871b289b3042
   dots_indicator: ^3.0.0
 
 dependency_overrides:
