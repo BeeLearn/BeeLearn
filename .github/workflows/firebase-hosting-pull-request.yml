@@ -12,7 +12,8 @@ jobs:
         with:
           flutter-version: '3.10.6 '
           channel: 'stable'
-      - run: flutter build web
+      - run: flutter pub get
+      - run: sh ./scripts/build-web.cmd
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
