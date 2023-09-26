@@ -1,3 +1,6 @@
+import io.sentry.android.gradle.extensions.InstrumentationFeature
+import io.sentry.android.gradle.instrumentation.logcat.LogcatLevel
+
 buildscript {
     ext.kotlin_version = '1.7.20'
     ext.gradle_version = '7.3.1'
@@ -13,6 +16,15 @@ buildscript {
         classpath "com.google.gms:google-services:$google_services_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
+}
+
+
+plugins {
+    id "io.sentry.android.gradle" version "3.12.0"
+}
+
+sentry {
+
 }
 
 allprojects {
@@ -33,3 +45,4 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+

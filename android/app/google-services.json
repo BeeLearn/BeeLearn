@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "555382338219-qep8h303lu78d3vmg2r9e8104dp66rqn.apps.googleusercontent.com",
+          "client_id": "555382338219-v1b5kt0403356inaohmarj3lh8ir76vl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.oasis.beelearn",
+            "certificate_hash": "156bdb372f37d448734825b4cda6af9a19171d38"
+          }
+        },
+        {
+          "client_id": "555382338219-9gmn3h7c6jggtf4v0lnk3pdg3t28dq31.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -27,8 +35,15 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "555382338219-qep8h303lu78d3vmg2r9e8104dp66rqn.apps.googleusercontent.com",
+              "client_id": "555382338219-9gmn3h7c6jggtf4v0lnk3pdg3t28dq31.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "555382338219-clu4s86ik7ed1n9o5rqsjanjcssq1rik.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.oasis.beelearn.beelearn"
+              }
             }
           ]
         }

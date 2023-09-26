@@ -35,7 +35,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
-  go_router: ^9.0.3
+  go_router: ^11.0.0
   google_fonts: ^5.1.0
   flutter_launcher_icons: ^0.13.1
   http: ^1.1.0
@@ -148,8 +148,7 @@ flutter_launcher_icons:
 
 
 sentry:
-  org: gong-africa
-  project: beelearn
+  org:
+  project:
   upload_source_maps: true
   upload_debug_symbols: true
-  auth_token: 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

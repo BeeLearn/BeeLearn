@@ -76,6 +76,13 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
     super.initState();
   }
 
+  @override
+  dispose(){
+    clickTimer?.cancel();
+
+    super.dispose();
+  }
+
   _updateButtonAppearance(bool update) {
     clickTimer?.cancel();
 

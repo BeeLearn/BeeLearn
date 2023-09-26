@@ -1,4 +1,3 @@
-import 'package:beelearn/views/onboarding_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +8,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'views/enhancement_view.dart';
 import 'views/main_view.dart';
 import 'views/module_view.dart';
+import 'views/onboarding_view.dart';
 import 'views/search_view.dart';
 import 'views/topic_view.dart';
 
@@ -44,13 +44,13 @@ GoRouter router = GoRouter(
             GoRoute(
               path: "topics",
               builder: (context, state) => TopicView(
-                query: state.queryParameters,
+                query: state.uri.queryParameters,
               ),
               routes: [
                 GoRoute(
                   path: ":topicId/enhancements",
                   builder: (context, state) => EnhancementView(
-                    topicId: state.pathParameters["topicId"] as int,
+                    topicId: state.uri.queryParameters["topicId"] as int,
                   ),
                 ),
               ],
@@ -59,20 +59,18 @@ GoRouter router = GoRouter(
               path: "modules",
               builder: (context, state) {
                 return ModuleView(
-                  courseName: state.queryParameters["courseName"],
-                  query: state.queryParameters,
+                  courseName: state.uri.queryParameters["courseName"],
+                  query: state.pathParameters,
                 );
               },
             ),
           ],
           redirect: (context, state) async {
-            if (FirebaseAuth.instance.currentUser == null) {
-              if (state.location.contains("onboarding")) return null;
+            String? redirectPath;
+            if (FirebaseAuth.instance.currentUser == null) redirectPath = "/onboarding";
+            if (redirectPath == state.path) return null;
 
-              return "/onboarding";
-            }
-
-            return null;
+            return redirectPath;
           },
         ),
       ],
