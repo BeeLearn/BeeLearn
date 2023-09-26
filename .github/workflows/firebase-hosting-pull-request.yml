@@ -18,5 +18,6 @@ jobs:
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_BEE_LEARN }}'
+          expires: 7d
           channelId: preview
           projectId: bee-learn
