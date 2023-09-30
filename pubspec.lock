@@ -621,9 +621,11 @@ packages:
   flutterwave_standard:
     dependency: "direct main"
     description:
-      path: "../../../code/workspace/dart/Flutter-v3"
-      relative: true
-    source: path
+      path: "."
+      ref: "2a75a56a6f4f0a94274aeb1e7686d12082190ede"
+      resolved-ref: "2a75a56a6f4f0a94274aeb1e7686d12082190ede"
+      url: "https://github.com/oasisMystre/Flutter-v3.git"
+    source: git
     version: "1.0.7"
   form_validator:
     dependency: "direct main"

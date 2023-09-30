@@ -89,7 +89,9 @@ dependencies:
   firebase_remote_config: ^4.2.6
   firebase_analytics: ^10.5.0
   flutterwave_standard:
-    path: ../../../code/workspace/dart/Flutter-v3
+    git:
+      url: https://github.com/oasisMystre/Flutter-v3.git
+      ref: 2a75a56a6f4f0a94274aeb1e7686d12082190ede
   url_launcher: ^6.1.14
   money_converter: ^2.0.2
 
