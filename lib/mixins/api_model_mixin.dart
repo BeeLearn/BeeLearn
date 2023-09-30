@@ -66,12 +66,13 @@ mixin ApiModelMixin {
 
   /// Retrieve
   Future<T> create<T>({
+    String? url,
     Map<String, dynamic>? query,
     required Map<String, dynamic> body,
     required T Function(Map<String, dynamic> json) fromJson,
   }) async {
     final response = await post(
-      Uri.parse(apiUrl).replace(queryParameters: query),
+      Uri.parse(url ?? apiUrl).replace(queryParameters: query),
       headers: headers,
       body: jsonEncode(body),
     );
@@ -106,22 +107,24 @@ mixin ApiModelMixin {
   }
 
   /// Retrieve
-  Future<T> remove<T>({
-    required int id,
+  Future<T?> remove<T>({
+    required dynamic path,
     Map<String, dynamic>? query,
-    required T Function(Map<String, dynamic> json) fromJson,
+    T Function(Map<String, dynamic> json)? fromJson,
   }) async {
     final response = await delete(
-      Uri.parse(getDetailedPath(id)).replace(queryParameters: query),
+      Uri.parse(getDetailedPath(path)).replace(queryParameters: query),
       headers: headers,
     );
 
     switch (response.statusCode) {
       case HttpStatus.ok:
-        return fromJson(jsonDecode(response.body));
+        if (fromJson != null) return fromJson(jsonDecode(response.body));
       default:
         return Future.error(response);
     }
+
+    return null;
   }
 
   Future<T> multipartRequest<T>({

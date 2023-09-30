@@ -87,17 +87,21 @@ class SettingsView extends StatelessWidget {
                       child: Row(
                         children: [
                           Expanded(
-                            child: Text.rich(
-                              const TextSpan(
-                                children: [
-                                  TextSpan(text: "You're not "),
+                            child: Consumer<UserModel>(
+                              builder: (context, model, child) {
+                                return Text.rich(
                                   TextSpan(
-                                    text: "Premium",
-                                    style: TextStyle(fontWeight: FontWeight.w900),
+                                    children: [
+                                      TextSpan(text: model.value.isPremium ? "You're " : "You're not"),
+                                      const TextSpan(
+                                        text: "Premium",
+                                        style: TextStyle(fontWeight: FontWeight.w900),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              style: Theme.of(context).textTheme.titleLarge?.copyWith(),
+                                  style: Theme.of(context).textTheme.titleLarge?.copyWith(),
+                                );
+                              },
                             ),
                           ),
                           Container(

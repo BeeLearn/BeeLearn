@@ -50,7 +50,7 @@ class User {
   final String lastName;
 
   @JsonKey(required: true, name: "is_premium")
-  final bool isPremium;
+  bool isPremium;
 
   @JsonKey(includeToJson: false, includeFromJson: false)
   String get tagUsername => "@$username";

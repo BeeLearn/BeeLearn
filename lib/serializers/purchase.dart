@@ -5,15 +5,22 @@ import 'product.dart';
 part 'purchase.g.dart';
 
 enum PurchaseStatus {
+  @JsonValue("FAILED")
   failed,
+  @JsonValue("PENDING")
   pending,
+  @JsonValue("UNKNOWN")
+  unknown,
+  @JsonValue("CANCELED")
+  canceled,
+  @JsonValue("SUCCESSFUL")
   successful,
 }
 
 @JsonSerializable()
 class Purchase {
   @JsonKey(required: true)
-  final int id;
+  final String id;
 
   @JsonKey(required: true)
   final Product product;
@@ -21,8 +28,8 @@ class Purchase {
   @JsonKey(required: true)
   final PurchaseStatus status;
 
-  @JsonKey(required: true)
-  final Map<String, dynamic> metadata;
+  @JsonKey(required: true, includeIfNull: false)
+  final Map<String, dynamic>? metadata;
 
   @JsonKey(required: true, name: "created_at")
   final DateTime createdAt;

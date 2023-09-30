@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -8,17 +9,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:in_app_purchase/in_app_purchase.dart' hide PurchaseStatus;
+import 'package:in_app_purchase/in_app_purchase.dart' as in_app_purchase show PurchaseStatus;
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-import '../../controllers/notification_controller.dart';
+import '../../controllers/controllers.dart';
 import '../../globals.dart';
 import '../../main_application.dart';
 import '../../middlewares/api_middleware.dart';
 import '../../middlewares/widget_middleware.dart';
 import '../../mixins/initialization_state_mixin.dart';
-import '../../models/user_model.dart';
+import '../../models/models.dart';
+import '../../serializers/purchase.dart';
 import '../app_theme.dart';
 
 /// Application state wrapper for authentication, middlewares and more
@@ -32,6 +35,7 @@ class ApplicationFragment extends StatefulWidget {
 
 class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with InitializationStateMixin<T> {
   late final UserModel _userModel;
+  late final ProductModel _productModel;
   late final StreamSubscription<User?> _authStateChangeListener;
 
   StreamSubscription<List<PurchaseDetails>>? _purchaseUpdateListener;
@@ -57,6 +61,11 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
       listen: false,
     );
 
+    _productModel = Provider.of<ProductModel>(
+      context,
+      listen: false,
+    );
+
     _authStateChangeListener = FirebaseAuth.instance.authStateChanges().listen(
       (user) async {
         await _userModel.setFirebaseUser(user);
@@ -68,26 +77,45 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
         );
       },
     );
-
-    if (!kIsWeb && Platform.isAndroid && Platform.isIOS) {
+    if (!kIsWeb && Platform.isAndroid || Platform.isIOS) {
       _purchaseUpdateListener = InAppPurchase.instance.purchaseStream.listen(
-        (purchaseDetailsList) {
+        (purchaseDetailsList) async {
           for (final purchaseDetails in purchaseDetailsList) {
-            switch (purchaseDetails.status) {
-              case PurchaseStatus.pending:
+            if ([
+              in_app_purchase.PurchaseStatus.purchased,
+              in_app_purchase.PurchaseStatus.restored,
+            ].contains(purchaseDetails.status)) {
+              try {
+                final purchase = await purchaseController.verifyPurchase(
+                  {
+                    "type": "consumable",
+                    "source": purchaseDetails.verificationData.source,
+                    "token": purchaseDetails.verificationData.serverVerificationData,
+                    "product": {
+                      "productId": purchaseDetails.productID,
+                      "purchaseId": purchaseDetails.purchaseID!,
+                    },
+                  },
+                );
 
-                /// Todo update purchase status as pending
-                break;
-              case PurchaseStatus.purchased:
-              case PurchaseStatus.restored:
+                InAppPurchase.instance.completePurchase(purchaseDetails);
 
-                /// Todo add user as entitled when purchase is verified
-                break;
-              case PurchaseStatus.canceled:
-              case PurchaseStatus.error:
-
-                /// Todo remove user as entitled when purchase is cancelled or has an error
-                break;
+                /// If realtime notification on called before this
+                /// user will have to close and reopen app
+                /// Todo Token is not returned
+                /// Todo maybe just verify regardless if realtime notification is called
+                if (purchase.status == PurchaseStatus.successful) {
+                  final user = _userModel.value;
+                  user.isPremium = true;
+                  _userModel.value = user;
+                }
+              } catch (error, stackTrace) {
+                log(
+                  "Response error",
+                  error: error,
+                  stackTrace: stackTrace,
+                );
+              }
             }
           }
         },

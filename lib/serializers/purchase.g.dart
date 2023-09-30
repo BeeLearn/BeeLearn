@@ -19,26 +19,38 @@ Purchase _$PurchaseFromJson(Map<String, dynamic> json) {
     ],
   );
   return Purchase(
-    id: json['id'] as int,
+    id: json['id'] as String,
     product: Product.fromJson(json['product'] as Map<String, dynamic>),
     status: $enumDecode(_$PurchaseStatusEnumMap, json['status']),
-    metadata: json['metadata'] as Map<String, dynamic>,
+    metadata: json['metadata'] as Map<String, dynamic>?,
     createdAt: DateTime.parse(json['created_at'] as String),
     updatedAt: DateTime.parse(json['updated_at'] as String),
   );
 }
 
-Map<String, dynamic> _$PurchaseToJson(Purchase instance) => <String, dynamic>{
-      'id': instance.id,
-      'product': instance.product,
-      'status': _$PurchaseStatusEnumMap[instance.status]!,
-      'metadata': instance.metadata,
-      'created_at': instance.createdAt.toIso8601String(),
-      'updated_at': instance.updatedAt.toIso8601String(),
-    };
+Map<String, dynamic> _$PurchaseToJson(Purchase instance) {
+  final val = <String, dynamic>{
+    'id': instance.id,
+    'product': instance.product,
+    'status': _$PurchaseStatusEnumMap[instance.status]!,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('metadata', instance.metadata);
+  val['created_at'] = instance.createdAt.toIso8601String();
+  val['updated_at'] = instance.updatedAt.toIso8601String();
+  return val;
+}
 
 const _$PurchaseStatusEnumMap = {
-  PurchaseStatus.failed: 'failed',
-  PurchaseStatus.pending: 'pending',
-  PurchaseStatus.successful: 'successful',
+  PurchaseStatus.failed: 'FAILED',
+  PurchaseStatus.pending: 'PENDING',
+  PurchaseStatus.unknown: 'UNKNOWN',
+  PurchaseStatus.canceled: 'CANCELED',
+  PurchaseStatus.successful: 'SUCCESSFUL',
 };

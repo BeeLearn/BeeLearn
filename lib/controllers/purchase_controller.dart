@@ -2,7 +2,15 @@ import '../mixins/api_model_mixin.dart';
 import '../serializers/paginate.dart';
 import '../serializers/purchase.dart';
 
-class PurchaseController with ApiModelMixin {
+class _PaymentLinkResponse {
+  final String link;
+
+  const _PaymentLinkResponse(this.link);
+
+  factory _PaymentLinkResponse.fromJson(Map<String, dynamic> json) => _PaymentLinkResponse(json["json"]);
+}
+
+class _PurchaseController with ApiModelMixin {
   @override
   String get basePath => "api/payment/purchases";
 
@@ -29,7 +37,7 @@ class PurchaseController with ApiModelMixin {
   }
 
   Future<Purchase> updatePurchase({
-    required int id,
+    required String id,
     Map<String, dynamic>? query,
     required Map<String, dynamic>? body,
   }) {
@@ -40,4 +48,33 @@ class PurchaseController with ApiModelMixin {
       fromJson: Purchase.fromJson,
     );
   }
+
+  Future<void> deletePurchase({
+    required dynamic id,
+    Map<String, dynamic>? query,
+  }) async {
+    return super.remove(path: id, query: query);
+  }
+
+  /// Create payment link to redirect user
+  Future<_PaymentLinkResponse> createPaymentLink(Map<String, dynamic> body) {
+    return super.create(
+      url: getDetailedPath("create-payment-link"),
+      body: body,
+      fromJson: _PaymentLinkResponse.fromJson,
+    );
+  }
+
+  /// Verify in-app purchase, throws NotFound, NotAcceptable exception
+  /// [Response] NotFound: If purchase data can't be gotten
+  /// [Response] NotAcceptable: If purchase source is not implemented
+  Future<Purchase> verifyPurchase(Map<String, dynamic> body) {
+    return create(
+      body: body,
+      url: getDetailedPath("verify"),
+      fromJson: Purchase.fromJson,
+    );
+  }
 }
+
+final purchaseController = _PurchaseController();

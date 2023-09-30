@@ -15,6 +15,7 @@ class _ProductController with ApiModelMixin {
       fromJson: (Map<String, dynamic> json) => Paginate.fromJson(json, Product.fromJson),
     );
   }
+
 }
 
 final productController = _ProductController();

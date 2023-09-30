@@ -44,6 +44,7 @@ class _ProfileTabViewState extends State<ProfileTabView> {
               IconButton(
                 onPressed: () => showDialog(
                   context: context,
+                  useSafeArea: false,
                   builder: (context) => const SettingsView(),
                 ),
                 icon: const Icon(Icons.settings_outlined),

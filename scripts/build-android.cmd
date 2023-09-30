@@ -1,3 +1,0 @@
-flutter build apk --obfuscate --split-per-abi --split-debug-info=debug/info --extra-gen-snapshot-options=--save-obfuscation-map=debug/obfuscation
-sentry-cli debug-files upload debug/ --org=gong-africa --project=beelearn --auth-token=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
-sentry-cli upload-proguard debug/obfuscation --org=gong-africa --project=beelearn --auth-token=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

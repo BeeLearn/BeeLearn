@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:beelearn/constants/constants.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ class _ApplicationViewState extends State<ApplicationView> {
         "APP_LOVIN_REWARD_ADS": "",
         "APP_LOVIN_INTERSTITIAL_ADS": "",
         "APP_LOVIN_NATIVE_ADS": "",
+        "FLUTTER_PUBLIC_KEY": flutterPublicKey,
       },
     );
 

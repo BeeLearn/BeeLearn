@@ -46,6 +46,8 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
 
   Widget _getBody(BuildContext context) {
     return LoaderOverlay(
+      overlayOpacity: 0,
+      overlayColor: Colors.black45,
       child: Consumer<UserModel>(
         builder: (context, model, child) {
           return Form(

@@ -88,9 +88,14 @@ dependencies:
   dots_indicator: ^3.0.0
   firebase_remote_config: ^4.2.6
   firebase_analytics: ^10.5.0
+  flutterwave_standard:
+    path: ../../../code/workspace/dart/Flutter-v3
+  url_launcher: ^6.1.14
+  money_converter: ^2.0.2
 
 dependency_overrides:
-    intl: ^0.18.0
+    intl: ^0.18.1
+    http: ^1.1.0
 
 dev_dependencies:
   flutter_test:
@@ -151,7 +156,5 @@ flutter_launcher_icons:
 
 
 sentry:
-  org:
-  project:
   upload_source_maps: true
   upload_debug_symbols: true

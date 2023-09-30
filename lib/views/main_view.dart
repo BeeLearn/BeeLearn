@@ -48,7 +48,7 @@ class _MainViewState extends State<MainView> {
     );
 
     /// Lazy Load this
-    initialize().catchError(
+    initialize().onError(
       (error, stackError) {
         log("lazy error", error: error, stackTrace: stackError);
       },
@@ -78,10 +78,10 @@ class _MainViewState extends State<MainView> {
     if (!kIsWeb && Platform.isIOS && Platform.isAndroid) {
       subscriptionQuery["skid__isnull"] = false;
     }
-
     final products = await productController.listProducts(
       query: subscriptionQuery,
     );
+
     _productModel.setAll(products.results);
   }
 
