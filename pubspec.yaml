@@ -36,7 +36,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   go_router: ^11.0.0
-  google_fonts: ^5.1.0
+  google_fonts: ^6.1.0
   flutter_launcher_icons: ^0.13.1
   http: ^1.1.0
   provider: ^6.0.5
@@ -73,8 +73,8 @@ dependencies:
   loadmore: ^2.1.0
   flutter_social_textfield: ^0.1.2
   wechat_assets_picker: ^8.6.3
-  awesome_notifications_fcm: 0.7.4+1
-  awesome_notifications: 0.7.4+1
+  awesome_notifications_fcm: ^0.7.6
+  awesome_notifications: ^0.7.7
   showcaseview: ^2.0.3
   uuid: ^3.0.7
   http_parser: ^4.0.2
