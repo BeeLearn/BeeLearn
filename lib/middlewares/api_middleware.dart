@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:djira_client/djira_client.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,14 +7,9 @@ import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
 import '../main_application.dart';
-import '../models/course_model.dart';
-import '../models/reward_model.dart';
-import '../models/streak_model.dart';
-import '../models/user_model.dart';
-import '../serializers/course.dart';
-import '../serializers/profile.dart';
-import '../serializers/reward.dart';
-import '../serializers/streak.dart';
+import '../models/models.dart';
+import '../serializers/serializers.dart';
+import '../serializers/serializers.dart' as serializer;
 import '../socket_client.dart';
 
 void showSnackBar({
@@ -44,14 +41,39 @@ void showSnackBar({
   );
 }
 
+class _NotificationResponse {
+  final int unread;
+  final serializer.Notification notification;
+
+  const _NotificationResponse({
+    required this.unread,
+    required this.notification,
+  });
+
+  factory _NotificationResponse.fromJson(Map<String, dynamic> json) => _NotificationResponse(
+        unread: json["unread"] as int,
+        notification: serializer.Notification.fromJson(json["notification"] as Map<String, dynamic>),
+      );
+}
+
 class ApiMiddleware {
+  static void _onError(Response response) {
+    log(
+      "Socket API error",
+      error: {
+        "requestId": response.requestId,
+        "data": response.data,
+      },
+    );
+  }
+
   static void run(BuildContext context) {
     createClient(MainApplication.accessToken);
 
     client?.socket.onConnect((data) async {
       client?.subscribe(
         namespace: "courses",
-        onError: (response) {},
+        onError: _onError,
         onSuccess: (response) {
           final course = Course.fromJson(response.data);
           final inProgressCourseModel = Provider.of<InProgressCourseModel>(
@@ -74,7 +96,7 @@ class ApiMiddleware {
 
       client?.subscribe(
         namespace: "favourites",
-        onError: (response) {},
+        onError: _onError,
         onSuccess: (response) {
           final course = Course.fromJson(response.data);
           final favouriteCourseModel = Provider.of<FavouriteCourseModel>(
@@ -92,7 +114,7 @@ class ApiMiddleware {
 
       client?.subscribe(
         namespace: "rewards",
-        onError: (response) {},
+        onError: _onError,
         onSuccess: (response) {
           final reward = Reward.fromJson(response.data);
 
@@ -110,7 +132,7 @@ class ApiMiddleware {
 
       client?.subscribe(
         namespace: "streaks",
-        onError: (response) {},
+        onError: _onError,
         onSuccess: (response) {
           final streak = Streak.fromJson(response.data);
           Provider.of<StreakModel>(
@@ -136,7 +158,7 @@ class ApiMiddleware {
 
       client?.subscribe(
         namespace: "profiles",
-        onError: (response) {},
+        onError: _onError,
         onSuccess: (response) {
           final userModel = Provider.of<UserModel>(
             context,
@@ -146,6 +168,40 @@ class ApiMiddleware {
           user.profile = Profile.fromJson(response.data);
 
           userModel.value = user;
+        },
+      );
+
+      client?.subscribe(
+        namespace: "notifications",
+        onError: _onError,
+        onSuccess: (response) {
+          NotificationModel notificationModel = Provider.of<NotificationModel>(
+            context,
+            listen: false,
+          );
+
+          UserModel userModel = Provider.of<UserModel>(
+            context,
+            listen: false,
+          );
+
+          _NotificationResponse data = _NotificationResponse.fromJson(response.data);
+
+          User user = userModel.value;
+          user.unreadNotifications = data.unread;
+          userModel.value = user;
+
+          switch (response.type!) {
+            case Type.created:
+              notificationModel.setOne(data.notification);
+              break;
+            case Type.updated:
+              notificationModel.updateOrAddOne(data.notification);
+              break;
+            case Type.removed:
+              notificationModel.removeOne(data.notification);
+              break;
+          }
         },
       );
     });

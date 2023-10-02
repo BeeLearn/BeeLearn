@@ -33,8 +33,9 @@ apply plugin: 'com.google.gms.google-services'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    namespace "com.oasis.beelearn.beelearn"
-    compileSdkVersion flutter.compileSdkVersion
+    namespace "com.oasis.beelearn"
+    // compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 34
     ndkVersion flutter.ndkVersion
 
     compileOptions {

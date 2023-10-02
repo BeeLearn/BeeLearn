@@ -52,6 +52,9 @@ class User {
   @JsonKey(required: true, name: "is_premium")
   bool isPremium;
 
+  @JsonKey(required: true, name: "unread_notifications")
+  int unreadNotifications;
+
   @JsonKey(includeToJson: false, includeFromJson: false)
   String get tagUsername => "@$username";
 
@@ -70,6 +73,7 @@ class User {
     required this.firstName,
     required this.lastName,
     required this.isPremium,
+    required this.unreadNotifications,
   });
 
   /// Update current daily streak spent seconds

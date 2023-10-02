@@ -32,6 +32,7 @@ class _ApplicationViewState extends State<ApplicationView> {
         "APP_LOVIN_INTERSTITIAL_ADS": "",
         "APP_LOVIN_NATIVE_ADS": "",
         "FLUTTER_PUBLIC_KEY": flutterPublicKey,
+        "PAYSTACK_PUBLIC_KEY": paystackPublicKey,
       },
     );
 
@@ -65,6 +66,7 @@ class _ApplicationViewState extends State<ApplicationView> {
         ChangeNotifierProvider(create: (context) => FavouriteCourseModel()),
         ChangeNotifierProvider(create: (context) => PurchaseModel()),
         ChangeNotifierProvider(create: (context) => ProductModel()),
+        ChangeNotifierProvider(create: (context) => NotificationModel()),
       ],
       child: MaterialApp(
         theme: AppTheme.dark,

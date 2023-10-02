@@ -1,3 +1,4 @@
+import 'package:beelearn/views/notification_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,6 +38,10 @@ GoRouter router = GoRouter(
           path: '/',
           builder: (context, state) => const MainView(),
           routes: [
+            GoRoute(
+              path: "notifications",
+              builder: (context, state) => const NotificationView(),
+            ),
             GoRoute(
               path: "search",
               builder: (context, state) => const SearchView(),

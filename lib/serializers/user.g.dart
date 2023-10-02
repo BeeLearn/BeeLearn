@@ -17,7 +17,8 @@ User _$UserFromJson(Map<String, dynamic> json) {
       'avatar',
       'first_name',
       'last_name',
-      'is_premium'
+      'is_premium',
+      'unread_notifications'
     ],
   );
   return User(
@@ -38,6 +39,7 @@ User _$UserFromJson(Map<String, dynamic> json) {
     firstName: json['first_name'] as String,
     lastName: json['last_name'] as String,
     isPremium: json['is_premium'] as bool,
+    unreadNotifications: json['unread_notifications'] as int,
   );
 }
 
@@ -53,6 +55,7 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'first_name': instance.firstName,
       'last_name': instance.lastName,
       'is_premium': instance.isPremium,
+      'unread_notifications': instance.unreadNotifications,
     };
 
 const _$UserTypeEnumMap = {

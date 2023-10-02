@@ -92,7 +92,7 @@ class SettingsView extends StatelessWidget {
                                 return Text.rich(
                                   TextSpan(
                                     children: [
-                                      TextSpan(text: model.value.isPremium ? "You're " : "You're not"),
+                                      TextSpan(text: model.value.isPremium ? "You're " : "You're not "),
                                       const TextSpan(
                                         text: "Premium",
                                         style: TextStyle(fontWeight: FontWeight.w900),

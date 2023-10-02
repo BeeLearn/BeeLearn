@@ -1,32 +1,37 @@
 import 'dart:io';
 
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutterwave_standard/core/flutterwave.dart';
+import 'package:flutter_paystack_payment/flutter_paystack_payment.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../main_application.dart';
 import '../controllers/controllers.dart';
+import '../main_application.dart';
 import '../models/models.dart';
 import '../serializers/serializers.dart';
 
 class PurchaseService {
-  late bool isInAppPurchaseAvailable;
+  bool? isInAppPurchaseAvailable;
   static PurchaseService? _instance;
+  static final PaystackPayment _paystackPayment = PaystackPayment();
 
   /// Does platform support inAppPurchase
   bool get isInAppPurchaseEnabled => !kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
 
   /// Is InApp Purchase supported for this application
-  bool get isInAppPurchaseSupported => isInAppPurchaseEnabled && isInAppPurchaseAvailable;
+  bool get isInAppPurchaseSupported => !isInAppPurchaseEnabled && isInAppPurchaseAvailable!;
 
   /// Purchase service singleton instance
   static PurchaseService get instance => _instance ??= PurchaseService._();
 
   PurchaseService._() {
     _initialize();
+    _paystackPayment.initialize(
+      publicKey: FirebaseRemoteConfig.instance.getString("PAYSTACK_PUBLIC_KEY"),
+    );
   }
 
   Future<void> _initialize() async {
@@ -79,34 +84,43 @@ class PurchaseService {
       context,
       listen: false,
     );
+
     final txRef = const Uuid().v4();
-    final paymentLinkResponse = purchaseController.createPaymentLink(
+    final paymentLinkResponse = purchaseController.createPaymentLink<PaystackPaymentLink>(
       {
-        "tx_ref": txRef,
+        "reference": txRef,
+        "source": "paystack",
         "amount": product.amount,
-        "currency": product.currency,
-        "redirect_url": "${MainApplication.baseURL}/payment/verify/",
-        "customer": {"email": userModel.value.email},
-        "customization": {
-          "title": "BeeLearn",
-          "logo": MainApplication.appNetworkLogo,
-          "description": "Subscribe to BeeLearn Premium Membership Plan",
-        }
+        "email": userModel.value.email,
       },
     );
+    _paystackPayment.initialize(publicKey: FirebaseRemoteConfig.instance.getString("PAYSTACK_PUBLIC_KEY"));
 
-    final chargeResponse = await Flutterwave.fromPaymentLink(
-      context: context,
-      txRef: txRef,
-      link: (await paymentLinkResponse).link,
+    final chargeResponse = await _paystackPayment.checkout(
+      context,
+      scanCard: !kIsWeb && (Platform.isIOS || Platform.isAndroid),
+      logo: ClipRRect(
+        borderRadius: BorderRadius.circular(100.0),
+        child: Image.network(
+          MainApplication.appNetworkLogo,
+          width: 32,
+          height: 32,
+        ),
+      ),
+      charge: Charge()
+        ..amount = int.parse(product.amount)
+        ..email = userModel.value.email
+        ..accessCode = (await paymentLinkResponse).data.accessCode
+        ..reference = (await paymentLinkResponse).data.reference,
     );
 
-    await purchaseController.createPurchase(
-      body: {
-        "product": product.id,
-        "reference": chargeResponse.txRef,
-        "status": chargeResponse.status ?? "PENDING",
-      },
-    );
+    if (chargeResponse.status) {
+      await purchaseController.createPurchase(
+        body: {
+          "id": txRef,
+          "product": product.id,
+        },
+      );
+    }
   }
 }

@@ -35,7 +35,6 @@ class ApplicationFragment extends StatefulWidget {
 
 class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with InitializationStateMixin<T> {
   late final UserModel _userModel;
-  late final ProductModel _productModel;
   late final StreamSubscription<User?> _authStateChangeListener;
 
   StreamSubscription<List<PurchaseDetails>>? _purchaseUpdateListener;
@@ -57,11 +56,6 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
   @override
   Future<void> initialize() async {
     _userModel = Provider.of<UserModel>(
-      context,
-      listen: false,
-    );
-
-    _productModel = Provider.of<ProductModel>(
       context,
       listen: false,
     );

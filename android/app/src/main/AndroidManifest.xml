@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <queries>
         <provider android:authorities="com.facebook.katana.provider.PlatformProvider" />
@@ -49,10 +50,13 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
                     android:host="bee-learn.web.app"
+                    android:scheme="http"/>  <data
+                    android:host="academy.usebeelearn.com"
                     android:scheme="http"/>
                 <data android:scheme="https" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />

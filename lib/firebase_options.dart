@@ -70,6 +70,6 @@ class DefaultFirebaseOptions {
     projectId: 'bee-learn',
     storageBucket: 'bee-learn.appspot.com',
     iosClientId: '555382338219-clu4s86ik7ed1n9o5rqsjanjcssq1rik.apps.googleusercontent.com',
-    iosBundleId: 'com.oasis.beelearn.beelearn',
+    iosBundleId: 'com.oasis.beelearn',
   );
 }

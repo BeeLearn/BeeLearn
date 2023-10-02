@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
 
 import '../globals.dart';
@@ -102,10 +103,18 @@ class _SettingsPremiumView extends State<SettingsPremiumView> {
                                                 child: FilledButton(
                                                   onPressed: model.value.isPremium
                                                       ? null
-                                                      : () => PurchaseService.instance.subscription(
-                                                            context,
-                                                            snapshot.requireData,
-                                                          ),
+                                                      : () {
+                                                          if (!context.loaderOverlay.visible) {
+                                                            context.loaderOverlay.show();
+
+                                                            PurchaseService.instance
+                                                                .subscription(
+                                                                  context,
+                                                                  snapshot.requireData,
+                                                                )
+                                                                .whenComplete(() => context.loaderOverlay.hide());
+                                                          }
+                                                        },
                                                   style: FilledButton.styleFrom(
                                                     shape: RoundedRectangleBorder(
                                                       borderRadius: BorderRadius.circular(4.0),
@@ -168,9 +177,12 @@ class _SettingsPremiumView extends State<SettingsPremiumView> {
 
   @override
   Widget build(BuildContext context) {
-    return DialogFragment(
-      alignment: Alignment.center,
-      builder: _getBody,
+    return LoaderOverlay(
+      overlayColor: Colors.black45,
+      child: DialogFragment(
+        alignment: Alignment.center,
+        builder: _getBody,
+      ),
     );
   }
 }

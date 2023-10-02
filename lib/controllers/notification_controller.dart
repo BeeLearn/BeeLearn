@@ -112,6 +112,10 @@ class NotificationController with ApiModelMixin {
       fromJson: Notification.fromJson,
     );
   }
+
+  Future<void> deleteNotification({required int id}) {
+    return super.remove(path: id);
+  }
 }
 
 final notificationController = NotificationController();

@@ -2,6 +2,19 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'notification.g.dart';
 
+enum NotificationTopic {
+  @JsonValue("ADS")
+  ads,
+  @JsonValue("REWARD")
+  reward,
+  @JsonValue("STREAK")
+  streak,
+  @JsonValue("COMMENT")
+  comment,
+  @JsonValue("GENERAL")
+  general,
+}
+
 @JsonSerializable()
 class Notification {
   @JsonKey(required: true)
@@ -10,35 +23,46 @@ class Notification {
   @JsonKey(
     required: true,
     includeIfNull: true,
-    name: "small_image",
   )
-  final String? smallImage;
+  final String? icon;
 
   @JsonKey(required: true)
-  final String content;
+  final NotificationTopic topic;
+
+  @JsonKey(required: true)
+  final String image;
+
+  @JsonKey(required: true)
+  final String title;
+
+  @JsonKey(required: true)
+  final String body;
 
   @JsonKey(
     required: true,
     includeIfNull: true,
-    name: "intent_to",
+    name: "is_read",
   )
-  final String? intentTo;
-
-  @JsonKey(required: true, includeIfNull: true, name: "is_read")
   final bool isRead;
 
-  @JsonKey(required: true)
+  @JsonKey(required: true, includeIfNull: true)
+  final Map<String, dynamic>? metadata;
+
+  @JsonKey(required: true, name: "created_at")
   final DateTime createdAt;
 
-  @JsonKey(required: true)
+  @JsonKey(required: true, name: "updated_at")
   final DateTime updatedAt;
 
   const Notification({
     required this.id,
-    required this.smallImage,
-    required this.content,
-    required this.intentTo,
+    required this.image,
+    required this.icon,
+    required this.topic,
+    required this.title,
+    required this.body,
     required this.isRead,
+    required this.metadata,
     required this.createdAt,
     required this.updatedAt,
   });

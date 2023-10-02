@@ -1,6 +1,4 @@
-import 'package:beelearn/main_application.dart';
-import 'package:beelearn/views/streak_view.dart';
-import 'package:beelearn/views/user_lifeline_view.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -8,9 +6,11 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:showcaseview/showcaseview.dart';
 
-import '../../models/course_model.dart';
-import '../../models/user_model.dart';
+import '../../main_application.dart';
+import '../../models/models.dart';
 import '../components/pill_chip.dart';
+import '../streak_view.dart';
+import '../user_lifeline_view.dart';
 import 'category_single_tab.dart';
 import 'category_tab.dart';
 
@@ -54,9 +54,9 @@ class _CategoryTabView extends State<CategoryTabView> {
             Consumer<UserModel>(
               builder: (context, model, child) {
                 return SliverAppBar(
-                  floating: true,
-                  pinned: true,
                   snap: true,
+                  pinned: true,
+                  floating: true,
                   title: GestureDetector(
                     onTap: () => context.go("/search"),
                     child: const AbsorbPointer(
@@ -121,8 +121,16 @@ class _CategoryTabView extends State<CategoryTabView> {
                       title: "Notifications",
                       description: "View all your notifications and alerts here",
                       child: IconButton(
-                        onPressed: () {},
-                        icon: const Icon(Icons.notifications_none),
+                        onPressed: () => context.go("/notifications"),
+                        icon: badges.Badge(
+                          badgeContent: Selector<UserModel, int>(
+                            selector: (context, model) => model.value.unreadNotifications,
+                            builder: (context, value, child) {
+                              return Text("$value");
+                            },
+                          ),
+                          child: const Icon(Icons.notifications_none),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8.0),
@@ -132,10 +140,9 @@ class _CategoryTabView extends State<CategoryTabView> {
             ),
           ];
         },
-        body: Consumer<UserModel>(
-          builder: (context, model, child) {
-            final user = model.value;
-
+        body: Selector<UserModel, int>(
+          selector: (context, model) => model.value.id,
+          builder: (context, userId, child) {
             return TabBarView(
               children: [
                 const CategoryTab(),
@@ -178,8 +185,8 @@ class _CategoryTabView extends State<CategoryTabView> {
                 CategorySingleTab<InProgressCourseModel>(
                   initState: () async {
                     CourseModel.getCourses(query: {
-                      "course_enrolled_users": "${user.id}",
-                      "course_complete_users!": "${user.id}",
+                      "course_enrolled_users": "$userId",
+                      "course_complete_users!": "$userId",
                     }).then(
                       (courses) {
                         final inProgressCourseModel = Provider.of<InProgressCourseModel>(
@@ -217,7 +224,7 @@ class _CategoryTabView extends State<CategoryTabView> {
                 CategorySingleTab<CompletedCourseModel>(
                   initState: () async {
                     CourseModel.getCourses(query: {
-                      "course_complete_users": "${user.id}",
+                      "course_complete_users": "$userId",
                     }).then(
                       (courses) {
                         final completedCourseModel = Provider.of<CompletedCourseModel>(

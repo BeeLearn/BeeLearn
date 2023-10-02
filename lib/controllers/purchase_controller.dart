@@ -1,14 +1,5 @@
 import '../mixins/api_model_mixin.dart';
-import '../serializers/paginate.dart';
-import '../serializers/purchase.dart';
-
-class _PaymentLinkResponse {
-  final String link;
-
-  const _PaymentLinkResponse(this.link);
-
-  factory _PaymentLinkResponse.fromJson(Map<String, dynamic> json) => _PaymentLinkResponse(json["json"]);
-}
+import '../serializers/serializers.dart';
 
 class _PurchaseController with ApiModelMixin {
   @override
@@ -57,11 +48,11 @@ class _PurchaseController with ApiModelMixin {
   }
 
   /// Create payment link to redirect user
-  Future<_PaymentLinkResponse> createPaymentLink(Map<String, dynamic> body) {
+  Future<PaymentLink<T>> createPaymentLink<T>(Map<String, dynamic> body) {
     return super.create(
       url: getDetailedPath("create-payment-link"),
       body: body,
-      fromJson: _PaymentLinkResponse.fromJson,
+      fromJson: PaymentLink.fromJson,
     );
   }
 

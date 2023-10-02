@@ -14,5 +14,5 @@ class MainApplication {
 
   static final GlobalKey<ScaffoldMessengerState> scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 
-  static const String appNetworkLogo = "https://academy.usebeelearn.com/icons/icon-512.png";
+  static const String appNetworkLogo = "https://academy.usebeelearn.com/icons/Icon-192.png";
 }
