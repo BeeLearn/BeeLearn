@@ -2,12 +2,11 @@ import '../models/base_model.dart';
 import '../serializers/notification.dart';
 
 class NotificationModel extends BaseModel<Notification> {
-  int? _unread;
+  String? _next;
 
-  int get unread => _unread ?? 0;
-
-  set unread(int value) {
-    _unread = unread;
+  String? get next => _next;
+  set next(String? value) {
+    next = value;
     notifyListeners();
   }
 

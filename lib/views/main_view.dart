@@ -1,7 +1,5 @@
 import 'dart:developer';
-import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
@@ -32,6 +30,7 @@ class _MainViewState extends State<MainView> {
 
   late final StreakModel _streakModel;
   late final ProductModel _productModel;
+  late final NotificationModel _notificationModel;
 
   /// Call all non-blocking ui initialization stuffs here
   @override
@@ -42,7 +41,13 @@ class _MainViewState extends State<MainView> {
       context,
       listen: false,
     );
+
     _productModel = Provider.of<ProductModel>(
+      context,
+      listen: false,
+    );
+
+    _notificationModel = Provider.of<NotificationModel>(
       context,
       listen: false,
     );
@@ -56,8 +61,25 @@ class _MainViewState extends State<MainView> {
   }
 
   Future<void> initialize() async {
-    // fetch current month streaks
+    lazyLoadStreaks();
+    lazyLoadProducts();
+    lazyLoadNotifications();
+  }
+
+  /// Lazy load notifications
+  /// Fetch notifications
+  Future<void> lazyLoadNotifications() async {
+    final response = await notificationController.listNotifications();
+
+    _notificationModel.setAll(response.results);
+    _notificationModel.loading = false;
+  }
+
+  /// Lazy load streaks
+  /// fetch current month streaks
+  Future<void> lazyLoadStreaks() async {
     final (monthStart, monthEnd) = DateService.getMonthStartAndEnd();
+
     final response = await streakController.getStreaks(
       query: {
         "no_page": "true",
@@ -72,17 +94,16 @@ class _MainViewState extends State<MainView> {
     );
 
     _streakModel.setAll(response);
+    _streakModel.loading = false;
+  }
 
-    // Fetch subscription enlisting
-    Map<String, dynamic> subscriptionQuery = {};
-    if (!kIsWeb && Platform.isIOS && Platform.isAndroid) {
-      subscriptionQuery["skid__isnull"] = false;
-    }
-    final products = await productController.listProducts(
-      query: subscriptionQuery,
-    );
+  /// Lazy load products
+  /// Fetch subscription enlisting
+  Future<void> lazyLoadProducts() async {
+    final products = await productController.listProducts();
 
     _productModel.setAll(products.results);
+    _productModel.loading = false;
   }
 
   get _smallScreenNavigation {

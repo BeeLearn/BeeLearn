@@ -24,8 +24,8 @@ GoRouter router = GoRouter(
           systemNavigationBarIconBrightness: Theme.of(context).brightness == Brightness.light ? Brightness.dark : Brightness.light,
         ),
         child: LoaderOverlay(
+          overlayOpacity: 1,
           overlayColor: Colors.black45,
-          closeOnBackButton: true,
           child: child,
         ),
       ),

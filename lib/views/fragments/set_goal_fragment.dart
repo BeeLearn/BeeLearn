@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
+import '../../middlewares/api_middleware.dart';
 import '../../models/streak_model.dart';
 import '../../models/user_model.dart';
 
@@ -34,6 +35,29 @@ class _SetGoalFragmentState extends State<SetGoalFragment> {
     _dailyStreakMinutesGoal = _userModel.value.profile!.dailyStreakMinutes;
   }
 
+  Future<void> _updateDailyGoal() async {
+    setState(() => isLoading = true);
+    final user = _userModel.value;
+
+    await user.setDailyStreakMinutes(_dailyStreakMinutesGoal).then(
+      (user) {
+        _userModel.value = user;
+        _streakModel.todayStreak.currentStreakSeconds = 0;
+        Navigator.of(context).pop();
+
+        showSnackBar(
+          leading: Icon(
+            Icons.check_circle_rounded,
+            color: Colors.greenAccent[700],
+          ),
+          title: "Daily goal updated",
+        );
+      },
+    );
+
+    setState(() => isLoading = false);
+  }
+
   @override
   Widget build(context) {
     return Column(
@@ -45,23 +69,7 @@ class _SetGoalFragmentState extends State<SetGoalFragment> {
           title: const Text("Daily goal"),
           actions: [
             FilledButton(
-              onPressed: () async {
-                setState(() {
-                  isLoading = true;
-                });
-
-                final user = _userModel.value;
-
-                return user.setDailyStreakMinutes(_dailyStreakMinutesGoal).then(
-                  (user) {
-                    _userModel.value = user;
-                    _streakModel.todayStreak.currentStreakSeconds = 0;
-                    Navigator.of(context).pop();
-                  },
-                ).whenComplete(() {
-                  setState(() => isLoading = false);
-                });
-              },
+              onPressed: _dailyStreakMinutesGoal == _userModel.value.profile!.dailyStreakMinutes ? null : _updateDailyGoal,
               child: isLoading
                   ? SizedBox(
                       width: 24,

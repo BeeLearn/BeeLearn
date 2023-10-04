@@ -1,11 +1,13 @@
 import 'dart:async';
 
-import 'package:beelearn/globals.dart';
+import 'package:beelearn/services/ad_loader.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import "package:provider/provider.dart";
 import 'package:responsive_framework/responsive_breakpoints.dart';
 
+import '../../globals.dart';
 import '../models/streak_model.dart';
 import '../models/topic_model.dart';
 import '../models/user_model.dart';
@@ -24,19 +26,38 @@ class TopicView extends StatefulWidget {
   State createState() => _TopicViewState();
 }
 
+/// Todo don't show ads if premium user
 class _TopicViewState extends State<TopicView> {
   Timer? _timer;
+
+  late final String _adUnitId;
+  late final UserModel _userModel;
+  late final StreakModel _streakModel;
+  InterstitialAdLoader? _interstitialAdLoader;
 
   @override
   void initState() {
     super.initState();
 
-    final streakModel = Provider.of<StreakModel>(
+    _streakModel = Provider.of<StreakModel>(
       context,
       listen: false,
     );
 
-    if (!streakModel.todayStreak.isComplete) {
+    _userModel = Provider.of<UserModel>(
+      context,
+      listen: false,
+    );
+
+    _adUnitId = FirebaseRemoteConfig.instance.getString("APP_LOVIN_INTERSTITIAL_AD");
+
+    if (!_userModel.value.isPremium) {
+      _interstitialAdLoader = InterstitialAdLoader()
+        ..setAdListener()
+        ..loadAd(_adUnitId);
+    }
+
+    if (!_streakModel.todayStreak.isComplete) {
       _timer = Timer.periodic(
         const Duration(seconds: 1),
         (timer) async {
@@ -65,22 +86,30 @@ class _TopicViewState extends State<TopicView> {
 
   @override
   Widget build(context) {
-    return Scaffold(
-      extendBody: true,
-      extendBodyBehindAppBar: true,
-      body: LoaderOverlay(
-        closeOnBackButton: true,
-        child: MultiProvider(
-          providers: [
-            ChangeNotifierProvider(
-              create: (context) => TopicModel(),
-            ),
-          ],
-          child: SafeArea(
-            bottom: false,
-            child: ResponsiveBreakpoints(
-              breakpoints: defaultBreakpoints,
-              child: TopicFragment(query: widget.query),
+    return WillPopScope(
+      onWillPop: () async {
+        _interstitialAdLoader?.showAd(_adUnitId);
+        return true;
+      },
+      child: Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
+        body: LoaderOverlay(
+          closeOnBackButton: true,
+          overlayOpacity: 1,
+          overlayColor: Colors.black45,
+          child: MultiProvider(
+            providers: [
+              ChangeNotifierProvider(
+                create: (context) => TopicModel(),
+              ),
+            ],
+            child: SafeArea(
+              bottom: false,
+              child: ResponsiveBreakpoints(
+                breakpoints: defaultBreakpoints,
+                child: TopicFragment(query: widget.query),
+              ),
             ),
           ),
         ),

@@ -13,12 +13,12 @@ class TopicQuestion {
   final int topic;
 
   @JsonKey(required: true, name: "is_answered")
-  final bool isAnswered;
+  bool isAnswered;
 
   @JsonKey(required: true)
   final Question question;
 
-  const TopicQuestion({
+  TopicQuestion({
     required this.id,
     required this.topic,
     required this.question,

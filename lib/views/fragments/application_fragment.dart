@@ -1,8 +1,7 @@
 import 'dart:async';
-import 'dart:developer';
 import 'dart:io';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:awesome_notifications/awesome_notifications.dart' hide NotificationModel;
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -35,6 +34,7 @@ class ApplicationFragment extends StatefulWidget {
 
 class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with InitializationStateMixin<T> {
   late final UserModel _userModel;
+
   late final StreamSubscription<User?> _authStateChangeListener;
 
   StreamSubscription<List<PurchaseDetails>>? _purchaseUpdateListener;
@@ -64,13 +64,10 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
       (user) async {
         await _userModel.setFirebaseUser(user);
 
-        setState(
-          () {
-            appInitializationState = InitializationState.success;
-          },
-        );
+        setState(() => appInitializationState = InitializationState.success);
       },
     );
+
     if (!kIsWeb && Platform.isAndroid || Platform.isIOS) {
       _purchaseUpdateListener = InAppPurchase.instance.purchaseStream.listen(
         (purchaseDetailsList) async {
@@ -79,36 +76,24 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
               in_app_purchase.PurchaseStatus.purchased,
               in_app_purchase.PurchaseStatus.restored,
             ].contains(purchaseDetails.status)) {
-              try {
-                final purchase = await purchaseController.verifyPurchase(
-                  {
-                    "type": "consumable",
-                    "source": purchaseDetails.verificationData.source,
-                    "token": purchaseDetails.verificationData.serverVerificationData,
-                    "product": {
-                      "productId": purchaseDetails.productID,
-                      "purchaseId": purchaseDetails.purchaseID!,
-                    },
+              final purchase = await purchaseController.verifyPurchase(
+                {
+                  "type": "consumable",
+                  "source": purchaseDetails.verificationData.source,
+                  "token": purchaseDetails.verificationData.serverVerificationData,
+                  "product": {
+                    "productId": purchaseDetails.productID,
+                    "purchaseId": purchaseDetails.purchaseID!,
                   },
-                );
+                },
+              );
 
-                InAppPurchase.instance.completePurchase(purchaseDetails);
+              InAppPurchase.instance.completePurchase(purchaseDetails);
 
-                /// If realtime notification on called before this
-                /// user will have to close and reopen app
-                /// Todo Token is not returned
-                /// Todo maybe just verify regardless if realtime notification is called
-                if (purchase.status == PurchaseStatus.successful) {
-                  final user = _userModel.value;
-                  user.isPremium = true;
-                  _userModel.value = user;
-                }
-              } catch (error, stackTrace) {
-                log(
-                  "Response error",
-                  error: error,
-                  stackTrace: stackTrace,
-                );
+              if (purchase.status == PurchaseStatus.successful) {
+                final user = _userModel.value;
+                user.isPremium = true;
+                _userModel.value = user;
               }
             }
           }

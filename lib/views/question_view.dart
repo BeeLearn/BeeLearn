@@ -1,8 +1,9 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
 
+import '../controllers/controllers.dart';
+import '../models/models.dart';
 import '../serializers/serializers.dart';
 import '../services/code_question_parser.dart';
 import '../views/app_theme.dart';
@@ -11,6 +12,7 @@ import '../views/components/question_drag_sort.dart';
 import '../views/components/question_multiple_choice.dart';
 import '../views/components/question_single_choice.dart';
 import '../views/components/question_text_option.dart';
+import '../views/fragments/subscription_ad_fragment.dart';
 
 class QuestionView extends StatefulWidget {
   final TopicQuestion topicQuestion;
@@ -29,6 +31,7 @@ class QuestionView extends StatefulWidget {
 }
 
 class _QuestionViewState extends State<QuestionView> {
+  late final UserModel _userModel;
   final onAnswerListener = ValueNotifier<void Function()?>(null);
   final onValidateListener = ValueNotifier<void Function()?>(null);
 
@@ -37,6 +40,37 @@ class _QuestionViewState extends State<QuestionView> {
   @override
   void initState() {
     super.initState();
+
+    _userModel = Provider.of(
+      context,
+      listen: false,
+    );
+  }
+
+  /// Decrease user lives if answer is invalid
+  Future<void> _isAnswerInvalid() async {
+    final user = _userModel.value;
+
+    if (user.isPremium) return;
+
+    final profile = user.profile!;
+
+    // Deduct life from temporaryLives if any
+    if (profile.temporaryLives > 0) {
+      profile.temporaryLives -= 1;
+      user.profile = profile;
+      _userModel.value = user;
+      return;
+    }
+
+    await userController.updateUser(
+      id: _userModel.value.id,
+      body: {
+        "profile": {
+          "lives": _userModel.value.profile!.lives - 1,
+        },
+      },
+    );
   }
 
   Widget getView() {
@@ -56,12 +90,17 @@ class _QuestionViewState extends State<QuestionView> {
               if (isCorrect) {
                 await widget.markQuestionAsCompleted();
                 onValidateListener.value = widget.nextPage;
+              } else {
+                /// Todo prevent for premium users
+                _isAnswerInvalid();
+                onValidateListener.value = null;
               }
             };
           },
         );
       case QuestionType.multipleChoice:
         final question = widget.topicQuestion.question as MultiChoiceQuestion;
+
         return QuestionMultipleChoice(
           choices: question.choices,
           onInit: (answer) => onAnswerListener.value = answer,
@@ -75,6 +114,10 @@ class _QuestionViewState extends State<QuestionView> {
               if (isCorrect) {
                 widget.markQuestionAsCompleted();
                 onValidateListener.value = widget.nextPage;
+              } else {
+                /// Todo prevent for premium users
+                _isAnswerInvalid();
+                onValidateListener.value = null;
               }
             };
           },
@@ -95,11 +138,13 @@ class _QuestionViewState extends State<QuestionView> {
             onValidateListener.value = () async {
               if (formKey.currentState!.validate()) {
                 bool isCorrect = fragmentKeys.every((key) => key.currentState!.validateField());
-                log(isCorrect.toString());
+
                 if (isCorrect) {
                   await widget.markQuestionAsCompleted();
                   onValidateListener.value = widget.nextPage;
                 }
+              } else {
+                _isAnswerInvalid();
               }
             };
 
@@ -112,18 +157,20 @@ class _QuestionViewState extends State<QuestionView> {
         );
       case QuestionType.dragDrop:
         final question = widget.topicQuestion.question as DragDropQuestion;
+
         return QuestionDragDrop(
           question: question,
           onChange: (targets, validateTargets) {
             if (targets.every((target) => target.hasData)) {
               onValidateListener.value = () async {
-                log("This is called not expected");
                 if (validateTargets()) {
                   await widget.markQuestionAsCompleted();
                   onValidateListener.value = widget.nextPage;
                 }
               };
             } else {
+              /// Todo prevent for premium users
+              _isAnswerInvalid();
               onValidateListener.value = null;
             }
           },
@@ -138,17 +185,18 @@ class _QuestionViewState extends State<QuestionView> {
           onReorder: (newChoices, onSubmit) {
             onValidateListener.value = () async {
               final isValid = onSubmit();
+
               if (isValid) {
                 await widget.markQuestionAsCompleted();
                 onValidateListener.value = widget.nextPage;
               } else {
+                /// Todo prevent for premium users
+                _isAnswerInvalid();
                 onValidateListener.value = null;
               }
             };
           },
         );
-      default:
-        return const Placeholder();
     }
   }
 
@@ -163,7 +211,20 @@ class _QuestionViewState extends State<QuestionView> {
           children: [
             OutlinedButton.icon(
               onPressed: () {
-                if (onAnswerListener.value != null) onAnswerListener.value!();
+                if (_userModel.value.isPremium) {
+                  if (onAnswerListener.value != null) onAnswerListener.value!();
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (context) => SubscriptionAdFragment(
+                      title: "Watch ads to answer question",
+                      onAdsLoaded: () {
+                        if (onAnswerListener.value != null) onAnswerListener.value!();
+                      },
+                      onBackPressed: () => Navigator.pop(context),
+                    ),
+                  );
+                }
               },
               style: FilledButton.styleFrom(
                 shape: RoundedRectangleBorder(

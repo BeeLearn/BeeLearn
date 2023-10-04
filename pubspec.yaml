@@ -88,14 +88,12 @@ dependencies:
   dots_indicator: ^3.0.0
   firebase_remote_config: ^4.2.6
   firebase_analytics: ^10.5.0
-#  flutterwave_standard:
-#    git:
-#      url: https://github.com/oasisMystre/Flutter-v3.git
-#      ref: 2a75a56a6f4f0a94274aeb1e7686d12082190ede
   url_launcher: ^6.1.14
   money_converter: ^2.0.2
   flutter_paystack_payment:
-    path: ../../../code/workspace/dart/flutter_paystack_payment
+    git:
+      url: https://github.com/oasisMystre/flutter_paystack_payment.git
+      ref: 28a9aca1819fdec41935ae24d8c02768efeebb62
   badges: ^3.1.2
 
 dependency_overrides:

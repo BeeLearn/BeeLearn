@@ -52,6 +52,8 @@ Map<String, dynamic> _$NotificationToJson(Notification instance) =>
 
 const _$NotificationTopicEnumMap = {
   NotificationTopic.ads: 'ADS',
+  NotificationTopic.live: 'LIVE',
+  NotificationTopic.level: 'LEVEL',
   NotificationTopic.reward: 'REWARD',
   NotificationTopic.streak: 'STREAK',
   NotificationTopic.comment: 'COMMENT',

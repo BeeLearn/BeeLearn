@@ -28,9 +28,9 @@ class _ApplicationViewState extends State<ApplicationView> {
     _remoteConfig = FirebaseRemoteConfig.instance;
     _remoteConfig.setDefaults(
       {
-        "APP_LOVIN_REWARD_ADS": "",
-        "APP_LOVIN_INTERSTITIAL_ADS": "",
-        "APP_LOVIN_NATIVE_ADS": "",
+        "APP_LOVIN_REWARD_AD": appLovinRewardAd,
+        "APP_LOVIN_INTERSTITIAL_AD": appLovinInterstitialAd,
+        "APP_LOVIN_NATIVE_AD": "",
         "FLUTTER_PUBLIC_KEY": flutterPublicKey,
         "PAYSTACK_PUBLIC_KEY": paystackPublicKey,
       },

@@ -31,13 +31,16 @@ class _SettingsPremiumView extends State<SettingsPremiumView> {
         actions: [
           PopupMenuButton(
             itemBuilder: (context) => [
-              const PopupMenuItem(
-                child: Text("Manage Subscription"),
+              PopupMenuItem(
+                child: const Text("Manage Subscription"),
+                onTap: () {},
               ),
               PopupMenuItem(
                 child: const Text("Restore Subscriptions"),
                 onTap: () {
-                  InAppPurchase.instance.restorePurchases();
+                  if (PurchaseService.instance.isInAppPurchaseSupported) {
+                    InAppPurchase.instance.restorePurchases();
+                  }
                 },
               ),
             ],

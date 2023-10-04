@@ -579,9 +579,11 @@ packages:
   flutter_paystack_payment:
     dependency: "direct main"
     description:
-      path: "../../../code/workspace/dart/flutter_paystack_payment"
-      relative: true
-    source: path
+      path: "."
+      ref: "28a9aca1819fdec41935ae24d8c02768efeebb62"
+      resolved-ref: "28a9aca1819fdec41935ae24d8c02768efeebb62"
+      url: "https://github.com/oasisMystre/flutter_paystack_payment.git"
+    source: git
     version: "0.1.3"
   flutter_secure_storage:
     dependency: transitive

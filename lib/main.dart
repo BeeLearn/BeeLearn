@@ -31,7 +31,7 @@ void main() async {
       );
 
       // available in mobile apps only
-      if (!kIsWeb && Platform.isAndroid && Platform.isIOS) {
+      if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
         // Lazy load ads
         AppLovinMAX.initialize("soO6pWhn7s2kMMeZhJ3qBqGfvepFKXcT2U2Wr3LSzA7FFrz8hEMSQ9Fm595iS17Cu4crlPUAGbBCFCvFODpXs5");
         // Lazy load notifications

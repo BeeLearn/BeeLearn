@@ -43,9 +43,10 @@ class _LinearProgressPageIndicatorState extends State<LinearProgressPageIndicato
   Widget build(context) {
     return Column(
       children: [
-        SizedBox(
+        AnimatedContainer(
           width: widget.width,
           height: widget.height,
+          duration: const Duration(milliseconds: 5000),
           child: Align(
             alignment: Alignment.center,
             child: ListView.builder(
@@ -58,7 +59,7 @@ class _LinearProgressPageIndicatorState extends State<LinearProgressPageIndicato
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 2.0),
                   child: SizedBox(
-                    width: (widget.width * (active ? 0.8 : 0.5)) / widget.itemCount,
+                    width: (widget.width * 0.45) / widget.itemCount,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(100),
                       child: LinearProgressIndicator(

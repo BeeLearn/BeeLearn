@@ -5,6 +5,10 @@ part 'notification.g.dart';
 enum NotificationTopic {
   @JsonValue("ADS")
   ads,
+  @JsonValue("LIVE")
+  live,
+  @JsonValue("LEVEL")
+  level,
   @JsonValue("REWARD")
   reward,
   @JsonValue("STREAK")

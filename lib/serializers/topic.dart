@@ -13,7 +13,7 @@ class Topic {
   final int id;
 
   @JsonKey(required: true, name: "is_liked")
-  final bool isLiked;
+  bool isLiked;
 
   @JsonKey(required: true)
   final String title;
@@ -25,7 +25,7 @@ class Topic {
   final List<TopicQuestion> topicQuestions;
 
   @JsonKey(required: false, name: "is_unlocked")
-  final bool isUnlocked;
+  bool isUnlocked;
 
   @JsonKey(required: false, name: "is_completed")
   final bool isCompleted;
@@ -58,11 +58,14 @@ class Topic {
   Future<Topic> setIsLiked(User user, bool state) {
     final action = state ? "add" : "remove";
 
-    return TopicModel.updateTopic(id: id, data: {
-      "likes": {
-        action: [user.id]
-      }
-    });
+    return TopicModel.updateTopic(
+      id: id,
+      data: {
+        "likes": {
+          action: [user.id]
+        }
+      },
+    );
   }
 
   Future<Topic> setIsComplete(User user) {

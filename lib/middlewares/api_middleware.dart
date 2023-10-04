@@ -14,11 +14,13 @@ import '../socket_client.dart';
 
 void showSnackBar({
   String? subtitle,
+  Widget? leading,
   SnackBarAction? action,
-  required Widget leading,
+  ScaffoldMessengerState? scaffoldMessenger,
+  SnackBarBehavior barBehavior = SnackBarBehavior.fixed,
   required String title,
 }) {
-  MainApplication.scaffoldKey.currentState?.showSnackBar(
+  (scaffoldMessenger ?? MainApplication.scaffoldKey.currentState!).showSnackBar(
     SnackBar(
       padding: EdgeInsets.zero,
       content: ListTile(

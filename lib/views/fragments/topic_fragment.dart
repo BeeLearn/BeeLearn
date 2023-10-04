@@ -1,8 +1,6 @@
-import 'dart:developer';
-import 'dart:io';
+import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:horizontal_blocked_scroll_physics/horizontal_blocked_scroll_physics.dart';
@@ -17,7 +15,8 @@ import '../../models/thread_model.dart';
 import '../../models/topic_model.dart';
 import '../../models/user_model.dart';
 import '../../serializers/serializers.dart';
-import '../../services/ad_loader.dart';
+import '../../views/components/pill_chip.dart';
+import '../../views/fragments/subscription_ad_fragment.dart';
 import '../../views/thread_view.dart';
 import '../components/page_view_indicators.dart';
 import '../question_view.dart';
@@ -43,9 +42,7 @@ class _TopicFragmentState extends State<TopicFragment> {
 
   int currentPage = 0;
 
-  final String adUnitId = "45261f3464c633f7";
   final PageController controller = PageController();
-  final RewardedAdLoader adLoader = RewardedAdLoader();
 
   @override
   void initState() {
@@ -54,6 +51,7 @@ class _TopicFragmentState extends State<TopicFragment> {
       context,
       listen: false,
     );
+
     topicModel = Provider.of<TopicModel>(
       context,
       listen: false,
@@ -66,22 +64,44 @@ class _TopicFragmentState extends State<TopicFragment> {
       },
     );
 
-    if (!kIsWeb && Platform.isAndroid && Platform.isIOS) {
-      adLoader.setRewardedAdListener(
-        onAdLoadFailedCallback: (adUnit, error) {
-          context.loaderOverlay.hide();
-        },
-        onAdReceivedRewardCallback: (ad, reward) {
-          context.loaderOverlay.hide();
-          controller.nextPage(
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        },
-      );
+    userModel.addListener(onLifeFinished);
 
-      adLoader.loadAd(adUnitId);
+    // ensure user can't access course when lifeline is low
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        onLifeFinished();
+      },
+    );
+  }
+
+  void onLifeFinished() {
+    if (userModel.value.profile!.lifeLine == 0) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => SubscriptionAdFragment(
+          title: "You don't have any lives left",
+          onAdsLoaded: () {
+            final user = userModel.value;
+            user.profile!.temporaryLives += 1;
+            userModel.value = user;
+
+            Navigator.pop(context);
+          },
+          onBackPressed: () => Navigator.popUntil(
+            context,
+            (route) => route.isFirst,
+          ),
+        ),
+      );
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    userModel.removeListener(onLifeFinished);
   }
 
   /// Markdown widget view
@@ -122,8 +142,6 @@ class _TopicFragmentState extends State<TopicFragment> {
   }
 
   Widget getTopicView(Topic topic, int index) {
-    // codeWrapper(child, text) => CodeWrapperWidget(child: child, text: text);
-
     return Stack(
       children: [
         SafeArea(
@@ -178,11 +196,11 @@ class _TopicFragmentState extends State<TopicFragment> {
                     ),
                     IconButton(
                       onPressed: () async {
-                        await topic.setIsLiked(userModel.value, !topic.isLiked).then(
-                          (topic) {
-                            topicModel.updateOne(topic);
-                          },
-                        );
+                        /// Lazy update
+                        topic.setIsLiked(userModel.value, !topic.isLiked);
+
+                        topic.isLiked = !topic.isLiked;
+                        topicModel.updateOne(topic);
                       },
                       isSelected: topic.isLiked,
                       selectedIcon: const Icon(
@@ -221,23 +239,18 @@ class _TopicFragmentState extends State<TopicFragment> {
     List<_TopicFragmentViewType> viewTypes,
   ) async {
     if (currentPage < items.length - 1) {
-      final nextViewType = viewTypes[currentPage + 1];
       context.loaderOverlay.show();
-      try {
-        if (nextViewType == _TopicFragmentViewType.topicView) {
-          // Unlock nextTopic
-          await unlockTopic(items[currentPage + 1]);
+      final nextViewType = viewTypes[currentPage + 1];
 
-          controller.nextPage(
-            duration: const Duration(milliseconds: 500),
-            curve: Curves.easeInOut,
-          );
-        }
-      } catch (error, stackTrace) {
-        log("HEY ERROR", error: error, stackTrace: stackTrace);
-      } finally {
-        context.loaderOverlay.hide();
+      if (nextViewType == _TopicFragmentViewType.topicView) {
+        unlockTopic(items[currentPage + 1]);
+        controller.nextPage(
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
       }
+
+      context.loaderOverlay.hide();
     }
   }
 
@@ -298,15 +311,19 @@ class _TopicFragmentState extends State<TopicFragment> {
   /// unlock topic
   Future<void> unlockTopic(Topic topic) async {
     if (!topic.isUnlocked) {
-      final newTopic = await topic.setIsUnlocked(userModel.value);
-      topicModel.updateOne(newTopic);
+      // Lazy update
+      topic.setIsUnlocked(userModel.value);
+
+      topic.isUnlocked = true;
+      topicModel.updateOne(topic);
     }
   }
 
   /// Mark question as answered by user
   Future<void> _markQuestionAsAnswered(TopicQuestion topicQuestion) async {
     if (!topicQuestion.isAnswered) {
-      final newTopicQuestion = await topicQuestionController.updateTopicQuestion(
+      // Lazy update
+      topicQuestionController.updateTopicQuestion(
         id: topicQuestion.id,
         body: {
           "answered_users": {
@@ -315,15 +332,14 @@ class _TopicFragmentState extends State<TopicFragment> {
         },
       );
 
-      final topic = topicModel.getEntityById(newTopicQuestion.topic);
-      final index = topic?.topicQuestions.indexWhere(
-        (topicQuestion) => topicQuestion.id == newTopicQuestion.id,
+      topicQuestion.isAnswered = true;
+      final topic = topicModel.getEntityById(topicQuestion.topic)!;
+      final index = topic.topicQuestions.indexWhere(
+        (topicQuestion) => topicQuestion.id == topicQuestion.id,
       );
 
-      if (index != null && index > -1) {
-        topic!.topicQuestions[index] = newTopicQuestion;
-        topicModel.updateOne(topic);
-      }
+      topic.topicQuestions[index] = topicQuestion;
+      topicModel.updateOne(topic);
     }
   }
 
@@ -333,71 +349,35 @@ class _TopicFragmentState extends State<TopicFragment> {
       builder: (context, model, child) {
         final (viewTypes, items) = _getViewTypes(model.items);
 
-        //_TopicFragmentViewType? currentViewType;
-
-        //if (viewTypes.isNotEmpty) currentViewType = viewTypes[currentPage];
-
         return Scaffold(
           extendBody: true,
           extendBodyBehindAppBar: true,
           appBar: AppBar(
             centerTitle: true,
             backgroundColor: Colors.transparent,
-            leading: BackButton(
-              onPressed: () => Navigator.pop(context),
-            ),
+            leading: const CloseButton(),
             title: LinearProgressPageIndicator(
               itemCount: items.length,
               pageController: controller,
             ),
-            actions: const [
-              // Visibility(
-              //   visible: topics.isNotEmpty && currentPage == topics.length - 1 && !(topics[currentPage].isUnlocked || topics[currentPage].isCompleted),
-              //   child: TextButton(
-              //     onPressed: () async {
-              //       final topic = topics[currentPage];
-              //
-              //       // Ignore if error
-              //       unlockTopic(topic);
-              //       completeTopic(topic);
-              //
-              //       ScaffoldMessenger.of(context).showSnackBar(
-              //         SnackBar(
-              //           duration: const Duration(seconds: 2),
-              //           padding: EdgeInsets.zero,
-              //           content: ListTile(
-              //             leading: const Icon(CupertinoIcons.sparkles),
-              //             title: const Text("Hurray, Lesson completed"),
-              //             trailing: Text(
-              //               "+8xp",
-              //               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              //                     color: Theme.of(context).colorScheme.primary,
-              //                   ),
-              //             ),
-              //           ),
-              //           backgroundColor: Colors.black,
-              //         ),
-              //       );
-              //
-              //       Navigator.pop(context);
-              //     },
-              //     child: const Text("Continue"),
-              //   ),
-              // ),
-              // Visibility(
-              //   visible: currentViewType != null && currentPage != topics.length - 1 && currentViewType == _TopicFragmentViewType.questionView,
-              //   child: TextButton(
-              //     onPressed: () async {
-              //       await unlockTopic(topics[currentPage + 1]);
-              //
-              //       controller.nextPage(
-              //         duration: const Duration(milliseconds: 500),
-              //         curve: Curves.easeInOut,
-              //       );
-              //     },
-              //     child: const Text("Skip"),
-              //   ),
-              // ),
+            actions: [
+              PillChip(
+                children: [
+                  const Icon(
+                    Icons.favorite,
+                    size: 20,
+                    color: Colors.redAccent,
+                  ),
+                  const SizedBox(width: 4.0),
+                  Selector<UserModel, int>(
+                    selector: (context, model) => model.value.profile!.lifeLine,
+                    builder: (context, lives, child) {
+                      return Text("$lives");
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(width: 4.0),
             ],
           ),
           body: model.loading

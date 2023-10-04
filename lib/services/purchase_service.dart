@@ -22,7 +22,7 @@ class PurchaseService {
   bool get isInAppPurchaseEnabled => !kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
 
   /// Is InApp Purchase supported for this application
-  bool get isInAppPurchaseSupported => !isInAppPurchaseEnabled && isInAppPurchaseAvailable!;
+  bool get isInAppPurchaseSupported => isInAppPurchaseEnabled && isInAppPurchaseAvailable!;
 
   /// Purchase service singleton instance
   static PurchaseService get instance => _instance ??= PurchaseService._();

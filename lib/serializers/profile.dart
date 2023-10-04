@@ -8,7 +8,7 @@ class Profile {
   final int id;
 
   @JsonKey(required: true)
-  final int lives;
+  int lives;
 
   @JsonKey(required: true)
   final int xp;
@@ -23,6 +23,12 @@ class Profile {
   int dailyStreakMinutes;
 
   int get dailyStreakSeconds => dailyStreakMinutes * 60;
+
+  /// This lives is gained via ads and not stored in database
+  int temporaryLives = 0;
+
+  /// User total lifeLine for this session
+  int get lifeLine => lives + temporaryLives;
 
   Profile({
     required this.id,
