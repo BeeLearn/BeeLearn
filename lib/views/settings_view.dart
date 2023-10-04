@@ -1,11 +1,11 @@
-import 'package:beelearn/models/models.dart';
-import 'package:beelearn/views/fragments/dialog_fragment.dart';
-import 'package:beelearn/views/settings_notifications_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/models.dart';
+import '../../services/view_service.dart';
+import '../../views/fragments/dialog_fragment.dart';
+import '../../views/settings_notifications_view.dart';
 import 'settings_edit_profile.dart';
-import 'settings_premium_view.dart';
 
 /// Settings Page
 class SettingsView extends StatelessWidget {
@@ -65,15 +65,7 @@ class SettingsView extends StatelessWidget {
                   ),
                   const SizedBox(height: 16.0),
                   InkWell(
-                    onTap: () {
-                      showDialog(
-                        useSafeArea: false,
-                        context: context,
-                        builder: (buildContext) {
-                          return const SettingsPremiumView();
-                        },
-                      );
-                    },
+                    onTap: () => ViewService.showPremiumDialog(context),
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(

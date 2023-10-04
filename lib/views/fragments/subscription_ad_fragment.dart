@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/models.dart';
 import '../../services/ad_loader.dart';
+import '../../services/view_service.dart';
 
 class SubscriptionAdFragment extends StatefulWidget {
   final String title;
@@ -86,7 +87,7 @@ class _SubscriptionAdFragmentState extends State<SubscriptionAdFragment> {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: () {},
+              onPressed: () => ViewService.showPremiumDialog(context),
               child: const Text("Subscribe"),
             ),
           ),

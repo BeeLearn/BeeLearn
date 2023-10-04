@@ -27,6 +27,7 @@ class _FavoriteTabViewState extends State<FavoriteTabView> {
       context,
       listen: false,
     );
+
     _favouriteCourseModel = Provider.of<FavouriteCourseModel>(
       context,
       listen: false,
@@ -40,7 +41,7 @@ class _FavoriteTabViewState extends State<FavoriteTabView> {
 
     final response = await CourseModel.getCourses(
       query: {
-        "module__lesson__topic__likes": "${user.id}",
+        "modules__lessons__topics__likes": "${user.id}",
       },
     );
 

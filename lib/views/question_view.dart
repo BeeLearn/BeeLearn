@@ -47,6 +47,24 @@ class _QuestionViewState extends State<QuestionView> {
     );
   }
 
+  void _answerQuestion (){
+    if (_userModel.value.isPremium) {
+        if (onAnswerListener.value != null) onAnswerListener.value!();
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) => SubscriptionAdFragment(
+            title: "Watch ads to answer question",
+            onAdsLoaded: () {
+              if (onAnswerListener.value != null) onAnswerListener.value!();
+              Navigator.pop(context);
+            },
+            onBackPressed: () => Navigator.pop(context),
+          ),
+        );
+      }
+  }
+
   /// Decrease user lives if answer is invalid
   Future<void> _isAnswerInvalid() async {
     final user = _userModel.value;
@@ -210,22 +228,7 @@ class _QuestionViewState extends State<QuestionView> {
           alignment: WrapAlignment.center,
           children: [
             OutlinedButton.icon(
-              onPressed: () {
-                if (_userModel.value.isPremium) {
-                  if (onAnswerListener.value != null) onAnswerListener.value!();
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (context) => SubscriptionAdFragment(
-                      title: "Watch ads to answer question",
-                      onAdsLoaded: () {
-                        if (onAnswerListener.value != null) onAnswerListener.value!();
-                      },
-                      onBackPressed: () => Navigator.pop(context),
-                    ),
-                  );
-                }
-              },
+              onPressed: _answerQuestion,
               style: FilledButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),

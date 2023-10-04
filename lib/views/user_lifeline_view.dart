@@ -1,8 +1,12 @@
-import 'package:beelearn/models/models.dart';
+import 'package:beelearn/controllers/controllers.dart';
+import 'package:beelearn/services/view_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+
+import '../middlewares/api_middleware.dart';
+import '../models/models.dart';
 
 class UserLifeLineView extends StatelessWidget {
   const UserLifeLineView({super.key});
@@ -35,15 +39,74 @@ class UserLifeLineView extends StatelessWidget {
     );
   }
 
+  Future<void> _refillHearts(BuildContext context) async {
+    final userModel = Provider.of<UserModel>(
+      context,
+      listen: false,
+    );
+
+    final user = userModel.value;
+    final bits = user.profile!.bits;
+    final lives = user.profile!.lives;
+
+    if (lives >= 3) {
+      showSnackBar(
+        leading: const Icon(
+          Icons.info,
+          color: Colors.redAccent,
+        ),
+        title: "You have reached the maximum heart refill",
+      );
+
+      return;
+    }
+
+    if (bits < 60) {
+      showSnackBar(
+        leading: const Icon(
+          Icons.bolt_rounded,
+          color: Colors.amber,
+        ),
+        title: "You have $bits bits, you need ${60 - bits} more!",
+      );
+
+      return;
+    }
+
+    /// Lazy update
+    userController.updateUser(
+      id: user.id,
+      body: {
+        "profile": {
+          "lives": lives + 1,
+          "bits": bits - 60,
+        }
+      },
+    );
+
+    user.profile!.bits -= 60;
+    user.profile!.lives += 1;
+
+    userModel.value = user;
+
+    showSnackBar(
+      leading: const Icon(
+        Icons.favorite,
+        color: Colors.redAccent,
+      ),
+      title: "An extra life beckons! You have got ${lives + 1} lives left.",
+    );
+  }
+
   @override
   Widget build(context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         children: [
-          Consumer<UserModel>(
-            builder: (context, model, child) {
-              final lives = model.value.profile!.lives;
+          Selector<UserModel, int>(
+            selector: (context, model) => model.value.profile!.lives,
+            builder: (context, lives, child) {
               final hasRanOutOfLives = lives == 0;
 
               return Wrap(
@@ -61,7 +124,7 @@ class UserLifeLineView extends StatelessWidget {
                           fontSize: 24,
                           fontWeight: FontWeight.w900,
                         ),
-                      ), // You ran out of hearts
+                      ),
                       Text(
                         hasRanOutOfLives ? "Your hearts  will be refill in 4h 57 m" : "You have $lives Hearts. Take on your next Challenge",
                         style: const TextStyle(color: Colors.grey),
@@ -82,7 +145,7 @@ class UserLifeLineView extends StatelessWidget {
                         const Icon(
                           Icons.favorite,
                           size: 48,
-                          color: Colors.redAccent,
+                          color: Colors.grey,
                         ),
                     ],
                   ),
@@ -102,7 +165,7 @@ class UserLifeLineView extends StatelessWidget {
                 ),
                 const Text("Become a pro to unlock unlimited learning"),
                 FilledButton(
-                  onPressed: () {},
+                  onPressed: () => ViewService.showPremiumDialog(context),
                   style: FilledButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -132,7 +195,7 @@ class UserLifeLineView extends StatelessWidget {
                 ),
                 const Text("Use your Bits to refill the Hearts."),
                 OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () => _refillHearts(context),
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),

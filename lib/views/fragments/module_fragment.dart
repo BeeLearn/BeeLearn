@@ -31,14 +31,12 @@ class _ModuleFragmentState extends State<ModuleFragment> {
       listen: false,
     );
 
-    fetchModules().then(
-      (value) => moduleModel.loading = false,
-    );
-
     initialize();
   }
 
   initialize() async {
+    await fetchModules();
+
     unsubscribeModuleListener = await client?.subscribe(
       namespace: "modules",
       onError: (response) {},
@@ -69,10 +67,11 @@ class _ModuleFragmentState extends State<ModuleFragment> {
     super.dispose();
   }
 
-  Future<void> fetchModules() {
-    return ModuleModel.getModules(query: widget.query).then((response) {
-      moduleModel.setAll(response.results);
-    });
+  Future<void> fetchModules() async {
+    final response = await ModuleModel.getModules(query: widget.query);
+
+    moduleModel.setAll(response.results);
+    moduleModel.loading = false;
   }
 
   showTopicViewDialog(Lesson lesson) {

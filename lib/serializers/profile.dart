@@ -14,7 +14,7 @@ class Profile {
   final int xp;
 
   @JsonKey(required: true)
-  final int bits;
+  int bits;
 
   @JsonKey(required: true)
   final int streaks;
