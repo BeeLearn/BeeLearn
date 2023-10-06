@@ -10,13 +10,22 @@ class SettingsNotificationView extends StatelessWidget {
   const SettingsNotificationView({super.key});
 
   Widget _getBody(BuildContext context) {
+    final userModel = Provider.of<UserModel>(
+      context,
+      listen: false,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Notifications"),
       ),
-      body: Consumer<UserModel>(
-        builder: (context, model, child) {
-          final user = model.value;
+      body: Selector<UserModel, (bool, bool)>(
+        selector: (context, model) => (
+          model.value.settings!.isPromotionalEmailEnabled,
+          model.value.settings!.isPushNotificationsEnabled,
+        ),
+        builder: (context, data, child) {
+          final (isPromotionalEmailEnabled, isPushNotificationsEnabled) = data;
 
           return ListView(
             children: [
@@ -26,7 +35,10 @@ class SettingsNotificationView extends StatelessWidget {
                   "Receive promotional emails, new letters and social media post updates",
                 ),
                 onChanged: (value) async {
-                  final newUser = await userController.updateUser(
+                  final user = userModel.value;
+
+                  // Lazy update
+                  userController.updateUser(
                     id: user.id,
                     body: {
                       "settings": {
@@ -34,10 +46,10 @@ class SettingsNotificationView extends StatelessWidget {
                       }
                     },
                   );
-
-                  model.value = newUser;
+                  user.settings!.isPromotionalEmailEnabled = value;
+                  userModel.value = user;
                 },
-                value: user.settings!.isPromotionalEmailEnabled,
+                value: isPromotionalEmailEnabled,
               ),
               const Divider(),
               SwitchListTile(
@@ -46,7 +58,10 @@ class SettingsNotificationView extends StatelessWidget {
                   "Receive new content alert and recommendations, following and mentions updates and more",
                 ),
                 onChanged: (value) async {
-                  final newUser = await userController.updateUser(
+                  final user = userModel.value;
+
+                  // Lazy update
+                  userController.updateUser(
                     id: user.id,
                     body: {
                       "settings": {
@@ -55,9 +70,10 @@ class SettingsNotificationView extends StatelessWidget {
                     },
                   );
 
-                  model.value = newUser;
+                  user.settings!.isPushNotificationsEnabled = value;
+                  userModel.value = user;
                 },
-                value: user.settings!.isPushNotificationsEnabled,
+                value: isPushNotificationsEnabled,
               ),
             ],
           );

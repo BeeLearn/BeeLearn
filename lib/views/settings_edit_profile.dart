@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:beelearn/views/fragments/dialog_fragment.dart';
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:http/http.dart';
@@ -13,6 +12,7 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import '../controllers/user_controller.dart';
 import '../middlewares/api_middleware.dart' show showSnackBar;
 import '../models/user_model.dart';
+import '../views/fragments/dialog_fragment.dart';
 
 /// Todo make ui more cool
 class SettingsEditProfile extends StatefulWidget {
@@ -69,19 +69,31 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
                         "first_name": firstNameTextEditController.text,
                         "username": usernameTextEditController.text,
                       };
+                      try {
+                        userModel.value = await userController.updateUser(
+                          id: userModel.value.id,
+                          body: data,
+                        );
+                        showSnackBar(
+                          leading: Icon(
+                            Icons.check_circle_rounded,
+                            color: Colors.greenAccent[700],
+                          ),
+                          title: "Profile updated successfully",
+                        );
+                      } catch (error, stackTrace) {
+                        showSnackBar(
+                          leading: const Icon(
+                            Icons.error,
+                            color: Colors.redAccent,
+                          ),
+                          title: "An error occur while updating your profile",
+                        );
 
-                      userModel.value = await userController.updateUser(id: userModel.value.id, body: data).onError(
-                        (error, stackTrace) {
-                          showSnackBar(
-                            leading: const Icon(Icons.error),
-                            title: "An error occur while updating your profile",
-                          );
-
-                          return Future.error(error!);
-                        },
-                      ).whenComplete(
-                        () => context.loaderOverlay.hide(),
-                      );
+                        rethrow;
+                      } finally {
+                        context.loaderOverlay.hide();
+                      }
                     },
                     child: const Text("Save"),
                   ),

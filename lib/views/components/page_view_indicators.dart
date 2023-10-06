@@ -46,7 +46,7 @@ class _LinearProgressPageIndicatorState extends State<LinearProgressPageIndicato
         AnimatedContainer(
           width: widget.width,
           height: widget.height,
-          duration: const Duration(milliseconds: 5000),
+          duration: const Duration(milliseconds: 500),
           child: Align(
             alignment: Alignment.center,
             child: ListView.builder(

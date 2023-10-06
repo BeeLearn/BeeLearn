@@ -1,4 +1,5 @@
 import 'package:badges/badges.dart' as badges;
+import 'package:beelearn/views/notification_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -51,8 +52,14 @@ class _CategoryTabView extends State<CategoryTabView> {
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
           return [
-            Consumer<UserModel>(
-              builder: (context, model, child) {
+            Selector2<UserModel, StreakModel, (int, int)>(
+              selector: (context, userModel, streakModel) => (
+                userModel.value.profile!.lives,
+                streakModel.totalCompletedWeekStreaks,
+              ),
+              builder: (context, data, child) {
+                final (lives, totalStreaks) = data;
+
                 return SliverAppBar(
                   snap: true,
                   pinned: true,
@@ -89,7 +96,7 @@ class _CategoryTabView extends State<CategoryTabView> {
                             color: Colors.redAccent,
                           ),
                           const SizedBox(width: 8.0),
-                          Text(model.value.profile!.lives.toString())
+                          Text("$lives")
                         ],
                       ),
                     ),
@@ -112,7 +119,7 @@ class _CategoryTabView extends State<CategoryTabView> {
                             color: Colors.greenAccent[700],
                           ),
                           const SizedBox(width: 8.0),
-                          Text(model.value.profile!.streaks.toString()),
+                          Text("$totalStreaks"),
                         ],
                       ),
                     ),
@@ -121,7 +128,10 @@ class _CategoryTabView extends State<CategoryTabView> {
                       title: "Notifications",
                       description: "View all your notifications and alerts here",
                       child: IconButton(
-                        onPressed: () => context.go("/notifications"),
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (context) => const NotificationView(),
+                        ),
                         icon: badges.Badge(
                           badgeContent: Selector<UserModel, int>(
                             selector: (context, model) => model.value.unreadNotifications,

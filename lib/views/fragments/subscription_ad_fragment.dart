@@ -55,23 +55,35 @@ class _SubscriptionAdFragmentState extends State<SubscriptionAdFragment> {
       onWillPop: () async => _userModel.value.profile!.lifeLine <= 0,
       child: AlertDialog(
         titlePadding: EdgeInsets.zero,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            IconButton(
-              onPressed: widget.onBackPressed,
-              icon: const Icon(Icons.close),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(widget.title),
-            )
-          ],
+        title: Padding(
+          padding: const EdgeInsets.only(
+            top: 8.0,
+            right: 8.0,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              IconButton(
+                onPressed: widget.onBackPressed,
+                icon: const Icon(Icons.close),
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 16.0,
+                    right: 8.0,
+                  ),
+                  child: Text(widget.title),
+                ),
+              ),
+            ],
+          ),
         ),
         content: Text(
           widget.description ??
               'Subscribe to BeeHive monthly membership '
-                  'for unlimited access or watch an ads.',
+                  'for unlimited access or watch an ad.',
         ),
         actionsAlignment: MainAxisAlignment.start,
         actions: [
@@ -81,9 +93,10 @@ class _SubscriptionAdFragmentState extends State<SubscriptionAdFragment> {
               onPressed: () {
                 _rewardedAdLoader.showAd(_adUnitId);
               },
-              child: const Text("Watch an Ads"),
+              child: const Text("Watch an Ad"),
             ),
           ),
+          const SizedBox(height: 8.0),
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:beelearn/views/fragments/dialog_fragment.dart';
 import 'package:djira_client/djira_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_social_textfield/flutter_social_textfield.dart';
@@ -12,10 +13,7 @@ import '../controllers/comment_controller.dart';
 import '../controllers/reply_controller.dart';
 import '../controllers/thread_controller.dart';
 import '../models/models.dart';
-import '../models/thread_model.dart';
-import '../serializers/reply.dart';
 import '../serializers/serializers.dart';
-import '../serializers/thread.dart';
 import '../socket_client.dart';
 import 'components/message_text_field.dart';
 
@@ -272,34 +270,33 @@ class _ThreadViewState extends State<ThreadView> {
                     child: const Text("Deleted Comment"),
                   ),
                 if (!comment.isDeleted)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: RichTextView(
-                      maxLines: 3,
-                      viewLessText: "hide",
-                      text: comment.content,
-                      supportedTypes: [
-                        EmailParser(
-                          onTap: (value) {},
-                        ),
-                        PhoneParser(
-                          onTap: (value) {},
-                        ),
-                        UrlParser(
-                          onTap: (value) {},
-                        ),
-                        HashTagParser(
-                          onTap: (value) {},
-                        ),
-                        MentionParser(
-                          onTap: (value) {},
-                        ),
-                        BoldParser(),
-                      ],
-                      truncate: true,
-                      linkStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
-                    ),
+                  RichTextView(
+                    maxLines: 3,
+                    selectable: true,
+                    viewLessText: "hide",
+                    text: comment.content,
+                    supportedTypes: [
+                      EmailParser(
+                        onTap: (value) {},
+                      ),
+                      PhoneParser(
+                        onTap: (value) {},
+                      ),
+                      UrlParser(
+                        onTap: (value) {},
+                      ),
+                      HashTagParser(
+                        onTap: (value) {},
+                      ),
+                      MentionParser(
+                        onTap: (value) {},
+                      ),
+                      BoldParser(),
+                    ],
+                    truncate: true,
+                    linkStyle: TextStyle(color: Theme.of(context).colorScheme.primary),
                   ),
+                if (!comment.isDeleted) const SizedBox(height: 4.0),
                 if (!comment.isDeleted)
                   Row(
                     children: [
@@ -408,121 +405,125 @@ class _ThreadViewState extends State<ThreadView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Comments"),
-      ),
-      body: Flex(
-        direction: Axis.vertical,
-        children: [
-          Flexible(
-            child: GestureDetector(
-              onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-              child: RefreshIndicator(
-                onRefresh: () async {},
-                child: Consumer<ThreadModel>(
-                  builder: (context, model, child) {
-                    final comments = model.items;
+    return DialogFragment(
+      alignment: Alignment.topRight,
+      insetPadding: EdgeInsets.zero,
+      builder: (context) => Scaffold(
+        appBar: AppBar(
+          title: const Text("Comments"),
+        ),
+        body: Flex(
+          direction: Axis.vertical,
+          children: [
+            Flexible(
+              child: GestureDetector(
+                onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                child: RefreshIndicator(
+                  onRefresh: () async {},
+                  child: Consumer<ThreadModel>(
+                    builder: (context, model, child) {
+                      final comments = model.items;
 
-                    return model.loading
-                        ? const Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : LoadMore(
-                            onLoadMore: _onLoadMore,
-                            isFinish: nextUrl == null,
-                            child: ListView.builder(
-                              itemCount: comments.length,
-                              itemBuilder: (context, index) {
-                                final comment = comments[index];
-                                final List<Comment>? replies = comment.replies?.toList();
-                                replies?.sort(
-                                  (first, second) => first.createdAt.compareTo(second.createdAt),
-                                );
+                      return model.loading
+                          ? const Center(
+                              child: CircularProgressIndicator(),
+                            )
+                          : LoadMore(
+                              onLoadMore: _onLoadMore,
+                              isFinish: nextUrl == null,
+                              child: ListView.builder(
+                                itemCount: comments.length,
+                                itemBuilder: (context, index) {
+                                  final comment = comments[index];
+                                  final List<Comment>? replies = comment.replies?.toList();
+                                  replies?.sort(
+                                    (first, second) => first.createdAt.compareTo(second.createdAt),
+                                  );
 
-                                return getCommentFragment(
-                                  parent: null,
-                                  comment: comment,
-                                  children: [
-                                    if (replies != null)
-                                      ListView.builder(
-                                        itemCount: replies.length,
-                                        shrinkWrap: true,
-                                        physics: const ClampingScrollPhysics(),
-                                        itemBuilder: (context, index) {
-                                          final reply = replies.elementAt(index);
-                                          return getCommentFragment(
-                                            comment: reply,
-                                            parent: comment,
-                                          );
-                                        },
-                                      ),
-                                  ],
-                                );
-                              },
-                            ),
-                          );
-                  },
+                                  return getCommentFragment(
+                                    parent: null,
+                                    comment: comment,
+                                    children: [
+                                      if (replies != null)
+                                        ListView.builder(
+                                          itemCount: replies.length,
+                                          shrinkWrap: true,
+                                          physics: const ClampingScrollPhysics(),
+                                          itemBuilder: (context, index) {
+                                            final reply = replies.elementAt(index);
+                                            return getCommentFragment(
+                                              comment: reply,
+                                              parent: comment,
+                                            );
+                                          },
+                                        ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            );
+                    },
+                  ),
                 ),
               ),
             ),
-          ),
-          MessageTextField(
-            focusNode: messageTextFieldFocusNode,
-            controller: messageTextFieldController,
-            onSend: (String message) async {
-              if (editComment == null) {
-                if (replyComment == null) {
-                  final newThread = await threadController.createThread(
-                    body: {
-                      "reference": widget.reference,
-                      "comment": {
-                        "content": message,
-                      }
-                    },
-                  );
+            MessageTextField(
+              focusNode: messageTextFieldFocusNode,
+              controller: messageTextFieldController,
+              onSend: (String message) async {
+                if (editComment == null) {
+                  if (replyComment == null) {
+                    final newThread = await threadController.createThread(
+                      body: {
+                        "reference": widget.reference,
+                        "comment": {
+                          "content": message,
+                        }
+                      },
+                    );
 
-                  threadModel.addThread(newThread);
+                    threadModel.addThread(newThread);
+                  } else {
+                    final newReply = await replyController.createReply(
+                      body: {
+                        "parent": replyComment!.id,
+                        "comment": {
+                          "content": message,
+                        }
+                      },
+                    );
+
+                    threadModel.setReply(newReply);
+                  }
+                  replyComment = null;
                 } else {
-                  final newReply = await replyController.createReply(
-                    body: {
-                      "parent": replyComment!.id,
-                      "comment": {
-                        "content": message,
-                      }
-                    },
+                  final (parent, comment) = editComment as (Comment?, Comment);
+
+                  final newComment = await commentController.updateComment(
+                    id: comment.id,
+                    body: {"content": message},
                   );
 
-                  threadModel.setReply(newReply);
+                  if (parent == null) {
+                    threadModel.updateThread(
+                      Thread(
+                        comment: newComment,
+                        reference: widget.reference,
+                      ),
+                    );
+                  } else {
+                    threadModel.updateReply(
+                      Reply(
+                        parent: parent.id,
+                        comment: newComment,
+                      ),
+                    );
+                  }
                 }
-                replyComment = null;
-              } else {
-                final (parent, comment) = editComment as (Comment?, Comment);
-
-                final newComment = await commentController.updateComment(
-                  id: comment.id,
-                  body: {"content": message},
-                );
-
-                if (parent == null) {
-                  threadModel.updateThread(
-                    Thread(
-                      comment: newComment,
-                      reference: widget.reference,
-                    ),
-                  );
-                } else {
-                  threadModel.updateReply(
-                    Reply(
-                      parent: parent.id,
-                      comment: newComment,
-                    ),
-                  );
-                }
-              }
-            },
-          ),
-        ],
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

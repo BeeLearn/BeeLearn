@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:beelearn/views/fragments/dialog_fragment.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -33,7 +34,7 @@ class _NotificationViewState extends State<NotificationView> {
     );
   }
 
-  Widget getNotificationSmallIcon(serializer.Notification notification) {
+  Widget _getNotificationSmallIcon(serializer.Notification notification) {
     if (notification.icon != null) {
       return CircleAvatar(
         maxRadius: 12,
@@ -129,113 +130,126 @@ class _NotificationViewState extends State<NotificationView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Notifications"),
-      ),
-      body: Selector<NotificationModel, UnmodifiableListView<serializer.Notification>>(
-        selector: (context, model) => model.items,
-        builder: (context, notifications, child) {
-          return _notificationModel.loading
-              ? const Center(
-                  child: CircularProgressIndicator(),
-                )
-              : notifications.isEmpty
-                  ? _emptyState
-                  : RefreshIndicator(
-                      onRefresh: _loadNotifications,
-                      child: LoadMore(
-                        isFinish: _notificationModel.next == null,
-                        onLoadMore: () async {
-                          if (_notificationModel.next == null) return false;
-                          await _loadNotifications(url: _notificationModel.next);
+    return DialogFragment(
+      alignment: Alignment.topRight,
+      insetPadding: EdgeInsets.zero,
+      builder: (context) => Scaffold(
+        appBar: AppBar(
+          title: const Text("Notifications"),
+        ),
+        body: Selector<NotificationModel, UnmodifiableListView<serializer.Notification>>(
+          selector: (context, model) => model.items,
+          builder: (context, notifications, child) {
+            return _notificationModel.loading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : notifications.isEmpty
+                    ? _emptyState
+                    : RefreshIndicator(
+                        onRefresh: _loadNotifications,
+                        child: LoadMore(
+                          isFinish: _notificationModel.next == null,
+                          onLoadMore: () async {
+                            if (_notificationModel.next == null) return false;
+                            await _loadNotifications(url: _notificationModel.next);
 
-                          return true;
-                        },
-                        child: ListView.separated(
-                          itemCount: notifications.length,
-                          separatorBuilder: (context, index) => const Divider(),
-                          itemBuilder: (context, index) {
-                            final notification = notifications[index];
-                            return CustomDismissible(
-                              key: Key("${notification.id}"),
-                              confirmDismiss: (direction) async {
-                                if (direction == DismissDirection.startToEnd) {
-                                  final newNotification = await notificationController.updateNotification(
-                                    id: notification.id,
-                                    body: {"is_read": !notification.isRead},
-                                  );
-
-                                  _notificationModel.updateOne(newNotification);
-                                  return false;
-                                }
-
-                                if (direction == DismissDirection.endToStart) {
-                                  await notificationController.deleteNotification(id: notification.id);
-
-                                  _notificationModel.removeOne(notification);
-                                  return true;
-                                }
-
-                                return null;
-                              },
-                              getBackground: (direction) {
-                                if (direction == DismissDirection.endToStart) {
-                                  return _buildDismissBackground(
-                                    Colors.red,
-                                    const Icon(CupertinoIcons.delete),
-                                    CrossAxisAlignment.end,
-                                  );
-                                }
-
-                                return _buildDismissBackground(
-                                  Colors.deepPurpleAccent,
-                                  Icon(
-                                    notification.isRead ? Icons.check_circle_rounded : Icons.radio_button_unchecked_outlined,
-                                    size: 32,
-                                  ),
-                                  CrossAxisAlignment.start,
-                                );
-                              },
-                              child: ListTile(
-                                leading: ClipRRect(
-                                  borderRadius: BorderRadius.circular(100.0),
-                                  child: Image.network(
-                                    notification.image,
-                                    width: 48.0,
-                                    height: 48.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                title: Text(
-                                  notification.title,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                subtitle: Wrap(
-                                  runSpacing: 4.0,
-                                  children: [
-                                    Text(
-                                      notification.body,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Wrap(
-                                      spacing: 8.0,
-                                      crossAxisAlignment: WrapCrossAlignment.center,
-                                      children: [
-                                        getNotificationSmallIcon(notification),
-                                        Text(format(notification.createdAt)),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
+                            return true;
                           },
+                          child: ListView.separated(
+                            itemCount: notifications.length,
+                            separatorBuilder: (context, index) => const Divider(),
+                            itemBuilder: (context, index) {
+                              final notification = notifications[index];
+                              return CustomDismissible(
+                                key: Key("${notification.id}"),
+                                confirmDismiss: (direction) async {
+                                  if (direction == DismissDirection.startToEnd) {
+                                    final newNotification = await notificationController.updateNotification(
+                                      id: notification.id,
+                                      body: {
+                                        "is_read": !notification.isRead,
+                                      },
+                                    );
+
+                                    _notificationModel.updateOne(newNotification);
+                                    return false;
+                                  }
+
+                                  if (direction == DismissDirection.endToStart) {
+                                    await notificationController.deleteNotification(id: notification.id);
+
+                                    _notificationModel.removeOne(notification);
+                                    return true;
+                                  }
+
+                                  return null;
+                                },
+                                getBackground: (direction) {
+                                  if (direction == DismissDirection.endToStart) {
+                                    return _buildDismissBackground(
+                                      Colors.red,
+                                      const Icon(CupertinoIcons.delete),
+                                      CrossAxisAlignment.end,
+                                    );
+                                  }
+
+                                  return _buildDismissBackground(
+                                    Colors.deepPurpleAccent,
+                                    Icon(
+                                      notification.isRead ? Icons.check_circle_rounded : Icons.radio_button_unchecked_outlined,
+                                      size: 32,
+                                    ),
+                                    CrossAxisAlignment.start,
+                                  );
+                                },
+                                child: ListTile(
+                                  leading: ClipRRect(
+                                    borderRadius: BorderRadius.circular(100.0),
+                                    child: Image.network(
+                                      notification.image,
+                                      width: 48.0,
+                                      height: 48.0,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  title: Text(
+                                    notification.title,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Flexible(
+                                            child: Text(
+                                              notification.body,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4.0),
+                                      Wrap(
+                                        spacing: 8.0,
+                                        crossAxisAlignment: WrapCrossAlignment.center,
+                                        children: [
+                                          _getNotificationSmallIcon(notification),
+                                          Text(format(notification.createdAt)),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                    );
-        },
+                      );
+          },
+        ),
       ),
     );
   }

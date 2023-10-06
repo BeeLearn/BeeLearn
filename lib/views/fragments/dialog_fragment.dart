@@ -44,13 +44,15 @@ class ResponsiveDialogFragment extends StatelessWidget {
 
   @override
   Widget build(context) {
-    return ResponsiveBreakpoints.of(context).largerThan(TABLET)
+    final widthMultiplier = ResponsiveBreakpoints.of(context).screenWidth > 960 ? 0.45 : 0.75;
+
+    return ResponsiveBreakpoints.of(context).largerThan(MOBILE)
         ? Dialog(
             insetPadding: insetPadding,
             alignment: alignment,
             clipBehavior: insetPadding == EdgeInsets.zero ? Clip.none : Clip.hardEdge,
             child: SizedBox(
-              width: ResponsiveBreakpoints.of(context).screenWidth * 0.45,
+              width: ResponsiveBreakpoints.of(context).screenWidth * widthMultiplier,
               child: builder(context),
             ),
           )

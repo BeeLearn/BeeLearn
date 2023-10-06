@@ -14,9 +14,9 @@ class StreakModel extends BaseModel<Streak> {
     }).toList();
   }
 
-  List<DateTime> get completedStreakDates {
-    return items.where((streak) => streak.isComplete).map((streak) => streak.date).toList();
-  }
+  int get totalCompletedWeekStreaks => weekStreaks.where((streak) => streak.isComplete).length;
+
+  List<DateTime> get completedStreakDates => items.where((streak) => streak.isComplete).map((streak) => streak.date).toList();
 
   @override
   int getEntityId(Streak item) => item.id;

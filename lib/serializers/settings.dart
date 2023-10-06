@@ -8,12 +8,12 @@ class Settings {
   final int id;
 
   @JsonKey(required: true, name: "is_promotional_email_enabled")
-  final bool isPromotionalEmailEnabled;
+  bool isPromotionalEmailEnabled;
 
   @JsonKey(required: true, name: "is_push_notifications_enabled")
-  final bool isPushNotificationsEnabled;
+  bool isPushNotificationsEnabled;
 
-  const Settings({
+  Settings({
     required this.id,
     required this.isPromotionalEmailEnabled,
     required this.isPushNotificationsEnabled,

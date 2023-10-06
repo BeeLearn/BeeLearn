@@ -28,24 +28,28 @@ class CourseCard extends StatelessWidget {
 
   @override
   Widget build(context) {
-    return GestureDetector(
-      onTap: () {
+    final userModel = Provider.of<UserModel>(
+      context,
+      listen: false,
+    );
+
+    return InkWell(
+      onTap: () async {
         if (course.isEnrolled) {
           intent(context);
         } else {
-          final userModel = Provider.of<UserModel>(context, listen: false);
+          intent(context);
 
-          CourseModel.updateCourse(id: course.id, data: {
-            "course_enrolled_users": {
-              "add": [userModel.value.id]
+          final response = await CourseModel.updateCourse(
+            id: course.id,
+            data: {
+              "course_enrolled_users": {
+                "add": [userModel.value.id]
+              },
             },
-          }).then((course) {
-            if (onUpdate != null) {
-              onUpdate!(course);
-            }
+          );
 
-            intent(context);
-          });
+          if (onUpdate != null) onUpdate!(response);
         }
       },
       child: Card(

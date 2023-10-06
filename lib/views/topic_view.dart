@@ -1,13 +1,12 @@
 import 'dart:async';
 
 import 'package:beelearn/services/ad_loader.dart';
+import 'package:beelearn/views/fragments/dialog_fragment.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import "package:provider/provider.dart";
-import 'package:responsive_framework/responsive_breakpoints.dart';
 
-import '../../globals.dart';
 import '../models/streak_model.dart';
 import '../models/topic_model.dart';
 import '../models/user_model.dart';
@@ -86,28 +85,29 @@ class _TopicViewState extends State<TopicView> {
 
   @override
   Widget build(context) {
-    return WillPopScope(
-      onWillPop: () async {
-        _interstitialAdLoader?.showAd(_adUnitId);
-        return true;
-      },
-      child: Scaffold(
-        extendBody: true,
-        extendBodyBehindAppBar: true,
-        body: LoaderOverlay(
-          closeOnBackButton: true,
-          overlayOpacity: 1,
-          overlayColor: Colors.black45,
-          child: MultiProvider(
-            providers: [
-              ChangeNotifierProvider(
-                create: (context) => TopicModel(),
-              ),
-            ],
-            child: SafeArea(
-              bottom: false,
-              child: ResponsiveBreakpoints(
-                breakpoints: defaultBreakpoints,
+    return DialogFragment(
+      alignment: Alignment.topRight,
+      insetPadding: EdgeInsets.zero,
+      builder: (context) => WillPopScope(
+        onWillPop: () async {
+          _interstitialAdLoader?.showAd(_adUnitId);
+          return true;
+        },
+        child: Scaffold(
+          extendBody: true,
+          extendBodyBehindAppBar: true,
+          body: LoaderOverlay(
+            closeOnBackButton: true,
+            overlayOpacity: 1,
+            overlayColor: Colors.black45,
+            child: MultiProvider(
+              providers: [
+                ChangeNotifierProvider(
+                  create: (context) => TopicModel(),
+                ),
+              ],
+              child: SafeArea(
+                bottom: false,
                 child: TopicFragment(query: widget.query),
               ),
             ),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import '../../models/models.dart';
 import '../../views/components/course_card.dart';
+import '../topic_view.dart';
 
 class FavoriteTabView extends StatefulWidget {
   const FavoriteTabView({super.key}) : super();
@@ -117,8 +117,17 @@ class _FavoriteTabViewState extends State<FavoriteTabView> {
 
                             return CourseCard(
                               course: course,
-                              onTap: () => context.go(
-                                "/topics/?lesson__module__course=${course.id}&likes=${_userModel.value.id}",
+                              onTap: () => showDialog(
+                                context: context,
+                                useSafeArea: false,
+                                builder: (context) {
+                                  return TopicView(
+                                    query: {
+                                      "likes": "${_userModel.value.id}",
+                                      "lesson__module__course": "${course.id}",
+                                    },
+                                  );
+                                },
                               ),
                             );
                           },

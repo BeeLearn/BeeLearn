@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:horizontal_blocked_scroll_physics/horizontal_blocked_scroll_physics.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_framework/responsive_framework.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../controllers/topic_question_controller.dart';
@@ -168,13 +168,7 @@ class _TopicFragmentState extends State<TopicFragment> {
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(top: 16.0),
-                  child: ResponsiveBreakpoints.of(context).largerThan(TABLET)
-                      ? SizedBox(
-                          width: ResponsiveBreakpoints.of(context).screenWidth * 0.5,
-                          height: double.infinity,
-                          child: _getMarkdownContent(topic),
-                        )
-                      : _getMarkdownContent(topic),
+                  child: _getMarkdownContent(topic),
                 ),
               ),
               BottomAppBar(
@@ -384,42 +378,61 @@ class _TopicFragmentState extends State<TopicFragment> {
               ? const Center(
                   child: CircularProgressIndicator(),
                 )
-              : PageView.builder(
-                  itemCount: items.length,
-                  controller: controller,
-                  physics: items.isNotEmpty && _canScrollNext(items, viewTypes) ? null : const LeftBlockedScrollPhysics(),
-                  onPageChanged: (index) {
-                    if (index > 0) {
-                      final currentIndex = index - 1;
-                      final viewType = viewTypes[currentIndex];
-                      if (viewType == _TopicFragmentViewType.topicView) completeTopic(items[currentIndex]);
-                    }
-
-                    setState(() => currentPage = index);
+              : CallbackShortcuts(
+                  bindings: <ShortcutActivator, VoidCallback>{
+                    const SingleActivator(LogicalKeyboardKey.arrowLeft): () {
+                      controller.previousPage(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    const SingleActivator(LogicalKeyboardKey.arrowRight): () {
+                      controller.nextPage(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                    },
                   },
-                  itemBuilder: (context, index) {
-                    final viewType = viewTypes[index];
-                    final item = items[index];
+                  child: Focus(
+                    autofocus: true,
+                    child: PageView.builder(
+                      itemCount: items.length,
+                      controller: controller,
+                      physics: items.isNotEmpty && _canScrollNext(items, viewTypes) ? null : const LeftBlockedScrollPhysics(),
+                      onPageChanged: (index) {
+                        if (index > 0) {
+                          final currentIndex = index - 1;
+                          final viewType = viewTypes[currentIndex];
+                          if (viewType == _TopicFragmentViewType.topicView) completeTopic(items[currentIndex]);
+                        }
 
-                    switch (viewType) {
-                      case _TopicFragmentViewType.topicView:
-                        return getTopicView(item, index);
-                      case _TopicFragmentViewType.questionView:
-                        return QuestionView(
-                          topicQuestion: items[index],
+                        setState(() => currentPage = index);
+                      },
+                      itemBuilder: (context, index) {
+                        final viewType = viewTypes[index];
+                        final item = items[index];
 
-                          /// Todo rename callback as afterValidation
-                          markQuestionAsCompleted: () async {
-                            final topicQuestion = items[currentPage];
-                            // Mark question as answered
-                            await _markQuestionAsAnswered(topicQuestion);
-                          },
-                          nextPage: () => _nextPage(items, viewTypes),
-                        );
-                      default:
-                        throw UnimplementedError("viewType not implemented");
-                    }
-                  },
+                        switch (viewType) {
+                          case _TopicFragmentViewType.topicView:
+                            return getTopicView(item, index);
+                          case _TopicFragmentViewType.questionView:
+                            return QuestionView(
+                              topicQuestion: items[index],
+
+                              /// Todo rename callback as afterValidation
+                              markQuestionAsCompleted: () async {
+                                final topicQuestion = items[currentPage];
+                                // Mark question as answered
+                                await _markQuestionAsAnswered(topicQuestion);
+                              },
+                              nextPage: () => _nextPage(items, viewTypes),
+                            );
+                          default:
+                            throw UnimplementedError("viewType not implemented");
+                        }
+                      },
+                    ),
+                  ),
                 ),
         );
       },

@@ -1,4 +1,3 @@
-import 'package:beelearn/views/notification_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,12 +5,10 @@ import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-import 'views/enhancement_view.dart';
 import 'views/main_view.dart';
 import 'views/module_view.dart';
 import 'views/onboarding_view.dart';
 import 'views/search_view.dart';
-import 'views/topic_view.dart';
 
 /// Todo enhance
 /// Todo Create a middleware wrapper
@@ -39,36 +36,46 @@ GoRouter router = GoRouter(
           builder: (context, state) => const MainView(),
           routes: [
             GoRoute(
-              path: "notifications",
-              builder: (context, state) => const NotificationView(),
-            ),
-            GoRoute(
               path: "search",
               builder: (context, state) => const SearchView(),
             ),
-            GoRoute(
-              path: "topics",
-              builder: (context, state) => TopicView(
-                query: state.uri.queryParameters,
-              ),
-              routes: [
-                GoRoute(
-                  path: ":topicId/enhancements",
-                  builder: (context, state) => EnhancementView(
-                    topicId: state.uri.queryParameters["topicId"] as int,
-                  ),
-                ),
-              ],
-            ),
-            GoRoute(
-              path: "modules",
-              builder: (context, state) {
-                return ModuleView(
-                  courseName: state.uri.queryParameters["courseName"],
-                  query: state.pathParameters,
+            ShellRoute(
+              builder: (context, state, child) {
+                //log("URI", error: state.uri);
+
+                return Flex(
+                  direction: Axis.horizontal,
+                  children: [
+                    //Flexible(child: child),
+                    Flexible(child: Container()),
+                  ],
                 );
               },
+              routes: [
+                GoRoute(
+                  path: "modules",
+                  builder: (context, state) {
+                    return ModuleView(
+                      query: state.pathParameters,
+                      courseName: state.pathParameters["courseName"],
+                    );
+                  },
+                ),
+                // GoRoute(
+                //   path: "topics",
+                //   builder: (context, state) => TopicView(query: state.uri.queryParameters),
+                // ),
+              ],
             ),
+            // GoRoute(
+            //   path: "modules",
+            //   builder: (context, state) {
+            //     return ModuleView(
+            //       courseName: state.uri.queryParameters["courseName"],
+            //       query: state.pathParameters,
+            //     );
+            //   },
+            // ),
           ],
           redirect: (context, state) async {
             String? redirectPath;

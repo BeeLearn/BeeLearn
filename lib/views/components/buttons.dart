@@ -77,7 +77,7 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
   }
 
   @override
-  dispose(){
+  dispose() {
     clickTimer?.cancel();
 
     super.dispose();
@@ -132,7 +132,7 @@ class _CustomOutlinedButtonState extends State<CustomOutlinedButton> {
     return _getWidget(
       AnimatedContainer(
         curve: Curves.bounceInOut,
-        duration: const Duration(microseconds: 5000),
+        duration: const Duration(microseconds: 500),
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(

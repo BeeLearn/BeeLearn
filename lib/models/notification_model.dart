@@ -6,7 +6,7 @@ class NotificationModel extends BaseModel<Notification> {
 
   String? get next => _next;
   set next(String? value) {
-    next = value;
+    _next = value;
     notifyListeners();
   }
 

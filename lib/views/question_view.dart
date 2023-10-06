@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:responsive_framework/responsive_breakpoints.dart';
 
 import '../controllers/controllers.dart';
 import '../models/models.dart';
@@ -47,22 +46,22 @@ class _QuestionViewState extends State<QuestionView> {
     );
   }
 
-  void _answerQuestion (){
+  void _answerQuestion() {
     if (_userModel.value.isPremium) {
-        if (onAnswerListener.value != null) onAnswerListener.value!();
-      } else {
-        showDialog(
-          context: context,
-          builder: (context) => SubscriptionAdFragment(
-            title: "Watch ads to answer question",
-            onAdsLoaded: () {
-              if (onAnswerListener.value != null) onAnswerListener.value!();
-              Navigator.pop(context);
-            },
-            onBackPressed: () => Navigator.pop(context),
-          ),
-        );
-      }
+      if (onAnswerListener.value != null) onAnswerListener.value!();
+    } else {
+      showDialog(
+        context: context,
+        builder: (context) => SubscriptionAdFragment(
+          title: "Watch ads to answer question",
+          onAdsLoaded: () {
+            if (onAnswerListener.value != null) onAnswerListener.value!();
+            Navigator.pop(context);
+          },
+          onBackPressed: () => Navigator.pop(context),
+        ),
+      );
+    }
   }
 
   /// Decrease user lives if answer is invalid
@@ -279,12 +278,7 @@ class _QuestionViewState extends State<QuestionView> {
             ),
             const SizedBox(height: 16.0),
             Flexible(
-              child: ResponsiveBreakpoints.of(context).largerThan(TABLET)
-                  ? SizedBox(
-                      width: ResponsiveBreakpoints.of(context).screenWidth * 0.5,
-                      child: body,
-                    )
-                  : body,
+              child: body,
             ),
           ],
         ),

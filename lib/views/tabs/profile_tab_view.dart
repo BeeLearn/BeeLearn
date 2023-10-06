@@ -54,7 +54,7 @@ class _ProfileTabViewState extends State<ProfileTabView> {
         ];
       },
       body: SingleChildScrollView(
-        child: ResponsiveBreakpoints.of(context).smallerOrEqualTo(MOBILE)
+        child: ResponsiveBreakpoints.of(context).screenWidth < 780
             ? const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
