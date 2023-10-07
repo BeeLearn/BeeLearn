@@ -22,6 +22,7 @@ class Profile {
   int get dailyStreakSeconds => dailyStreakMinutes * 60;
 
   /// This lives is gained via ads and not stored in database
+  @JsonKey(includeFromJson: false, includeToJson: false)
   int temporaryLives = 0;
 
   /// User total lifeLine for this session

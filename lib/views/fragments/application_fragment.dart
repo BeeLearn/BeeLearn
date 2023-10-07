@@ -78,7 +78,7 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
             ].contains(purchaseDetails.status)) {
               final purchase = await purchaseController.verifyPurchase(
                 {
-                  "type": "consumable",
+                  "type": "non-consumable",
                   "source": purchaseDetails.verificationData.source,
                   "token": purchaseDetails.verificationData.serverVerificationData,
                   "product": {

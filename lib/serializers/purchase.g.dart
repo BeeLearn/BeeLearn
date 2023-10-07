@@ -11,6 +11,7 @@ Purchase _$PurchaseFromJson(Map<String, dynamic> json) {
     json,
     requiredKeys: const [
       'id',
+      'order_id',
       'product',
       'status',
       'metadata',
@@ -19,7 +20,8 @@ Purchase _$PurchaseFromJson(Map<String, dynamic> json) {
     ],
   );
   return Purchase(
-    id: json['id'] as String,
+    id: json['id'] as int,
+    orderId: json['order_id'] as String,
     product: Product.fromJson(json['product'] as Map<String, dynamic>),
     status: $enumDecode(_$PurchaseStatusEnumMap, json['status']),
     metadata: json['metadata'] as Map<String, dynamic>?,
@@ -31,6 +33,7 @@ Purchase _$PurchaseFromJson(Map<String, dynamic> json) {
 Map<String, dynamic> _$PurchaseToJson(Purchase instance) {
   final val = <String, dynamic>{
     'id': instance.id,
+    'order_id': instance.orderId,
     'product': instance.product,
     'status': _$PurchaseStatusEnumMap[instance.status]!,
   };

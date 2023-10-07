@@ -1,5 +1,7 @@
+import 'package:beelearn/middlewares/api_middleware.dart';
 import 'package:beelearn/models/models.dart';
 import 'package:beelearn/services/purchase_service.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,7 +35,13 @@ class _SettingsPremiumView extends State<SettingsPremiumView> {
             itemBuilder: (context) => [
               PopupMenuItem(
                 child: const Text("Manage Subscription"),
-                onTap: () {},
+                onTap: () {
+                  if (kIsWeb) {
+                    /// Todo show subscription manage ui
+                  } else {
+                    /// Todo Intent to deepLink appStore
+                  }
+                },
               ),
               PopupMenuItem(
                 child: const Text("Restore Subscriptions"),
@@ -106,16 +114,27 @@ class _SettingsPremiumView extends State<SettingsPremiumView> {
                                                 child: FilledButton(
                                                   onPressed: model.value.isPremium
                                                       ? null
-                                                      : () {
+                                                      : () async {
                                                           if (!context.loaderOverlay.visible) {
                                                             context.loaderOverlay.show();
+                                                            try {
+                                                              await PurchaseService.instance.subscription(
+                                                                context,
+                                                                snapshot.requireData,
+                                                              );
 
-                                                            PurchaseService.instance
-                                                                .subscription(
-                                                                  context,
-                                                                  snapshot.requireData,
-                                                                )
-                                                                .whenComplete(() => context.loaderOverlay.hide());
+                                                              if (kIsWeb) {
+                                                                showSnackBar(
+                                                                  leading: const Icon(
+                                                                    Icons.pending,
+                                                                    color: Colors.amber,
+                                                                  ),
+                                                                  title: "Payment is being processed, please wait few minutes and refresh.",
+                                                                );
+                                                              }
+                                                            } finally {
+                                                              context.loaderOverlay.hide();
+                                                            }
                                                           }
                                                         },
                                                   style: FilledButton.styleFrom(

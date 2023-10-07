@@ -1,6 +1,7 @@
 import 'package:clean_calendar/clean_calendar.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/models.dart';
@@ -11,6 +12,8 @@ class StreakView extends StatelessWidget {
 
   @override
   Widget build(context) {
+    final currentDate = DateTime.now();
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(
         top: 16.0,
@@ -32,9 +35,9 @@ class StreakView extends StatelessWidget {
                         fontWeight: FontWeight.w900,
                       ),
                     ),
-                    const Text(
-                      "Your monthly streak overview for september",
-                      style: TextStyle(color: Colors.grey),
+                    Text(
+                      "Your monthly streak overview for ${DateFormat("MMMM").format(currentDate)}",
+                      style: const TextStyle(color: Colors.grey),
                     ),
                   ],
                 ),
@@ -43,9 +46,12 @@ class StreakView extends StatelessWidget {
           ),
           Consumer<StreakModel>(
             builder: (context, model, child) {
+              final monthStart = DateTime(currentDate.year, currentDate.month);
+              final monthEnd = DateTime(currentDate.year, currentDate.month + 1, 0);
+
               return CleanCalendar(
-                startDateOfCalendar: DateTime(2023, 9, 1),
-                endDateOfCalendar: DateTime(2023, 9, 23),
+                startDateOfCalendar: monthStart,
+                endDateOfCalendar: monthEnd,
                 headerProperties: const HeaderProperties(
                   hide: true,
                 ),

@@ -86,14 +86,20 @@ class PurchaseService {
     );
 
     final txRef = const Uuid().v4();
+
     final paymentLinkResponse = purchaseController.createPaymentLink<PaystackPaymentLink>(
       {
         "reference": txRef,
         "source": "paystack",
         "amount": product.amount,
+        "plan": product.paystackPlanCode,
         "email": userModel.value.email,
+        "metadata": {
+          "reference": txRef,
+        },
       },
     );
+
     _paystackPayment.initialize(publicKey: FirebaseRemoteConfig.instance.getString("PAYSTACK_PUBLIC_KEY"));
 
     final chargeResponse = await _paystackPayment.checkout(
@@ -117,7 +123,9 @@ class PurchaseService {
     if (chargeResponse.status) {
       await purchaseController.createPurchase(
         body: {
-          "id": txRef,
+          "metadata": {
+            "reference": txRef,
+          },
           "product": product.id,
         },
       );

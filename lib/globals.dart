@@ -56,8 +56,8 @@ GoRouter router = GoRouter(
                   path: "modules",
                   builder: (context, state) {
                     return ModuleView(
-                      query: state.pathParameters,
-                      courseName: state.pathParameters["courseName"],
+                      query: state.uri.queryParameters,
+                      courseName: state.uri.queryParameters["courseName"],
                     );
                   },
                 ),

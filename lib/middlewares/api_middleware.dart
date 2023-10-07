@@ -206,6 +206,41 @@ class ApiMiddleware {
           }
         },
       );
+
+      client?.subscribe(
+        namespace: "purchases",
+        onError: _onError,
+        onSuccess: (response) {
+          final purchaseModel = Provider.of<PurchaseModel>(
+            context,
+            listen: false,
+          );
+
+          final userModel = Provider.of<UserModel>(
+            context,
+            listen: false,
+          );
+
+          final purchase = Purchase.fromJson(response.data);
+
+          switch (response.type!) {
+            case Type.created:
+            case Type.updated:
+              purchaseModel.updateOrAddOne(purchase);
+              // If purchase is a type of subscription and status is successful then user is a premium user
+              if (!purchase.product.consumable) {
+                final user = userModel.value;
+                user.isPremium = purchase.status == PurchaseStatus.successful;
+                userModel.value = user;
+              }
+
+              break;
+            case Type.removed:
+              purchaseModel.removeOne(purchase);
+              break;
+          }
+        },
+      );
     });
   }
 }

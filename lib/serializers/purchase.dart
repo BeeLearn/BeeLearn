@@ -20,7 +20,10 @@ enum PurchaseStatus {
 @JsonSerializable()
 class Purchase {
   @JsonKey(required: true)
-  final String id;
+  final int id;
+
+  @JsonKey(required: true, name: "order_id")
+  final String orderId;
 
   @JsonKey(required: true)
   final Product product;
@@ -39,6 +42,7 @@ class Purchase {
 
   const Purchase({
     required this.id,
+    required this.orderId,
     required this.product,
     required this.status,
     required this.metadata,

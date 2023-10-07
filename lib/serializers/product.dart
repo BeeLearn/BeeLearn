@@ -22,6 +22,15 @@ class Product {
   @JsonKey(required: true)
   final String currency;
 
+  @JsonKey(required: true)
+  final bool consumable;
+
+  @JsonKey(required: true, includeIfNull: true, name: "flutterwave_plan_id")
+  final String? flutterwavePlanId;
+
+  @JsonKey(required: true, includeIfNull: true, name: "paystack_plan_code")
+  final String? paystackPlanCode;
+
   @JsonKey(required: true, name: "created_at")
   final DateTime createdAt;
 
@@ -35,6 +44,9 @@ class Product {
     required this.price,
     required this.amount,
     required this.currency,
+    required this.consumable,
+    required this.flutterwavePlanId,
+    required this.paystackPlanCode,
     required this.createdAt,
     required this.updatedAt,
   });

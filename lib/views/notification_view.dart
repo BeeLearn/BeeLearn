@@ -125,7 +125,11 @@ class _NotificationViewState extends State<NotificationView> {
   Future<void> _loadNotifications({String? url}) async {
     final response = await notificationController.listNotifications(url: url);
     _notificationModel.next = response.next;
-    _notificationModel.setAll(response.results);
+    if (url == null) {
+      _notificationModel.setAll(response.results);
+    } else {
+      _notificationModel.addAll(response.results);
+    }
   }
 
   @override

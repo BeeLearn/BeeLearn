@@ -139,16 +139,10 @@ class _StreakCardState extends State<StreakCard> {
                         Expanded(
                           child: Consumer<StreakModel>(
                             builder: (context, model, child) {
-                              return Text("My streak is ${model.completedStreakDates.length} day");
+                              return Text("My streak is ${model.totalCompletedWeekStreaks} day");
                             },
                           ),
                         ),
-                        // TextButton(
-                        //   onPressed: () {},
-                        //   child: const Text(
-                        //     "All time record",
-                        //   ),
-                        // ),
                       ],
                     ),
                   ],

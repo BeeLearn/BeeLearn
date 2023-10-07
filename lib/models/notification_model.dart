@@ -14,5 +14,5 @@ class NotificationModel extends BaseModel<Notification> {
   int getEntityId(item) => item.id;
 
   @override
-  int orderBy(first, second) => first.createdAt.compareTo(second.createdAt);
+  int orderBy(first, second) => second.createdAt.compareTo(first.createdAt);
 }
