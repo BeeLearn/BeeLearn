@@ -1,3 +1,4 @@
+import 'package:beelearn/widget_keys.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,7 +7,6 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import 'views/main_view.dart';
-import 'views/module_view.dart';
 import 'views/onboarding_view.dart';
 import 'views/search_view.dart';
 
@@ -29,53 +29,20 @@ GoRouter router = GoRouter(
       routes: [
         GoRoute(
           path: "/onboarding",
-          builder: (context, state) => const OnBoardingView(),
+          builder: (context, state) => const OnBoardingView(
+            key: onBoardingViewKey,
+          ),
         ),
         GoRoute(
           path: '/',
-          builder: (context, state) => const MainView(),
+          builder: (context, state) => const MainView(
+            key: mainViewKey,
+          ),
           routes: [
             GoRoute(
               path: "search",
               builder: (context, state) => const SearchView(),
             ),
-            ShellRoute(
-              builder: (context, state, child) {
-                //log("URI", error: state.uri);
-
-                return Flex(
-                  direction: Axis.horizontal,
-                  children: [
-                    //Flexible(child: child),
-                    Flexible(child: Container()),
-                  ],
-                );
-              },
-              routes: [
-                GoRoute(
-                  path: "modules",
-                  builder: (context, state) {
-                    return ModuleView(
-                      query: state.uri.queryParameters,
-                      courseName: state.uri.queryParameters["courseName"],
-                    );
-                  },
-                ),
-                // GoRoute(
-                //   path: "topics",
-                //   builder: (context, state) => TopicView(query: state.uri.queryParameters),
-                // ),
-              ],
-            ),
-            // GoRoute(
-            //   path: "modules",
-            //   builder: (context, state) {
-            //     return ModuleView(
-            //       courseName: state.uri.queryParameters["courseName"],
-            //       query: state.pathParameters,
-            //     );
-            //   },
-            // ),
           ],
           redirect: (context, state) async {
             String? redirectPath;

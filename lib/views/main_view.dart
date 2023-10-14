@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:beelearn/widget_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
@@ -23,7 +24,9 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   int _currentIndex = 0;
   final List<Widget> _tabs = [
-    const CategoryTabView(),
+    const CategoryTabView(
+      key: categoryTabViewKey,
+    ),
     const FavoriteTabView(),
     const ProfileTabView(),
   ];

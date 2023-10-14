@@ -47,11 +47,13 @@ class CustomOutlinedButton extends StatefulWidget {
   State<CustomOutlinedButton> createState() => _CustomOutlinedButtonState();
 
   factory CustomOutlinedButton.icon({
+    Key? key,
     required void Function() onPressed,
     required Widget icon,
     required Widget label,
   }) =>
       CustomOutlinedButton(
+        key: key,
         onTap: onPressed,
         child: Row(
           children: [

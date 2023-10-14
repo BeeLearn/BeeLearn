@@ -1,3 +1,4 @@
+import 'package:beelearn/widget_keys.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart' hide OutlinedButton;
 import 'package:go_router/go_router.dart';
@@ -175,6 +176,7 @@ class _OnBoardingView extends State<OnBoardingView> with AutomaticKeepAliveClien
                         children: [
                           Expanded(
                             child: CustomOutlinedButton.icon(
+                              key: onBoardingViewGoogleSignInButtonKey,
                               onPressed: () => _signInWithGoogle(context),
                               icon: Image.asset(
                                 "assets/icons/ic_google.png",
@@ -191,6 +193,7 @@ class _OnBoardingView extends State<OnBoardingView> with AutomaticKeepAliveClien
                         children: [
                           Expanded(
                             child: CustomOutlinedButton.icon(
+                              key: onBoardingViewFacebookSignInButtonKey,
                               onPressed: () => _signInWithFacebook(context),
                               icon: Image.asset(
                                 "assets/icons/ic_facebook.png",

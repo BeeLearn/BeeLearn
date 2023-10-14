@@ -136,9 +136,9 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
               ApiMiddleware.run(context);
 
               if (!kIsWeb) {
-                await _awesomeNotificationsFcm.initialize(
+                _awesomeNotificationsFcm.initialize(
                   licenseKeys: null,
-                  debug: MainApplication.isDevelopment,
+                  debug: kDebugMode,
                   onFcmTokenHandle: NotificationController.fcmTokenHandle,
                   onFcmSilentDataHandle: NotificationController.silentDataHandle,
                   onNativeTokenHandle: NotificationController.nativeTokenHandle,
@@ -151,6 +151,7 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
                   onDismissActionReceivedMethod: NotificationController.onDismissActionReceivedMethod,
                 );
 
+                /// Todo
                 _awesomeNotifications.isNotificationAllowed().then((isAllowed) {
                   if (!isAllowed) {
                     // This is just a basic example. For real apps, you must show some
