@@ -102,12 +102,17 @@ class _StreakCardState extends State<StreakCard> {
                         children: [
                           FilledButton.tonal(
                             onPressed: () {
-                              showModalBottomSheet(
-                                context: context,
-                                builder: (context) {
-                                  return const SetGoalFragment();
-                                },
-                              );
+                              if(MediaQuery.of(context).orientation == Orientation.portrait){
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) => const SetGoalFragment(),
+                                );
+                              } else {
+                                showBottomSheet(
+                                  context: context,
+                                  builder: (context) => const SetGoalFragment(),
+                                );
+                              }
                             },
                             child: const Text("Adjust goal"),
                           ),

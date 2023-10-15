@@ -24,9 +24,7 @@ class MainView extends StatefulWidget {
 class _MainViewState extends State<MainView> {
   int _currentIndex = 0;
   final List<Widget> _tabs = [
-    const CategoryTabView(
-      key: categoryTabViewKey,
-    ),
+    const CategoryTabView(),
     const FavoriteTabView(),
     const ProfileTabView(),
   ];
@@ -194,6 +192,7 @@ class _MainViewState extends State<MainView> {
   @override
   Widget build(context) {
     return Scaffold(
+      key: mainViewKey,
       bottomNavigationBar: LayoutBuilder(
         builder: (context, constraints) {
           return constraints.maxWidth < 640 ? _smallScreenNavigation : const Row();
@@ -213,6 +212,7 @@ class _MainViewState extends State<MainView> {
                     ),
                     Expanded(
                       child: ShowCaseWidget(
+                        autoPlay: true,
                         onComplete: (index, keys) => MainApplication.isNewUser = false,
                         builder: Builder(
                           builder: (context) => IndexedStack(

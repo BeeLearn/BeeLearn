@@ -1,12 +1,19 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:beelearn/constants/constants.dart';
+import 'package:beelearn/views/email_link_login_view.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
+import 'package:uni_links/uni_links.dart';
 
 import '../main_application.dart';
+import '../middlewares/api_middleware.dart';
 import '../models/models.dart';
 import 'app_theme.dart';
 import 'fragments/application_fragment.dart';

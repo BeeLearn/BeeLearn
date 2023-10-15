@@ -1,13 +1,12 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:http/http.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:provider/provider.dart';
-import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../controllers/user_controller.dart';
 import '../middlewares/api_middleware.dart' show showSnackBar;
@@ -44,6 +43,11 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
     usernameTextEditController = TextEditingController(text: userModel.value.username);
   }
 
+  Future<XFile?> getImageFiles() async {
+    final ImagePicker picker = ImagePicker();
+    return await picker.pickImage(source: ImageSource.gallery,);
+  }
+
   Widget _getBody(BuildContext context) {
     return LoaderOverlay(
       overlayOpacity: 0,
@@ -74,6 +78,7 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
                           id: userModel.value.id,
                           body: data,
                         );
+
                         showSnackBar(
                           leading: Icon(
                             Icons.check_circle_rounded,
@@ -81,7 +86,7 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
                           ),
                           title: "Profile updated successfully",
                         );
-                      } catch (error, stackTrace) {
+                      } catch (error) {
                         showSnackBar(
                           leading: const Icon(
                             Icons.error,
@@ -120,23 +125,16 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
                             TextButton(
                               onPressed: () async {
                                 context.loaderOverlay.show();
-                                final List<AssetEntity>? result = await AssetPicker.pickAssets(
-                                  context,
-                                  pickerConfig: const AssetPickerConfig(
-                                    maxAssets: 1,
-                                  ),
-                                );
+                                final file = await getImageFiles();
 
-                                if (result != null && result.isNotEmpty) {
-                                  final File file = (await result[0].file)!;
-
+                                if (file != null) {
                                   userModel.value = await userController.updateMultipartUser(
                                     id: userModel.value.id,
                                     multipartFiles: [
                                       await MultipartFile.fromPath(
                                         "avatar",
                                         file.path,
-                                        contentType: MediaType.parse(result[0].mimeType!),
+                                        contentType: MediaType.parse(file.mimeType!),
                                       ),
                                     ],
                                   ).onError(

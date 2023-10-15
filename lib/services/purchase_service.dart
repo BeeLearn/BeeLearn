@@ -14,15 +14,17 @@ import '../models/models.dart';
 import '../serializers/serializers.dart';
 
 class PurchaseService {
-  bool? isInAppPurchaseAvailable;
   static PurchaseService? _instance;
   static final PaystackPayment _paystackPayment = PaystackPayment();
 
   /// Does platform support inAppPurchase
   bool get isInAppPurchaseEnabled => !kIsWeb && (Platform.isAndroid || Platform.isIOS || Platform.isMacOS);
 
+  Future <bool>  get isInAppPurchaseAvailable async => isInAppPurchaseEnabled ? await InAppPurchase.instance.isAvailable() : false;
+
   /// Is InApp Purchase supported for this application
-  bool get isInAppPurchaseSupported => isInAppPurchaseEnabled && isInAppPurchaseAvailable!;
+  Future <bool> get isInAppPurchaseSupported async  => isInAppPurchaseEnabled && await isInAppPurchaseAvailable;
+
 
   /// Purchase service singleton instance
   static PurchaseService get instance => _instance ??= PurchaseService._();
@@ -35,7 +37,6 @@ class PurchaseService {
   }
 
   Future<void> _initialize() async {
-    isInAppPurchaseAvailable = isInAppPurchaseEnabled ? await InAppPurchase.instance.isAvailable() : false;
   }
 
   /// Todo add support for other interval
@@ -48,7 +49,7 @@ class PurchaseService {
 
     final products = productModel.items;
 
-    if (isInAppPurchaseSupported) {
+    if (await isInAppPurchaseSupported) {
       /// Pipe predicate - filter out kIds is null
       final Set<String> kIds = products.map((product) => product.id).toSet();
       final ProductDetailsResponse response = await InAppPurchase.instance.queryProductDetails(kIds);
@@ -63,10 +64,14 @@ class PurchaseService {
     );
   }
 
-  Future<void> subscription(BuildContext context, dynamic product) {
-    if (isInAppPurchaseSupported) return _subscribeInApp(product);
+  Future<void> subscription(BuildContext context, dynamic product) async {
 
-    return _subscribeExternal(context, product);
+    return isInAppPurchaseSupported.then((value) {
+      if (value) return _subscribeInApp(product);
+      
+      return _subscribeExternal(context, product);
+    });
+
   }
 
   /// Handle in-app subscription

@@ -45,8 +45,8 @@ class _SettingsPremiumView extends State<SettingsPremiumView> {
               ),
               PopupMenuItem(
                 child: const Text("Restore Subscriptions"),
-                onTap: () {
-                  if (PurchaseService.instance.isInAppPurchaseSupported) {
+                onTap: () async {
+                  if (await PurchaseService.instance.isInAppPurchaseSupported) {
                     InAppPurchase.instance.restorePurchases();
                   }
                 },

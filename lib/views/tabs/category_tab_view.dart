@@ -1,5 +1,6 @@
 import 'package:badges/badges.dart' as badges;
 import 'package:beelearn/views/notification_view.dart';
+import 'package:beelearn/widget_keys.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -28,10 +29,22 @@ class _CategoryTabView extends State<CategoryTabView> {
   final GlobalKey _three = GlobalKey();
 
   List<Tab> get _tabs => [
-        const Tab(child: Text("For you")),
-        const Tab(child: Text("New")),
-        const Tab(child: Text("In progress")),
-        const Tab(child: Text("Completed")),
+        const Tab(
+          key: categoryCatalogueTabViewKey,
+          child: Text("For you"),
+        ),
+        const Tab(
+          key: categoryNewCatalogueTabViewKey,
+          child: Text("New"),
+        ),
+        const Tab(
+          key: categoryInProgressCatalogueTabViewKey,
+          child: Text("In progress"),
+        ),
+        const Tab(
+          key: categoryCompletedCatalogueTabViewKey,
+          child: Text("Completed"),
+        ),
       ];
 
   @override
@@ -40,7 +53,13 @@ class _CategoryTabView extends State<CategoryTabView> {
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       if (MainApplication.isNewUser) {
-        ShowCaseWidget.of(context).startShowCase([_one, _two, _three]);
+        ShowCaseWidget.of(context).startShowCase(
+          [
+            _one,
+            _two,
+            _three,
+          ],
+        );
       }
     });
   }
@@ -48,6 +67,7 @@ class _CategoryTabView extends State<CategoryTabView> {
   @override
   Widget build(context) {
     return DefaultTabController(
+      key: categoryCatalogueTabViewKey,
       length: _tabs.length,
       child: NestedScrollView(
         headerSliverBuilder: (context, innerBoxIsScrolled) {
@@ -83,12 +103,23 @@ class _CategoryTabView extends State<CategoryTabView> {
                       title: "Take on your next challenge",
                       description: "Use your hearts to keep learning!",
                       child: PillChip(
+                        key: categoryLifeRefillActionButtonKey,
                         onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            showDragHandle: true,
-                            builder: (context) => const UserLifeLineView(),
-                          );
+                          if (MediaQuery.of(context).orientation == Orientation.portrait) {
+                            showModalBottomSheet(
+                              context: context,
+                              showDragHandle: true,
+                              builder: (context) => const UserLifeLineView(key: lifeRefillModalViewKey),
+                            );
+                          } else {
+                            showBottomSheet(
+                              context: context,
+                              builder: (context) => const Padding(
+                                padding: EdgeInsets.only(top: 16.0),
+                                child: UserLifeLineView(key: lifeRefillModalViewKey),
+                              ),
+                            );
+                          }
                         },
                         children: [
                           const Icon(
@@ -106,12 +137,20 @@ class _CategoryTabView extends State<CategoryTabView> {
                       title: "Let that streak be consistent",
                       description: "View your streaks, and share",
                       child: PillChip(
+                        key: categoryStreakActionButtonKey,
                         onTap: () {
-                          showModalBottomSheet(
-                            context: context,
-                            showDragHandle: true,
-                            builder: (context) => const StreakView(),
-                          );
+                          if (MediaQuery.of(context).orientation == Orientation.portrait) {
+                            showModalBottomSheet(
+                              context: context,
+                              showDragHandle: true,
+                              builder: (context) => const StreakView(key: streakModalViewKey),
+                            );
+                          } else {
+                            showBottomSheet(
+                              context: context,
+                              builder: (context) => const StreakView(key: streakModalViewKey),
+                            );
+                          }
                         },
                         children: [
                           Icon(
@@ -128,9 +167,11 @@ class _CategoryTabView extends State<CategoryTabView> {
                       title: "Notifications",
                       description: "View all your notifications and alerts here",
                       child: IconButton(
+                        key: categoryNotificationActionButtonKey,
                         onPressed: () => showDialog(
                           context: context,
-                          builder: (context) => const NotificationView(),
+                          useSafeArea: false,
+                          builder: (context) => const NotificationView(key: notificationModalViewKey),
                         ),
                         icon: badges.Badge(
                           badgeContent: Selector<UserModel, int>(

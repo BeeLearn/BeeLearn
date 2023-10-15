@@ -10,4 +10,4 @@ flutter build apk --obfuscate --split-per-abi --split-debug-info=debug/info --ex
 REM Build app bundle
 flutter build appbundle --obfuscate --split-debug-info=debug/info --extra-gen-snapshot-options=--save-obfuscation-map=debug/obfuscation
 
-CMD /c scripts\sentry\upload-debug-files.bat
+CMD /c scripts\upload-debug-files.bat

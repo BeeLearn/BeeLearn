@@ -53,6 +53,20 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(17))
+        }
+    }
+
+    kotlin {
+        jvmToolchain 17
+    }
+
+    lintOptions {
+        warningsAsErrors true
+        enable 'unchecked'
+    }
 
     defaultConfig {
         applicationId "com.oasis.beelearn"
@@ -77,25 +91,11 @@ android {
     }
 
     buildTypes {
+
         release {
             minifyEnabled true
             signingConfig signingConfigs.release
             multiDexKeepProguard file('multidex-config.pro')
-        }
-    }
-
-    flavorDimensions "default"
-    productFlavors {
-        dev {
-            dimension "default"
-            versionNameSuffix "--dev"
-        }
-        stage {
-            dimension "default"
-            versionNameSuffix "--stage"
-        }
-        prod {
-            dimension "default"
         }
     }
 

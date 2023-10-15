@@ -13,6 +13,7 @@ import 'package:in_app_purchase/in_app_purchase.dart' as in_app_purchase show Pu
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
+import '../../views/settings_edit_profile.dart';
 import '../../controllers/controllers.dart';
 import '../../globals.dart';
 import '../../main_application.dart';
@@ -36,7 +37,6 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
   late final UserModel _userModel;
 
   late final StreamSubscription<User?> _authStateChangeListener;
-
   StreamSubscription<List<PurchaseDetails>>? _purchaseUpdateListener;
 
   // authStateChanges must be called before app can initialize
@@ -62,6 +62,13 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
 
     _authStateChangeListener = FirebaseAuth.instance.authStateChanges().listen(
       (user) async {
+        if (user != null && user.email == null && user.displayName == null) {
+          showDialog(
+            context: context,
+            builder: (context) => const SettingsEditProfile(),
+          );
+        }
+
         await _userModel.setFirebaseUser(user);
 
         setState(() => appInitializationState = InitializationState.success);
@@ -106,7 +113,6 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
   @override
   void dispose() {
     super.dispose();
-
     _authStateChangeListener.cancel();
     _purchaseUpdateListener?.cancel();
   }

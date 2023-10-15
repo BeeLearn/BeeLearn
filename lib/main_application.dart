@@ -13,7 +13,7 @@ import 'firebase_options.dart';
 
 /// global app state instance
 class MainApplication {
-  static const baseURL = kDebugMode ? "http://127.0.0.1:8000" : "https://beelearn-zb6z.onrender.com";
+  static const baseURL = kReleaseMode ? "https://beelearn-zb6z.onrender.com" :  "http://127.0.0.1:8000";
 
   static late SharedPreferences sharedPreferences;
 
@@ -42,9 +42,9 @@ class MainApplication {
     if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       AppLovinMAX.initialize(appLovinSdkKey);
       AwesomeNotifications().initialize(
+        debug: kDebugMode,
         NotificationConstant.appIcon,
         NotificationConstant.notificationChannels,
-        debug: kDebugMode,
         channelGroups: NotificationConstant.notificationChannelGroups,
       );
     }

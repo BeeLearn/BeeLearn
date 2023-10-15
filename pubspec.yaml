@@ -57,14 +57,22 @@ dependencies:
   firebase_core: ^2.15.0
   firebase_auth: ^4.7.2
   form_validator: ^2.1.1
-  uni_links: ^0.5.1
+  uni_links:
+    git:
+      url: https://github.com/oasisMystre/uni_links.git
+      ref: 3dce847f3ab584ae463d9874e7cde67baedb1a74
+      path: uni_links
   flutter_dotenv: ^5.1.0
   google_sign_in: ^6.1.5
   flutter_facebook_auth: ^6.0.1
   flutter_svg: ^2.0.7
   in_app_purchase: ^3.1.11
   horizontal_blocked_scroll_physics: ^4.0.1
-  applovin_max: ^3.3.0
+  applovin_max:
+    git:
+      url: https://github.com/oasisMystre/AppLovin-MAX-Flutter.git
+      ref: 926a4b24ea80a33d29b5235e11c4a261df50b67e
+      path: applovin_max
   djira_client:
     git:
       url: https://github.com/oasisMystre/djira_client_dart.git
@@ -76,7 +84,6 @@ dependencies:
   rich_text_view: ^1.2.0
   loadmore: ^2.1.0
   flutter_social_textfield: ^0.1.2
-  wechat_assets_picker: ^8.6.3
   awesome_notifications: ^0.8.2
   awesome_notifications_fcm: ^0.8.0
   showcaseview: ^2.0.3
@@ -84,7 +91,6 @@ dependencies:
   http_parser: ^4.0.2
   flutter_highlight: ^0.7.0
   collection: ^1.17.1
-  just_the_tooltip: ^0.0.12
   clean_calendar:
     git:
       url: https://github.com/oasisMystre/flutter_clean_calendar.git
@@ -96,12 +102,15 @@ dependencies:
   flutter_paystack_payment:
     git:
       url: https://github.com/oasisMystre/flutter_paystack_payment.git
-      ref: 28a9aca1819fdec41935ae24d8c02768efeebb62
+      ref: b2f184d04f8062ccdb619df62e549780c47979aa
   badges: ^3.1.2
+  image_picker: ^1.0.4
 
 dependency_overrides:
     intl: ^0.18.1
     http: ^1.1.0
+    credit_card_scanner:
+      git: https://github.com/oasisMystre/card-scanner-flutter.git
 
 dev_dependencies:
   flutter_test:
@@ -172,7 +181,6 @@ sentry:
 
 patrol:
   app_name: BeeLearn
-  flavor: development
   android:
     package_name: com.oasis.beelearn
   ios:

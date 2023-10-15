@@ -29,15 +29,11 @@ GoRouter router = GoRouter(
       routes: [
         GoRoute(
           path: "/onboarding",
-          builder: (context, state) => const OnBoardingView(
-            key: onBoardingViewKey,
-          ),
+          builder: (context, state) => const OnBoardingView(key: onBoardingViewKey),
         ),
         GoRoute(
           path: '/',
-          builder: (context, state) => const MainView(
-            key: mainViewKey,
-          ),
+          builder: (context, state) => const MainView(key: mainViewKey),
           routes: [
             GoRoute(
               path: "search",
@@ -46,7 +42,9 @@ GoRouter router = GoRouter(
           ],
           redirect: (context, state) async {
             String? redirectPath;
-            if (FirebaseAuth.instance.currentUser == null) redirectPath = "/onboarding";
+            final firebaseUser = FirebaseAuth.instance.currentUser;
+
+            if (firebaseUser == null) redirectPath = "/onboarding";
             if (redirectPath == state.path) return null;
 
             return redirectPath;

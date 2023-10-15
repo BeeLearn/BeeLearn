@@ -39,7 +39,7 @@ allprojects {
 rootProject.buildDir = '../build'
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"
-    afterEvaluate {
+   afterEvaluate {
         android {
             buildFeatures {
                 buildConfig true
