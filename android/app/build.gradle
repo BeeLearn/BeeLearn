@@ -27,8 +27,8 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
-def flutterCompileSdkVersion = localProperties.getProperty('flutter.compileSdkVersion')
-def flutterNdkVersion = localProperties.getProperty('flutter.ndkVersion')
+def flutterCompileSdkVersion = localProperties.getOrDefault('flutter.compileSdkVersion', 34)
+def flutterNdkVersion = localProperties.getOrDefault('flutter.ndkVersion',  '26.1.10909125')
 
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'

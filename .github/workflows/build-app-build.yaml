@@ -31,14 +31,14 @@ jobs:
       - run: flutter doctor -v
 
       # Checkout the repository code and get packages.
-      - name: Checkout flutter_app code
+      - name: Checkout BeeLearn code
         uses: actions/checkout@v3
       - run: flutter pub get
 
       - name: Build APK
         run: flutter build apk --split-per-abi --release
 
-      - name: Build APP BUNDLE
+      - name: Build AppBundle
         run: flutter build appbundle
 
       - name: Create Release
