@@ -7,6 +7,7 @@ import 'package:loader_overlay/loader_overlay.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
 import 'views/main_view.dart';
+import 'views/module_view.dart';
 import 'views/onboarding_view.dart';
 import 'views/search_view.dart';
 
@@ -38,6 +39,13 @@ GoRouter router = GoRouter(
             GoRoute(
               path: "search",
               builder: (context, state) => const SearchView(),
+            ),
+            GoRoute(
+              path: "modules",
+              builder: (context, state) => ModuleView(
+                courseName: state.uri.queryParameters["courseName"] as String,
+                query: state.uri.queryParameters,
+              ),
             ),
           ],
           redirect: (context, state) async {
