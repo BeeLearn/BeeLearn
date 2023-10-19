@@ -1,3 +1,4 @@
+import 'package:beelearn/widget_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
@@ -64,7 +65,7 @@ class _SetGoalFragmentState extends State<SetGoalFragment> {
       children: [
         AppBar(
           elevation: 0,
-          leading: const CloseButton(),
+          leading: const CloseButton(key: profileStreakCardDismissAdjustGoalModalKey),
           backgroundColor: Colors.transparent,
           title: const Text("Daily goal"),
           actions: [

@@ -1,6 +1,7 @@
 import 'package:beelearn/middlewares/api_middleware.dart';
 import 'package:beelearn/models/models.dart';
 import 'package:beelearn/services/purchase_service.dart';
+import 'package:beelearn/widget_keys.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,7 +27,7 @@ class _SettingsPremiumView extends State<SettingsPremiumView> {
       backgroundColor: Theme.of(context).colorScheme.primaryContainer,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        leading: const CloseButton(),
+        leading: const CloseButton(key: premiumSettingsViewBackButtonKey),
         systemOverlayStyle: const SystemUiOverlayStyle(
           systemNavigationBarColor: Colors.transparent,
         ),

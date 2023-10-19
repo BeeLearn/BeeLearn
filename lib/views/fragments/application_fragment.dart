@@ -62,12 +62,12 @@ class _ApplicationFragmentState<T extends StatefulWidget> extends State<T> with 
 
     _authStateChangeListener = FirebaseAuth.instance.authStateChanges().listen(
       (user) async {
-        if (user != null && user.email == null && user.displayName == null) {
-          showDialog(
-            context: context,
-            builder: (context) => const SettingsEditProfile(),
-          );
-        }
+        // if (user != null && user.email == null && user.displayName == null) {
+        //   showDialog(
+        //     context: context,
+        //     builder: (context) => const SettingsEditProfile(),
+        //   );
+        // }
 
         await _userModel.setFirebaseUser(user);
 

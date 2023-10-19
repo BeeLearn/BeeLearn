@@ -118,16 +118,19 @@ class _MainViewState extends State<MainView> {
       items: [
         const BottomNavigationBarItem(
           label: "Category",
+          tooltip: "Category",
           activeIcon: Icon(Icons.category),
           icon: Icon(Icons.category_outlined),
         ),
         const BottomNavigationBarItem(
           label: "Liked",
+          tooltip: "Liked",
           activeIcon: Icon(Icons.favorite),
           icon: Icon(Icons.favorite_outline),
         ),
         BottomNavigationBarItem(
           label: "Profile",
+          tooltip: "Profile",
           icon: Consumer<UserModel>(
             builder: (context, model, child) {
               return model.nullableValue == null

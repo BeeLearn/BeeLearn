@@ -1,3 +1,4 @@
+import 'package:beelearn/widget_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:responsive_framework/responsive_breakpoints.dart';
@@ -42,10 +43,11 @@ class _ProfileTabViewState extends State<ProfileTabView> {
             ),
             actions: [
               IconButton(
+                key: settingsActionKey,
                 onPressed: () => showDialog(
                   context: context,
                   useSafeArea: false,
-                  builder: (context) => const SettingsView(),
+                  builder: (context) => const SettingsView(key: settingsViewKey),
                 ),
                 icon: const Icon(Icons.settings_outlined),
               ),
@@ -59,14 +61,14 @@ class _ProfileTabViewState extends State<ProfileTabView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   RewardList(),
-                  StreakCard(),
+                  StreakCard(key: profileStreakCardKey),
                 ],
               )
             : const Flex(
                 direction: Axis.horizontal,
                 children: [
                   Flexible(child: RewardList()),
-                  Flexible(child: StreakCard()),
+                  Flexible(child: StreakCard(key: profileStreakCardKey)),
                 ],
               ),
       ),

@@ -1,7 +1,9 @@
 import 'package:badges/badges.dart' as badges;
+import 'package:beelearn/services/date_service.dart';
 import 'package:beelearn/views/notification_view.dart';
 import 'package:beelearn/widget_keys.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -108,7 +110,7 @@ class _CategoryTabView extends State<CategoryTabView> {
                           if (MediaQuery.of(context).orientation == Orientation.portrait) {
                             showModalBottomSheet(
                               context: context,
-                              showDragHandle: true,
+                              showDragHandle: kReleaseMode,
                               builder: (context) => const UserLifeLineView(key: lifeRefillModalViewKey),
                             );
                           } else {
@@ -142,7 +144,7 @@ class _CategoryTabView extends State<CategoryTabView> {
                           if (MediaQuery.of(context).orientation == Orientation.portrait) {
                             showModalBottomSheet(
                               context: context,
-                              showDragHandle: true,
+                              showDragHandle: kReleaseMode,
                               builder: (context) => const StreakView(key: streakModalViewKey),
                             );
                           } else {
@@ -199,17 +201,25 @@ class _CategoryTabView extends State<CategoryTabView> {
                 const CategoryTab(),
                 CategorySingleTab<NewCourseModel>(
                   initState: () async {
-                    CourseModel.getCourses(query: {}).then(
-                      (courses) {
-                        final newCourseModel = Provider.of<NewCourseModel>(
-                          context,
-                          listen: false,
-                        );
+                    final now = DateTime.now();
+                    final sevenDaysAgo = now.subtract(const Duration(days: 7));
+                    final format = DateService.defaultFormatter.format;
 
-                        newCourseModel.loading = false;
-                        newCourseModel.setAll(courses.results);
+                    final courses = await CourseModel.getCourses(
+                      query: {
+                        "created_at__range": "${format(now)},${format(sevenDaysAgo)}",
                       },
                     );
+
+                    if (context.mounted) {
+                      final newCourseModel = Provider.of<NewCourseModel>(
+                        context,
+                        listen: false,
+                      );
+
+                      newCourseModel.loading = false;
+                      newCourseModel.setAll(courses.results);
+                    }
                   },
                   emptyState: Center(
                     child: Column(
@@ -235,20 +245,22 @@ class _CategoryTabView extends State<CategoryTabView> {
                 ),
                 CategorySingleTab<InProgressCourseModel>(
                   initState: () async {
-                    CourseModel.getCourses(query: {
-                      "course_enrolled_users": "$userId",
-                      "course_complete_users!": "$userId",
-                    }).then(
-                      (courses) {
-                        final inProgressCourseModel = Provider.of<InProgressCourseModel>(
-                          context,
-                          listen: false,
-                        );
-
-                        inProgressCourseModel.loading = false;
-                        inProgressCourseModel.setAll(courses.results);
+                    final courses = await CourseModel.getCourses(
+                      query: {
+                        "course_enrolled_users": "$userId",
+                        "course_complete_users!": "$userId",
                       },
                     );
+
+                    if (context.mounted) {
+                      final inProgressCourseModel = Provider.of<InProgressCourseModel>(
+                        context,
+                        listen: false,
+                      );
+
+                      inProgressCourseModel.loading = false;
+                      inProgressCourseModel.setAll(courses.results);
+                    }
                   },
                   emptyState: Center(
                     child: Column(
@@ -274,19 +286,21 @@ class _CategoryTabView extends State<CategoryTabView> {
                 ),
                 CategorySingleTab<CompletedCourseModel>(
                   initState: () async {
-                    CourseModel.getCourses(query: {
-                      "course_complete_users": "$userId",
-                    }).then(
-                      (courses) {
-                        final completedCourseModel = Provider.of<CompletedCourseModel>(
-                          context,
-                          listen: false,
-                        );
-
-                        completedCourseModel.loading = false;
-                        completedCourseModel.setAll(courses.results);
+                    final courses = await CourseModel.getCourses(
+                      query: {
+                        "course_complete_users": "$userId",
                       },
                     );
+
+                    if (context.mounted) {
+                      final completedCourseModel = Provider.of<CompletedCourseModel>(
+                        context,
+                        listen: false,
+                      );
+
+                      completedCourseModel.loading = false;
+                      completedCourseModel.setAll(courses.results);
+                    }
                   },
                   emptyState: Center(
                     child: Column(

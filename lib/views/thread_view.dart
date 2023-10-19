@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:beelearn/views/components/loadmore_widget.dart';
 import 'package:beelearn/views/fragments/dialog_fragment.dart';
 import 'package:djira_client/djira_client.dart';
 import 'package:flutter/material.dart';
@@ -431,6 +432,7 @@ class _ThreadViewState extends State<ThreadView> {
                           : LoadMore(
                               onLoadMore: _onLoadMore,
                               isFinish: nextUrl == null,
+                              delegate: const CustomLoadMoreDelegate(),
                               child: ListView.builder(
                                 itemCount: comments.length,
                                 itemBuilder: (context, index) {

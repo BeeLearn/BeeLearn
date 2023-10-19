@@ -24,10 +24,12 @@ const categorySearchActionButtonKey = Key("categoryStreakActionButtonKey");
 const categoryStreakActionButtonKey = Key("categoryStreakActionButtonKey");
 // Streak View
 const streakModalViewKey  = Key("streakModalView");
+const streakModalDismissButtonKey = Key("lifeRefillDismissModalKey");
 
 const categoryLifeRefillActionButtonKey = Key("categoryLifeRefillActionButtonKey");
 // Life Refill View
 const lifeRefillModalViewKey  = Key("lifeRefillModalView");
+const lifeRefillModalDismissButtonKey = Key("lifeRefillModalDismissButtonKey");
 
 const categoryNotificationActionButtonKey = Key("categoryNotificationActionButtonKey");
 // Notification View
@@ -35,4 +37,24 @@ const notificationModalViewKey  = Key("notificationModalView");
 
 const favoriteViewKey = Key("FAVORITE_VIEW_KEY");
 
-const profileViewKey = Key("PROFILE_VIEW_KEY");
+const profileViewKey = Key("profileViewKey");
+const profileStreakCardKey = Key("profileStreakCardKey");
+const profileStreakCardAdjustGoalActionKey = Key("profileStreakCardAdjustGoalActionKey");
+const profileStreakCardAdjustGoalModalView = Key("profileStreakCardAdjustGoalModalView");
+const profileStreakCardDismissAdjustGoalModalKey = Key("profileStreakCardDismissAdjustGoalKey");
+
+const settingsActionKey = Key("settingsActionKey");
+const settingsViewKey = Key("settingsViewKey");
+const settingsViewBackButtonKey = Key("settingsViewBackButtonKey");
+
+const editProfileActionKey = Key("editProfileActionKey");
+const editProfileViewKey = Key("editProfileViewKey");
+const editProfileViewBackButtonKey = Key("editProfileViewBackButtonKey");
+
+const notificationSettingsActionKey = Key("notificationSettingsActionKey");
+const notificationSettingsViewKey = Key("notificationSettingsViewKey");
+const notificationSettingsViewBackButtonKey = Key("notificationSettingsViewBackButtonKey");
+
+const premiumSettingsActionKey = Key("premiumSettingsActionKey");
+const premiumSettingsViewKey = Key("premiumSettingsViewKey");
+const premiumSettingsViewBackButtonKey = Key("premiumSettingsViewBackButtonKey");

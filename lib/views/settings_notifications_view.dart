@@ -1,3 +1,4 @@
+import 'package:beelearn/widget_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +18,7 @@ class SettingsNotificationView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const CloseButton(key: notificationSettingsViewBackButtonKey),
         title: const Text("Notifications"),
       ),
       body: Selector<UserModel, (bool, bool)>(

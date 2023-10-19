@@ -1,3 +1,4 @@
+import 'package:beelearn/widget_keys.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +15,7 @@ class SettingsView extends StatelessWidget {
   Widget _getBody(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: const CloseButton(key: settingsViewBackButtonKey),
         title: const Text("Settings"),
       ),
       body: Padding(
@@ -25,13 +27,25 @@ class SettingsView extends StatelessWidget {
               Flex(
                 direction: Axis.vertical,
                 children: [
-                  Consumer<UserModel>(
-                    builder: (context, model, child) {
+                  Selector<UserModel, (String, String, String, String)>(
+                    selector: (context, model) {
+                      final user = model.value;
+                      return (
+                        user.avatar,
+                        user.fullName,
+                        user.userType.name,
+                        model.firebaseUser!.email!,
+                      );
+                    },
+                    builder: (context, tuple, child) {
+                      final (avatar, fullName, userType, email) = tuple;
+
                       return ListTile(
+                        key: editProfileActionKey,
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(100),
                           child: Image.network(
-                            model.value.avatar,
+                            avatar,
                             width: 48.0,
                             height: 48.0,
                           ),
@@ -40,19 +54,19 @@ class SettingsView extends StatelessWidget {
                           showDialog(
                             useSafeArea: false,
                             context: context,
-                            builder: (context) => const SettingsEditProfile(),
+                            builder: (context) => const SettingsEditProfile(key: editProfileViewKey),
                           );
                         },
                         title: Text(
-                          model.value.fullName,
+                          fullName,
                           style: Theme.of(context).textTheme.bodyLarge,
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(model.value.userType.name.toUpperCase()),
+                            Text(userType.toUpperCase()),
                             Text(
-                              model.firebaseUser!.email!.toString(),
+                              email,
                               style: TextStyle(
                                 color: Theme.of(context).brightness == Brightness.dark ? Theme.of(context).hintColor : null,
                               ),
@@ -65,6 +79,7 @@ class SettingsView extends StatelessWidget {
                   ),
                   const SizedBox(height: 16.0),
                   InkWell(
+                    key: premiumSettingsActionKey,
                     onTap: () => ViewService.showPremiumDialog(context),
                     child: Container(
                       width: double.infinity,
@@ -79,12 +94,13 @@ class SettingsView extends StatelessWidget {
                       child: Row(
                         children: [
                           Expanded(
-                            child: Consumer<UserModel>(
-                              builder: (context, model, child) {
+                            child: Selector<UserModel, bool>(
+                              selector: (context, model) => model.value.isPremium,
+                              builder: (context, isPremium, child) {
                                 return Text.rich(
                                   TextSpan(
                                     children: [
-                                      TextSpan(text: model.value.isPremium ? "You're " : "You're not "),
+                                      TextSpan(text: isPremium ? "You're " : "You're not "),
                                       const TextSpan(
                                         text: "Premium",
                                         style: TextStyle(fontWeight: FontWeight.w900),
@@ -132,13 +148,14 @@ class SettingsView extends StatelessWidget {
                   Column(
                     children: [
                       ListTile(
+                        key: notificationSettingsActionKey,
                         title: const Text("Notifications"),
                         trailing: const Icon(Icons.chevron_right),
                         onTap: () {
                           showDialog(
                             useSafeArea: false,
                             context: context,
-                            builder: (context) => const SettingsNotificationView(),
+                            builder: (context) => const SettingsNotificationView(key: notificationModalViewKey),
                           );
                         },
                       ),

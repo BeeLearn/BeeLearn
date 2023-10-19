@@ -1,3 +1,4 @@
+import "package:beelearn/widget_keys.dart";
 import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 import "package:provider/provider.dart";
@@ -59,13 +60,12 @@ class _StreakCardState extends State<StreakCard> {
 
                           /// Todo switch to a more explicit method
                           final isStreakComplete = streakModel.items.isEmpty ? false : streakModel.todayStreak.isComplete;
-                          //final dailyStreakSeconds = streakModel.items.isEmpty ? 0 : streakModel.todayStreak.currentStreakSeconds;
                           final dailyStreakMinutes = streakModel.items.isEmpty ? 0 : streakModel.todayStreak.currentStreakMinutes;
 
                           return CircularStepProgressIndicator(
+                            padding: 0,
                             width: 156,
                             height: 156,
-                            padding: 0,
                             totalSteps: user.profile!.dailyStreakMinutes,
                             currentStep: dailyStreakMinutes,
                             unselectedColor: Theme.of(context).brightness == Brightness.light ? Colors.grey[300] : Colors.grey,
@@ -101,16 +101,17 @@ class _StreakCardState extends State<StreakCard> {
                         spacing: 8.0,
                         children: [
                           FilledButton.tonal(
+                            key: profileStreakCardAdjustGoalActionKey,
                             onPressed: () {
-                              if(MediaQuery.of(context).orientation == Orientation.portrait){
+                              if (MediaQuery.of(context).orientation == Orientation.portrait) {
                                 showModalBottomSheet(
                                   context: context,
-                                  builder: (context) => const SetGoalFragment(),
+                                  builder: (context) => const SetGoalFragment(key: profileStreakCardAdjustGoalModalView),
                                 );
                               } else {
                                 showBottomSheet(
                                   context: context,
-                                  builder: (context) => const SetGoalFragment(),
+                                  builder: (context) => const SetGoalFragment(key: profileStreakCardAdjustGoalModalView),
                                 );
                               }
                             },

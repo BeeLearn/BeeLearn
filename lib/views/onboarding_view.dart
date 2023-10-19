@@ -242,11 +242,15 @@ class _OnBoardingView extends State<OnBoardingView> with AutomaticKeepAliveClien
         TextButton(
           key: onBoardingViewEmailSignInButtonKey,
           onPressed: () {
-            showDialog(
-              context: context,
-              useSafeArea: false,
-              builder: (context) => const EmailLinkLoginView(),
-            );
+            if (kReleaseMode) {
+              showDialog(
+                context: context,
+                useSafeArea: false,
+                builder: (context) => const EmailLinkLoginView(),
+              );
+            } else {
+              context.loaderOverlay.show();
+            }
           },
           child: const Text.rich(
             TextSpan(

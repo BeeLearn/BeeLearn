@@ -1,5 +1,5 @@
-import 'dart:developer';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
 import 'package:http/http.dart';
@@ -12,6 +12,7 @@ import '../controllers/user_controller.dart';
 import '../middlewares/api_middleware.dart' show showSnackBar;
 import '../models/user_model.dart';
 import '../views/fragments/dialog_fragment.dart';
+import '../widget_keys.dart';
 
 /// Todo make ui more cool
 class SettingsEditProfile extends StatefulWidget {
@@ -45,19 +46,23 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
 
   Future<XFile?> getImageFiles() async {
     final ImagePicker picker = ImagePicker();
-    return await picker.pickImage(source: ImageSource.gallery,);
+    return await picker.pickImage(
+      source: ImageSource.gallery,
+    );
   }
 
   Widget _getBody(BuildContext context) {
     return LoaderOverlay(
       overlayOpacity: 0,
       overlayColor: Colors.black45,
+      disableBackButton: kReleaseMode,
       child: Consumer<UserModel>(
         builder: (context, model, child) {
           return Form(
             key: _formKey,
             child: Scaffold(
               appBar: AppBar(
+                leading: const CloseButton(key: editProfileViewBackButtonKey),
                 title: const Text("Edit Profile"),
                 centerTitle: true,
                 actions: [
@@ -73,6 +78,7 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
                         "first_name": firstNameTextEditController.text,
                         "username": usernameTextEditController.text,
                       };
+
                       try {
                         userModel.value = await userController.updateUser(
                           id: userModel.value.id,
@@ -97,8 +103,13 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
 
                         rethrow;
                       } finally {
-                        context.loaderOverlay.hide();
+                        if(context.mounted) context.loaderOverlay.hide();
                       }
+
+                      // Lazy update
+                      final user = userModel.value;
+                      FirebaseAuth.instance.currentUser?.updateDisplayName(user.fullName);
+                      FirebaseAuth.instance.currentUser?.updatePhotoURL(user.avatar);
                     },
                     child: const Text("Save"),
                   ),
@@ -134,20 +145,32 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
                                       await MultipartFile.fromPath(
                                         "avatar",
                                         file.path,
-                                        contentType: MediaType.parse(file.mimeType!),
+                                        contentType: MediaType.parse("image/png"),
                                       ),
                                     ],
                                   ).onError(
                                     (error, stackTrace) {
-                                      log(
-                                        "Upload error",
-                                        error: error,
-                                        stackTrace: stackTrace,
+                                      showSnackBar(
+                                        leading: const Icon(
+                                          Icons.error_rounded,
+                                          color: Colors.redAccent,
+                                        ),
+                                        title: "An error occur while updating profile picture. Try again!",
                                       );
 
                                       return Future.error(error!);
                                     },
                                   ).whenComplete(() => context.loaderOverlay.hide());
+
+                                  showSnackBar(
+                                    leading: Icon(
+                                      Icons.check_circle,
+                                      color: Colors.greenAccent[700],
+                                    ),
+                                    title: "Profile picture was updated successfully.",
+                                  );
+                                } else {
+                                  if(context.mounted) context.loaderOverlay.hide();
                                 }
                               },
                               child: const Text("Change profile picture"),

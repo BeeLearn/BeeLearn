@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:beelearn/views/components/loadmore_widget.dart';
 import 'package:beelearn/views/fragments/dialog_fragment.dart';
 import 'package:beelearn/widget_keys.dart';
 import 'package:flutter/cupertino.dart';
@@ -161,6 +162,7 @@ class _NotificationViewState extends State<NotificationView> {
 
                             return true;
                           },
+                          delegate: const CustomLoadMoreDelegate(),
                           child: ListView.separated(
                             itemCount: notifications.length,
                             separatorBuilder: (context, index) => const Divider(),
