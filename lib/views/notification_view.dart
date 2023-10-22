@@ -2,6 +2,7 @@ import 'dart:collection';
 
 import 'package:beelearn/views/components/loadmore_widget.dart';
 import 'package:beelearn/views/fragments/dialog_fragment.dart';
+import 'package:beelearn/widget_keys.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -141,6 +142,7 @@ class _NotificationViewState extends State<NotificationView> {
       insetPadding: EdgeInsets.zero,
       builder: (context) => Scaffold(
         appBar: AppBar(
+          leading: const CloseButton(key: notificationModalDismissButtonKey),
           title: const Text("Notifications"),
         ),
         body: Selector<NotificationModel, UnmodifiableListView<serializer.Notification>>(

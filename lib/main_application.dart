@@ -13,7 +13,8 @@ import 'firebase_options.dart';
 
 /// global app state instance
 class MainApplication {
-  static const baseURL = kReleaseMode ? "https://v1.api.usebeelearn.com" :  "http://127.0.0.1:8000";
+  //static const baseURL = kReleaseMode ? "https://v1.api.usebeelearn.com" :  "http://127.0.0.1:8000";
+  static const baseURL = "https://v1.api.usebeelearn.com";
 
   static late SharedPreferences sharedPreferences;
 

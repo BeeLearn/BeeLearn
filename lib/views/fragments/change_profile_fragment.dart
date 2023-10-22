@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:beelearn/widget_keys.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -193,6 +194,7 @@ class _ChangeProfileFragmentState extends State<ChangeProfileFragment> {
           children: [
             Expanded(
               child: OutlinedButton(
+                key: editProfileChangeAvatarBackButtonKey,
                 onPressed: () => Navigator.pop(context),
                 child: const Text("Cancel"),
               ),
@@ -246,8 +248,6 @@ class _ChangeProfileFragmentState extends State<ChangeProfileFragment> {
                             ),
                             title: "An error occur while updating profile picture. Try again!",
                           );
-
-                          log("Fucked", error: error, stackTrace: stackTrace);
 
                           rethrow;
                         } finally {

@@ -31,17 +31,18 @@ const categoryLifeRefillActionButtonKey = Key("categoryLifeRefillActionButtonKey
 const lifeRefillModalViewKey  = Key("lifeRefillModalView");
 const lifeRefillModalDismissButtonKey = Key("lifeRefillModalDismissButtonKey");
 
-const categoryNotificationActionButtonKey = Key("categoryNotificationActionButtonKey");
+const categoryNotificationActionButtonKey = Key("categoryNotificationActionButton");
 // Notification View
 const notificationModalViewKey  = Key("notificationModalView");
+const notificationModalDismissButtonKey  = Key("notificationModalDismissButton");
 
 const favoriteViewKey = Key("FAVORITE_VIEW_KEY");
 
-const profileViewKey = Key("profileViewKey");
-const profileStreakCardKey = Key("profileStreakCardKey");
-const profileStreakCardAdjustGoalActionKey = Key("profileStreakCardAdjustGoalActionKey");
+const profileViewKey = Key("profileView");
+const profileStreakCardKey = Key("profileStreakCard");
+const profileStreakCardAdjustGoalActionKey = Key("profileStreakCardAdjustGoalAction");
 const profileStreakCardAdjustGoalModalView = Key("profileStreakCardAdjustGoalModalView");
-const profileStreakCardDismissAdjustGoalModalKey = Key("profileStreakCardDismissAdjustGoalKey");
+const profileStreakCardDismissAdjustGoalModalKey = Key("profileStreakCardDismissAdjustGoal");
 
 const settingsActionKey = Key("settingsActionKey");
 const settingsViewKey = Key("settingsViewKey");
@@ -50,6 +51,8 @@ const settingsViewBackButtonKey = Key("settingsViewBackButtonKey");
 const editProfileActionKey = Key("editProfileActionKey");
 const editProfileViewKey = Key("editProfileViewKey");
 const editProfileViewBackButtonKey = Key("editProfileViewBackButtonKey");
+const editProfileChangeAvatarActionKey = Key("editProfileChangeAvatarActionKey");
+const editProfileChangeAvatarBackButtonKey = Key("editProfileChangeAvatarBackButtonKey");
 
 const notificationSettingsActionKey = Key("notificationSettingsActionKey");
 const notificationSettingsViewKey = Key("notificationSettingsViewKey");

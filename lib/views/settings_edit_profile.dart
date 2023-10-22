@@ -130,10 +130,11 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
                               ),
                             ),
                             TextButton(
+                              key: editProfileChangeAvatarActionKey,
                               onPressed: () async {
                                 showDialog(
                                   context: context,
-                                  builder: (context) => ChangeProfileFragment(),
+                                  builder: (context) => const ChangeProfileFragment(),
                                 );
                               },
                               child: const Text("Change profile picture"),

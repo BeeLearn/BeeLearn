@@ -55,8 +55,8 @@ void main() {
           /// ii. Home test runner
           await repeat(3, () async {
             await tester.dragFrom(
-              Offset(0, screenSize.height/2),
-              Offset(screenSize.width, screenSize.height /2),
+              Offset(0, screenSize.height / 2),
+              Offset(screenSize.width, screenSize.height / 2),
             );
 
             await tester.pumpAndSettle();
@@ -90,19 +90,15 @@ void main() {
           await tester.tap(streakModalDismissButton);
           await tester.pumpAndSettleWithAfterDelay();
 
-          // // notification modal test
-          // await tester.tap(notificationActionButton);
-          // await tester.pump(const Duration(seconds: 1));
-          // await tester.tap(find.byType(ModalBarrier).first);
-          // await tester.pumpAndSettle();
-          //
-          // await repeat(
-          //   3,
-          //   () async {
-          //     await tester.startGesture(const Offset(0, 24));
-          //     await tester.pumpAndSettle();
-          //   },
-          // );
+          //notification modal test
+          await tester.tap(notificationActionButton);
+          await tester.pumpAndSettleWithAfterDelay();
+
+          final notificationModalDismissButton = find.byKey(notificationModalDismissButtonKey);
+          expect(notificationModalDismissButton, findsOneWidget);
+
+          await tester.tap(notificationModalDismissButton);
+          await tester.pumpAndSettleWithAfterDelay();
 
           // Goto Favorite Screen
           expect(find.byTooltip("Liked"), findsOneWidget);
@@ -135,13 +131,28 @@ void main() {
           await tester.tap(settingsAction);
           await tester.pumpAndSettleWithAfterDelay();
 
-          // Show Edit Settings Screen
+          // Show Edit Profile Settings Screen
           final editProfileAction = find.byKey(editProfileActionKey);
           expect(editProfileAction, findsOneWidget);
 
           await tester.tap(editProfileAction);
           await tester.pumpAndSettleWithAfterDelay();
 
+          // Show Change Avatar Modal
+          final changeAvatarAction = find.byKey(editProfileChangeAvatarActionKey);
+          expect(changeAvatarAction, findsOneWidget);
+
+          await tester.tap(changeAvatarAction);
+          await tester.pumpAndSettleWithAfterDelay();
+
+          // Dismiss Change Avatar Dialog
+          final changeAvatarModalBackButton = find.byKey(editProfileChangeAvatarBackButtonKey);
+          expect(changeAvatarModalBackButton, findsOneWidget);
+
+          await tester.tap(changeAvatarModalBackButton);
+          await tester.pumpAndSettleWithAfterDelay();
+
+          // Dismiss Edit Profile Settings
           final editProfileViewBackButton = find.byKey(editProfileViewBackButtonKey);
           expect(editProfileViewBackButton, findsOneWidget);
 
