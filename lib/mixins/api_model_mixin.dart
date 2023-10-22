@@ -142,18 +142,18 @@ mixin ApiModelMixin {
 
     final response = await request.send();
 
-    switch (response.statusCode) {
-      case HttpStatus.ok:
-        final completer = Completer<T>();
-        response.stream.transform(utf8.decoder).listen(
-          (response) {
-            completer.complete(fromJson(jsonDecode(response)));
-          },
-        );
+    final completer = Completer<T>();
+    response.stream.transform(utf8.decoder).listen(
+      (body) {
+        switch (response.statusCode) {
+          case HttpStatus.ok:
+            completer.complete(fromJson(jsonDecode(body)));
+          default:
+            return completer.completeError(body);
+        }
+      },
+    );
 
-        return completer.future;
-      default:
-        return Future.error(response);
-    }
+    return completer.future;
   }
 }

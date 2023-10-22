@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import '../models/base_model.dart';
 import '../serializers/streak.dart';
 import '../services/date_service.dart';

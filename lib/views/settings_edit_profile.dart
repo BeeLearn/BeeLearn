@@ -1,4 +1,7 @@
+import 'package:beelearn/views/fragments/change_profile_fragment.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:form_validator/form_validator.dart';
@@ -42,13 +45,6 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
     lastNameTextEditController = TextEditingController(text: userModel.value.lastName);
     firstNameTextEditController = TextEditingController(text: userModel.value.firstName);
     usernameTextEditController = TextEditingController(text: userModel.value.username);
-  }
-
-  Future<XFile?> getImageFiles() async {
-    final ImagePicker picker = ImagePicker();
-    return await picker.pickImage(
-      source: ImageSource.gallery,
-    );
   }
 
   Widget _getBody(BuildContext context) {
@@ -103,7 +99,7 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
 
                         rethrow;
                       } finally {
-                        if(context.mounted) context.loaderOverlay.hide();
+                        if (context.mounted) context.loaderOverlay.hide();
                       }
 
                       // Lazy update
@@ -126,8 +122,8 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(100),
-                              child: Image.network(
-                                userModel.value.avatar,
+                              child: CachedNetworkImage(
+                                imageUrl: userModel.value.avatar,
                                 width: 80.0,
                                 height: 80.0,
                                 fit: BoxFit.cover,
@@ -135,43 +131,10 @@ class _SettingsEditProfile extends State<SettingsEditProfile> {
                             ),
                             TextButton(
                               onPressed: () async {
-                                context.loaderOverlay.show();
-                                final file = await getImageFiles();
-
-                                if (file != null) {
-                                  userModel.value = await userController.updateMultipartUser(
-                                    id: userModel.value.id,
-                                    multipartFiles: [
-                                      await MultipartFile.fromPath(
-                                        "avatar",
-                                        file.path,
-                                        contentType: MediaType.parse("image/png"),
-                                      ),
-                                    ],
-                                  ).onError(
-                                    (error, stackTrace) {
-                                      showSnackBar(
-                                        leading: const Icon(
-                                          Icons.error_rounded,
-                                          color: Colors.redAccent,
-                                        ),
-                                        title: "An error occur while updating profile picture. Try again!",
-                                      );
-
-                                      return Future.error(error!);
-                                    },
-                                  ).whenComplete(() => context.loaderOverlay.hide());
-
-                                  showSnackBar(
-                                    leading: Icon(
-                                      Icons.check_circle,
-                                      color: Colors.greenAccent[700],
-                                    ),
-                                    title: "Profile picture was updated successfully.",
-                                  );
-                                } else {
-                                  if(context.mounted) context.loaderOverlay.hide();
-                                }
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => ChangeProfileFragment(),
+                                );
                               },
                               child: const Text("Change profile picture"),
                             ),

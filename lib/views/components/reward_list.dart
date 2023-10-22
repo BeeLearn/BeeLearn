@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -57,8 +58,8 @@ class _RewardListState extends State<RewardList> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Image.network(
-                          reward.icon,
+                        CachedNetworkImage(
+                          imageUrl: reward.icon,
                           width: 64,
                           height: 64,
                         ),

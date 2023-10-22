@@ -60,7 +60,7 @@ class _EmailLinkLoginViewState extends State<EmailLinkLoginView> {
           ),
           title: "Magic link sent to email successfully.",
         );
-      } catch (error, stackTrace) {
+      } catch (error) {
         showSnackBar(
           leading: const Icon(
             Icons.error_rounded,

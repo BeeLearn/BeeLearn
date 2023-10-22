@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:beelearn/widget_keys.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
@@ -108,39 +109,41 @@ class _MainViewState extends State<MainView> {
   }
 
   get _smallScreenNavigation {
-    return BottomNavigationBar(
-      currentIndex: _currentIndex,
-      onTap: (index) {
+    return NavigationBar(
+      selectedIndex: _currentIndex,
+      onDestinationSelected: (index) {
         setState(() {
           _currentIndex = index;
         });
       },
-      items: [
-        const BottomNavigationBarItem(
+      destinations: [
+        const NavigationDestination(
           label: "Category",
           tooltip: "Category",
-          activeIcon: Icon(Icons.category),
+          selectedIcon: Icon(Icons.category),
           icon: Icon(Icons.category_outlined),
         ),
-        const BottomNavigationBarItem(
+        const NavigationDestination(
           label: "Liked",
           tooltip: "Liked",
-          activeIcon: Icon(Icons.favorite),
+        selectedIcon: Icon(Icons.favorite),
           icon: Icon(Icons.favorite_outline),
         ),
-        BottomNavigationBarItem(
+        NavigationDestination(
           label: "Profile",
           tooltip: "Profile",
-          icon: Consumer<UserModel>(
-            builder: (context, model, child) {
-              return model.nullableValue == null
+          icon: Selector<UserModel, String?>(
+            selector: (context, model) => model.nullableValue?.avatar,
+            builder: (context, avatar, child) {
+              return avatar == null
                   ? const CircleAvatar()
                   : ClipRRect(
                       borderRadius: BorderRadius.circular(100),
-                      child: Image.network(
-                        model.value.avatar,
+                      child: CachedNetworkImage(
+                        imageUrl: avatar,
                         width: 32.0,
                         height: 32.0,
+                        fit: BoxFit.cover,
                       ),
                     );
             },
@@ -172,16 +175,18 @@ class _MainViewState extends State<MainView> {
           label: Text("Favourite"),
         ),
         NavigationRailDestination(
-          icon: Consumer<UserModel>(
-            builder: (context, model, child) {
-              return model.nullableValue == null
+          icon: Selector<UserModel, String?>(
+            selector: (context, model) => model.nullableValue?.avatar,
+            builder: (context, avatar, child) {
+              return avatar == null
                   ? const CircleAvatar()
                   : ClipRRect(
                       borderRadius: BorderRadius.circular(100),
-                      child: Image.network(
-                        model.value.avatar,
+                      child: CachedNetworkImage(
+                        imageUrl: avatar,
                         width: 32.0,
                         height: 32.0,
+                        fit: BoxFit.cover,
                       ),
                     );
             },

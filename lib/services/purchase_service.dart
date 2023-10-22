@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -112,8 +113,8 @@ class PurchaseService {
       scanCard: !kIsWeb && (Platform.isIOS || Platform.isAndroid),
       logo: ClipRRect(
         borderRadius: BorderRadius.circular(100.0),
-        child: Image.network(
-          MainApplication.appNetworkLogo,
+        child: CachedNetworkImage(
+          imageUrl: MainApplication.appNetworkLogo,
           width: 32,
           height: 32,
         ),

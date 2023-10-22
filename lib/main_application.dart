@@ -13,7 +13,7 @@ import 'firebase_options.dart';
 
 /// global app state instance
 class MainApplication {
-  static const baseURL = kReleaseMode ? "https://beelearn-zb6z.onrender.com" :  "http://127.0.0.1:8000";
+  static const baseURL = kReleaseMode ? "https://v1.api.usebeelearn.com" :  "http://127.0.0.1:8000";
 
   static late SharedPreferences sharedPreferences;
 
@@ -24,7 +24,7 @@ class MainApplication {
 
   static final GlobalKey<ScaffoldMessengerState> scaffoldKey = GlobalKey<ScaffoldMessengerState>();
 
-  static const String appNetworkLogo = "https://academy.usebeelearn.com/icons/Icon-192.png";
+  static const String appNetworkLogo = "https://res.cloudinary.com/beelearn/image/upload/v1697927475/permanent/app-logo-circle.png";
 
   static setUp(WidgetsBinding? widgetsBinding) async {
     if (widgetsBinding != null) {

@@ -13,7 +13,6 @@ import 'package:in_app_purchase/in_app_purchase.dart' as in_app_purchase show Pu
 import 'package:provider/provider.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 
-import '../../views/settings_edit_profile.dart';
 import '../../controllers/controllers.dart';
 import '../../globals.dart';
 import '../../main_application.dart';

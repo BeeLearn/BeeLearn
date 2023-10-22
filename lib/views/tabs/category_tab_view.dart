@@ -175,14 +175,18 @@ class _CategoryTabView extends State<CategoryTabView> {
                           useSafeArea: false,
                           builder: (context) => const NotificationView(key: notificationModalViewKey),
                         ),
-                        icon: badges.Badge(
-                          badgeContent: Selector<UserModel, int>(
-                            selector: (context, model) => model.value.unreadNotifications,
-                            builder: (context, value, child) {
-                              return Text("$value");
-                            },
-                          ),
-                          child: const Icon(Icons.notifications_none),
+                        icon: Selector<UserModel, int>(
+                          selector: (context, model) => model.value.unreadNotifications,
+                          builder: (context, unread, child) {
+                            return badges.Badge(
+                              showBadge: unread > 0,
+                              badgeContent: Text(
+                                "$unread",
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              child: const Icon(Icons.notifications_none_rounded),
+                            );
+                          },
                         ),
                       ),
                     ),

@@ -1,4 +1,5 @@
 import 'package:beelearn/widget_keys.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -44,10 +45,11 @@ class SettingsView extends StatelessWidget {
                         key: editProfileActionKey,
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(100),
-                          child: Image.network(
-                            avatar,
+                          child: CachedNetworkImage(
+                            imageUrl: avatar,
                             width: 48.0,
                             height: 48.0,
+                            fit: BoxFit.cover,
                           ),
                         ),
                         onTap: () {

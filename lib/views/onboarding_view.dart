@@ -105,10 +105,10 @@ class _OnBoardingView extends State<OnBoardingView> with AutomaticKeepAliveClien
           emailLink: link,
         );
       } else {
-        context.loaderOverlay.hide();
+        if(context.mounted) context.loaderOverlay.hide();
       }
     } on FirebaseAuthException catch (error) {
-      context.loaderOverlay.hide();
+      if(context.mounted) context.loaderOverlay.hide();
 
       late final String errorMessage;
 

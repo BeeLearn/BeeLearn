@@ -134,7 +134,7 @@ class _SettingsPremiumView extends State<SettingsPremiumView> {
                                                                 );
                                                               }
                                                             } finally {
-                                                              context.loaderOverlay.hide();
+                                                              if(context.mounted) context.loaderOverlay.hide();
                                                             }
                                                           }
                                                         },

@@ -14,7 +14,7 @@ class EnhancementModel extends BaseModel<Enhancement> {
   int getEntityId(Enhancement item) => item.id;
 
   @override
-  orderBy(Enhancement first, Enhancement second) => true ? 1 : -1;
+  orderBy(Enhancement first, Enhancement second) => first.createAt.compareTo(second.createAt);
 
   static Future<void> deleteEnhancement(int id) {
     return delete(Uri.parse("$apiURL$id/")).then((response) {

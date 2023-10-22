@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:beelearn/views/components/loadmore_widget.dart';
 import 'package:beelearn/views/fragments/dialog_fragment.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:djira_client/djira_client.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_social_textfield/flutter_social_textfield.dart';
@@ -177,10 +178,11 @@ class _ThreadViewState extends State<ThreadView> {
             margin: const EdgeInsets.only(top: 16.0), // make avatar align with text,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(100),
-              child: Image.network(
-                comment.user.avatar,
+              child: CachedNetworkImage(
+                imageUrl: comment.user.avatar,
                 width: 32.0,
                 height: 32.0,
+                fit: BoxFit.cover,
               ),
             ),
           ),

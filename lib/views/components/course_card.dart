@@ -1,5 +1,6 @@
 import 'package:beelearn/models/course_model.dart';
 import 'package:beelearn/models/user_model.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -58,8 +59,8 @@ class CourseCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.network(
-              course.image,
+            CachedNetworkImage(
+              imageUrl: course.image,
               fit: BoxFit.cover,
             ),
             if (course.isNew)

@@ -80,6 +80,8 @@ class _QuestionDragDropState extends State<QuestionDragDrop> with AutomaticKeepA
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+
     return Column(
       children: [
         questionWidget,

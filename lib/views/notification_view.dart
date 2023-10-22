@@ -2,7 +2,7 @@ import 'dart:collection';
 
 import 'package:beelearn/views/components/loadmore_widget.dart';
 import 'package:beelearn/views/fragments/dialog_fragment.dart';
-import 'package:beelearn/widget_keys.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -40,7 +40,7 @@ class _NotificationViewState extends State<NotificationView> {
     if (notification.icon != null) {
       return CircleAvatar(
         maxRadius: 12,
-        child: Image.network(notification.icon!),
+        child: CachedNetworkImage(imageUrl: notification.icon!),
       );
     }
 
@@ -213,8 +213,8 @@ class _NotificationViewState extends State<NotificationView> {
                                 child: ListTile(
                                   leading: ClipRRect(
                                     borderRadius: BorderRadius.circular(100.0),
-                                    child: Image.network(
-                                      notification.image,
+                                    child: CachedNetworkImage(
+                                      imageUrl: notification.image,
                                       width: 48.0,
                                       height: 48.0,
                                       fit: BoxFit.cover,

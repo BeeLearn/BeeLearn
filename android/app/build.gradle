@@ -76,9 +76,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
 
-        testInstrumentationRunner "pl.leancode.patrol.PatrolJUnitRunner"
-        testInstrumentationRunnerArguments clearPackageData: "true"
-
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
@@ -91,16 +89,13 @@ android {
     }
 
     buildTypes {
-
         release {
-            minifyEnabled true
+            minifyEnabled false /// Todo enable minify later On, Can't get it to work
+            shrinkResources false
             signingConfig signingConfigs.release
             multiDexKeepProguard file('multidex-config.pro')
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-    }
-
-    testOptions {
-        execution "ANDROIDX_TEST_ORCHESTRATOR"
     }
 }
 
@@ -109,7 +104,11 @@ flutter {
 }
 
 dependencies {
+    testImplementation "junit:junit:$junit"
+    androidTestImplementation "androidx.test:runner:$runner"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$expresso_core"
+    coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar_jdk_libs"
+
     implementation "androidx.multidex:multidex:$multidex_version"
-    androidTestUtil "androidx.test:orchestrator:$orchestrator_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
